@@ -15,7 +15,6 @@
 
   services.borgmatic = {
     enable = true;
-    frequency = "daily";
     configurations."hetzner" = {
 
       source_directories = [ "/srv/data" ];
