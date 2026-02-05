@@ -21,7 +21,7 @@
       repositories = [
         {
           label = "hetzner-sb1";
-          url = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./{{ inventory_hostname }}.borg";
+          url = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
         }
       ];
       remote_path = "borg";
