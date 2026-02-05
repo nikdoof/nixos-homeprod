@@ -51,7 +51,7 @@
         bash = {
            shellAliases = {
              # NixOS
-             nrs = "sudo nixos-rebuild switch github:nikdoof/nixos-homeprod#$(hostname)";
+             nrs = "sudo nixos-rebuild switch --flake github:nikdoof/nixos-homeprod#$(hostname)";
            };
          };
     };
