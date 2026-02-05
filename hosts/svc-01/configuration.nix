@@ -1,14 +1,19 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ../../hardware/prodesk-600-g3-dm.nix
-      ../../hardware/coral-tpu-pcie.nix
-      ../../modules/common.nix
-      ../../modules/server.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ../../hardware/prodesk-600-g3-dm.nix
+    ../../hardware/coral-tpu-pcie.nix
+    ../../modules/common.nix
+    ../../modules/server.nix
+  ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader = {
@@ -31,13 +36,21 @@
   };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
 
   # Media
   fileSystems."/mnt/nas-03/media" = {
     device = "nas-03.int.doofnet.uk:/mnt/media";
     fsType = "nfs";
-    options = [ "rw" "noatime" "nfsvers=4" "proto=tcp" ];
+    options = [
+      "rw"
+      "noatime"
+      "nfsvers=4"
+      "proto=tcp"
+    ];
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .

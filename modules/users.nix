@@ -1,12 +1,16 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   users = {
     defaultUserShell = pkgs.zsh;
     users.nikdoof = {
       isNormalUser = true;
-      extraGroups =
-      [
+      extraGroups = [
         "wheel"
       ];
       initialPassword = "pass1234";
