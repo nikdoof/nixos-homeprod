@@ -13,6 +13,7 @@
     ../../hardware/coral-tpu-pcie.nix
     ../../modules/common.nix
     ../../modules/server.nix
+    ../../modules/podman.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
