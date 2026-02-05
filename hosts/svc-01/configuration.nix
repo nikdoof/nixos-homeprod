@@ -5,7 +5,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../hardware/prodesk-600-g3-dm.nix
-      ../../hardware/coral-tpu.nix
+      ../../hardware/coral-tpu-pcie.nix
       ../../modules/common.nix
       ../../modules/server.nix
     ];
