@@ -6,6 +6,6 @@ let
   systems = [ svc-01 ];
 in
 {
- "borgmaticEncryptionKey.age".publicKeys = users ++ systems;
- "borgmaticSSHKey.age".publicKeys = users ++ systems;
+  "borgmaticEncryptionKey.age".publicKeys = users ++ systems;
+  "borgmaticSSHKey.age".publicKeys = users ++ systems;
 }

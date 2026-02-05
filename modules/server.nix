@@ -6,5 +6,36 @@
 }:
 
 {
+  age.secrets = {
+    borgmaticEncryptionKey.file = ../secrets/borgmaticEncryptionKey.age;
+    borgmaticSSHKey.file = ../secrets/borgmaticSSHKey.age;
+  };
+
   services.prometheus.exporters.node.enable = true;
+
+  services.borgmatic = {
+    enable = true;
+    frequency = "daily";
+    configurations."hetzner" = {
+
+      source_directories = [ "/srv/data" ];
+      repositories = [
+        {
+          label = "hetzner-sb1";
+          url = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./{{ inventory_hostname }}.borg";
+        }
+      ];
+      remote_path = "borg";
+      exclude_if_present = [ ".nobackup" ];
+
+      encryption_passphrase = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
+      ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
+      retention = {
+        keep_daily = 7;
+        keep_weekly = 4;
+        keep_monthly = 6;
+        keep_yearly = 1;
+      };
+    };
+  };
 }
