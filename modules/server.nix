@@ -21,20 +21,20 @@
       repositories = [
         {
           label = "hetzner-sb1";
-          url = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
+          path = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
         }
       ];
       remote_path = "borg";
       exclude_if_present = [ ".nobackup" ];
 
-      encryption_passphrase = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
+      encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
       ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
-      retention = {
-        keep_daily = 7;
-        keep_weekly = 4;
-        keep_monthly = 6;
-        keep_yearly = 1;
-      };
+
+      keep_daily = 7;
+      keep_weekly = 4;
+      keep_monthly = 6;
+      keep_yearly = 1;
+
     };
   };
 }
