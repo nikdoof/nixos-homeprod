@@ -16,14 +16,10 @@
     }@inputs:
     {
       nixosConfigurations = {
-        default = nixpkgs.lib.nixosSystem {
-          modules = [
-            agenix.nixosModules.default
-          ];
-        };
-        svc-01 = default {
+        svc-01 = nixpkgs.lib.nixosSystem {
           modules = [
             ./hosts/svc-01/configuration.nix
+            agenix.nixosModules.default
           ];
         };
       };
