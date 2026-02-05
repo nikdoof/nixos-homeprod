@@ -45,9 +45,6 @@
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [ 22 80 443 ];
 
-
-  system.copySystemConfiguration = true;
-
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
 

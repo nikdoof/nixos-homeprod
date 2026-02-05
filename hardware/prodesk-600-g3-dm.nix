@@ -4,7 +4,7 @@
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-      vaapiIntel
+      intel-vaapi-driver
       intel-media-driver
     ];
   };
