@@ -46,14 +46,14 @@
 
     programs = {
         git.enable = true;
-        zsh.enable = true;
+        zsh = {
+          enable = true;
+          shellAliases = {
+            # NixOS
+            nrs = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#$(hostname)";
+          };
+        };
         ssh.startAgent = true;
-        bash = {
-           shellAliases = {
-             # NixOS
-             nrs = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#$(hostname)";
-           };
-         };
     };
 
     environment.variables = {

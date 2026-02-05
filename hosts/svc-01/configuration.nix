@@ -35,7 +35,7 @@
   fileSystems."/mnt/nas-03/media" = {
     device = "nas-03.int.doofnet.uk:/mnt/media";
     fsType = "nfs";
-    options = [ "rw" "vers=4" "noatime" "nfsvers=4" "proto=tcp" ];
+    options = [ "rw" "noatime" "nfsvers=4" "proto=tcp" ];
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
