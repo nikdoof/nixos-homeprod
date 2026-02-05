@@ -19,6 +19,7 @@
 
   # Networking
   networking.hostName = "svc-01"; # Define your hostname.
+  networking.domain = "int.doofnet.uk";
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "eno1";
@@ -33,7 +34,7 @@
 
   # Media
   fileSystems."/mnt/nas-03/media" = {
-    device = "nas-03.int.doofnet.uk:/mnt/media";
+    device = "nas-03:/mnt/media";
     fsType = "nfs";
     options = [ "rw" "noatime" "nfsvers=4" "proto=tcp" ];
   };
