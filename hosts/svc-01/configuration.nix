@@ -24,6 +24,7 @@
   };
 
   # Networking
+  networking.useDHCP = false;
   networking.hostName = "svc-01"; # Define your hostname.
   networking.domain = "int.doofnet.uk";
   networking.search = [ "int.doofnet.uk" ];
