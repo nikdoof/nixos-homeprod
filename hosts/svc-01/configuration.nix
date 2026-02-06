@@ -54,6 +54,26 @@
     ];
   };
 
+  virtualisation.oci-containers.containers = {
+
+    # Openbooks
+    "openbooks" = {
+      image = "ghcr.io/evan-buss/openbooks:edge";
+      ports = [
+        "8080:8080"
+      ];
+      cmd = [
+        "server"
+        "--port"
+        "8080"
+        "--name"
+        "x32init"
+        "--searchbot"
+        "search"
+      ];
+    };
+  };
+
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
 
