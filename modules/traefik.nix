@@ -45,7 +45,7 @@
             dnsChallenge = {
               provider = "digitalocean";
               env = {
-                DO_AUTH_TOKEN_FILE = config.secrets.digitaloceanApiToken.path;
+                DO_AUTH_TOKEN_FILE = config.age.secrets.digitaloceanApiToken.path;
               };
             };
           };
