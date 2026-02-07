@@ -10,6 +10,12 @@
     digitaloceanApiToken.file = ../secrets/digitalOceanApiToken.age;
   };
 
+  systemd.services.traefik = {
+    environment = {
+      DO_AUTH_TOKEN_FILE = config.age.secrets.digitaloceanApiToken.path;
+    };
+  };
+
   services.traefik = {
     enable = true;
 
@@ -44,9 +50,6 @@
             storage = "${config.services.traefik.dataDir}/acme.json";
             dnsChallenge = {
               provider = "digitalocean";
-              env = {
-                DO_AUTH_TOKEN_FILE = config.age.secrets.digitaloceanApiToken.path;
-              };
             };
           };
         };
