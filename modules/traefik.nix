@@ -11,9 +11,7 @@
   };
 
   systemd.services.traefik = {
-    environment = {
-      DO_AUTH_TOKEN_FILE = config.age.secrets.digitaloceanApiToken.path;
-    };
+    environmentFile = config.age.secrets.digitaloceanApiToken.path;
   };
 
   services.traefik = {
