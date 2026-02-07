@@ -59,7 +59,7 @@
       providers = {
         docker = {
           exposedByDefault = false;
-          socket = "unix:///run/podman/podman.sock";
+          endpoint = "unix:///run/podman/podman.sock";
         };
       };
     };
