@@ -75,7 +75,7 @@
         "/dev/dri/renderD128:/dev/dri/renderD128"
         "/dev/dri/card1:/dev/dri/card1"
       ];
-      extraConfig = [ "--network=host" ];
+      extraOptions = [ "--network=host" ];
     };
 
     # Openbooks
