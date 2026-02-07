@@ -1,7 +1,6 @@
 # systemd timers for maintenance tasks
 {
   config,
-  lib,
   pkgs,
   ...
 }:

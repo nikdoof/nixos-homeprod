@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -9,7 +7,7 @@
     "gasket"
     "apex"
   ];
-  boot.extraModulePackages = with config.boot.kernelPackages; [
+  boot.extraModulePackages = [
     pkgs.linuxKernel.packages.linux_6_12.gasket
   ];
 
