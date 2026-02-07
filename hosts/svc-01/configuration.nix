@@ -69,6 +69,9 @@
       ports = [
         "127.0.0.1:9001:8080"
       ];
+      volumes = [
+        "/mnt/nas-03/media/Books/openbooks:/books"
+      ];
       cmd = [
         "server"
         "--port"
@@ -77,6 +80,7 @@
         "x32init"
         "--searchbot"
         "search"
+        "--persist"
       ];
     };
   };
