@@ -53,6 +53,10 @@
             email = "postmaster@${config.networking.domain}";
             storage = "${config.services.traefik.dataDir}/acme.json";
             dnsChallenge = {
+              resolvers = [
+                "1.1.1.1"
+                "8.8.8.8"
+              ];
               provider = "digitalocean";
             };
           };
