@@ -22,7 +22,7 @@
 
   systemd.services."swarm-mirror" = {
     script = ''
-      ${pkgs.podman}/bin/podman run -v ${config.age.secrets.swarmMirrorConfig.path}:/app/config/config.ini ghcr.io/nikdoof/foursquare-feeds:latest -- -k caldav
+      ${pkgs.podman}/bin/podman run -v ${config.age.secrets.swarmMirrorConfig.path}:/config.ini ghcr.io/nikdoof/foursquare-feeds:latest -c /config.ini -k caldav
     '';
     serviceConfig = {
       Type = "oneshot";
