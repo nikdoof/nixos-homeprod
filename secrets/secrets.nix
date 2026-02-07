@@ -6,6 +6,7 @@ let
   systems = [ svc-01 ];
 in
 {
+  "digitalOceanApiToken.age".publicKeys = users ++ systems;
   "borgmaticEncryptionKey.age".publicKeys = users ++ systems;
   "borgmaticSSHKey.age".publicKeys = users ++ systems;
 }

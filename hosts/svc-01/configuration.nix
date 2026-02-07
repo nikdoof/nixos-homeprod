@@ -14,6 +14,7 @@
     ../../modules/common.nix
     ../../modules/server.nix
     ../../modules/podman.nix
+    ../../modules/traefik.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
@@ -59,9 +60,14 @@
 
     # Openbooks
     "openbooks" = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.openbooks.rule" = "Host(`openbooks.int.doofnet.uk`)";
+        "traefik.http.services.openbooks.loadbalancer.server.port" = "8080";
+      };
       image = "ghcr.io/evan-buss/openbooks:edge";
       ports = [
-        "8080:8080"
+        "127.0.0.1:9001:8080"
       ];
       cmd = [
         "server"
