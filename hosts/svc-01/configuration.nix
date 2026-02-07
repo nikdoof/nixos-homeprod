@@ -66,9 +66,6 @@
         "traefik.http.services.openbooks.loadbalancer.server.port" = "8080";
       };
       image = "ghcr.io/evan-buss/openbooks:edge";
-      ports = [
-        "127.0.0.1:9001:8080"
-      ];
       volumes = [
         "/mnt/nas-03/media/Books/openbooks:/books"
       ];
@@ -89,12 +86,9 @@
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.calibre-web.rule" = "Host(`calibre-web.svc.doofnet.uk`)";
-        "traefik.http.services.calibre-web.loadbalancer.server.port" = "8080";
+        "traefik.http.services.calibre-web.loadbalancer.server.port" = "8083";
       };
       image = "ghcr.io/cdloh/calibre-web:0.6.26";
-      ports = [
-        "127.0.0.1:9002:8083"
-      ];
       volumes = [
         "/srv/data/calibre-web/config:/config"
         "/mnt/nas-03/media/:/data"
