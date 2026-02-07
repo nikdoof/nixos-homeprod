@@ -83,6 +83,23 @@
         "--persist"
       ];
     };
+
+    #calibre-web
+    "calibre-web" = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.calibre-web.rule" = "Host(`calibre-web.svc.doofnet.uk`)";
+        "traefik.http.services.calibre-web.loadbalancer.server.port" = "8080";
+      };
+      image = "ghcr.io/cdloh/calibre-web:0.6.26";
+      ports = [
+        "127.0.0.1:9002:8083"
+      ];
+      volumes = [
+        "/srv/data/calibre-web/config:/config"
+        "/mnt/nas-03/media/:/data"
+      ];
+    };
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
