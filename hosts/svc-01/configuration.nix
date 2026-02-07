@@ -62,7 +62,7 @@
     "openbooks" = {
       labels = {
         "traefik.enable" = "true";
-        "traefik.http.routers.openbooks.rule" = "Host(`openbooks.int.doofnet.uk`)";
+        "traefik.http.routers.openbooks.rule" = "Host(`openbooks.svc.doofnet.uk`)";
         "traefik.http.services.openbooks.loadbalancer.server.port" = "8080";
       };
       image = "ghcr.io/evan-buss/openbooks:edge";
