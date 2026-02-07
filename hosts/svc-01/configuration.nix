@@ -58,6 +58,26 @@
 
   virtualisation.oci-containers.containers = {
 
+    # Jellyfin
+    "jellyfin" = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.jellyfin.rule" = "Host(`jellyfin.svc.doofnet.uk`)";
+        "traefik.http.services.jellyfin.loadbalancer.server.port" = "8096";
+      };
+      image = "jellyfin/jellyfin:10.11.6";
+      volumes = [
+        "/mnt/nas-03/media/:/media"
+        "/srv/data/jellyfin/config:/config"
+        "/srv/data/jellyfin/cache:/cache"
+      ];
+      devices = [
+        "/dev/dri/renderD128:/dev/dri/renderD128"
+        "/dev/dri/card1:/dev/dri/card1"
+      ];
+      extraConfig = [ "--network=host" ];
+    };
+
     # Openbooks
     "openbooks" = {
       labels = {
