@@ -91,7 +91,7 @@
       image = "ghcr.io/cdloh/calibre-web:0.6.26";
       volumes = [
         "/srv/data/calibre-web/config:/config"
-        "/src/data/calibre-web/cache:/app/cps/cache"
+        "/srv/data/calibre-web/cache:/app/cps/cache"
         "/mnt/nas-03/media/:/data"
       ];
     };
