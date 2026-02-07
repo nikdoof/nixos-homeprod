@@ -7,7 +7,10 @@
 
 {
   age.secrets = {
-    digitaloceanApiToken.file = ../secrets/digitalOceanApiToken.age;
+    digitaloceanApiToken = {
+      file = ../secrets/digitalOceanApiToken.age;
+      owner = "traefik";
+    };
   };
 
   systemd.services.traefik = {
