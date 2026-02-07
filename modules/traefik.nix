@@ -40,7 +40,7 @@
 
       log = {
         level = "INFO";
-        filePath = "/var/log/traefik.log";
+        filePath = "${config.services.traefik.dataDir}/traefik.log";
         format = "json";
       };
 
