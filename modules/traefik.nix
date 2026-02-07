@@ -18,6 +18,7 @@
 
   services.traefik = {
     enable = true;
+    group = "podman";
 
     staticConfigOptions = {
       entryPoints = {
@@ -39,7 +40,7 @@
 
       log = {
         level = "INFO";
-        filePath = "${config.services.traefik.dataDir}/traefik.log";
+        filePath = "/var/log/traefik.log";
         format = "json";
       };
 
@@ -54,11 +55,12 @@
           };
         };
       };
-    };
 
-    dynamicConfigOptions = {
-      http.routers = { };
-      http.services = { };
+      providers = {
+        docker = {
+          exposedByDefault = false;
+        };
+      };
     };
   };
 }
