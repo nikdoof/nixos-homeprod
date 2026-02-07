@@ -67,7 +67,7 @@
       };
       image = "jellyfin/jellyfin:10.11.6";
       volumes = [
-        "/mnt/nas-03/media/:/media"
+        "/mnt/nas-03/media/:/mnt/media"
         "/srv/data/jellyfin/config:/config"
         "/srv/data/jellyfin/cache:/cache"
       ];
