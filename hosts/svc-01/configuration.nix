@@ -37,12 +37,6 @@
     };
   };
 
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    80
-    443
-  ];
-
   # Media
   fileSystems."/mnt/nas-03/media" = {
     device = "nas-03.int.doofnet.uk:/mnt/media";
