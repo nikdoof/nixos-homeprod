@@ -1,9 +1,10 @@
 { lib, ... }:
 
 let
-  # Extract all /srv/data paths from container volumes
+  # Follows the same structure as virtualisation.oci-containers.containers
   containers = {
 
+    # Jellyfin
     jellyfin = {
       labels = {
         "traefik.enable" = "true";
@@ -13,8 +14,8 @@ let
       image = "jellyfin/jellyfin:10.11.6";
       volumes = [
         "/mnt/nas-03/media/:/mnt/media"
-        "/srv/data/jellyfin/config:/config"
-        "/srv/data/jellyfin/cache:/cache"
+        "/srv/data/jellyfin/config:/config:U"
+        "/srv/data/jellyfin/cache:/cache:U"
       ];
       devices = [
         "/dev/dri/renderD128:/dev/dri/renderD128"
@@ -23,6 +24,7 @@ let
       extraOptions = [ "--network=host" ];
     };
 
+    # Prowlarr, Radarr, Sonarr
     prowlarr = {
       labels = {
         "traefik.enable" = "true";
@@ -53,6 +55,7 @@ let
       volumes = [ "/srv/data/sonarr/config:/config:U" ];
     };
 
+    # Openbooks and Calibre-Web
     openbooks = {
       labels = {
         "traefik.enable" = "true";
@@ -83,14 +86,14 @@ let
       };
       image = "ghcr.io/cdloh/calibre-web:0.6.26";
       volumes = [
-        "/srv/data/calibre-web/config:/config"
-        "/srv/data/calibre-web/cache:/app/cps/cache"
+        "/srv/data/calibre-web/config:/config:U"
+        "/srv/data/calibre-web/cache:/app/cps/cache:U"
         "/mnt/nas-03/media/:/data"
       ];
     };
   };
 
-  # Extract local /srv/data paths from all volumes
+  # Extract local /srv/data paths from all volumes defined in any containers
   srvDataDirs = lib.unique (
     lib.flatten (
       lib.mapAttrsToList (
