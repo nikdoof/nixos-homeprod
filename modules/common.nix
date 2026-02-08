@@ -30,6 +30,8 @@
     #packages = [ pkgs.spleen pkgs.tamsyn ];
     #font = "spleen-12x24";
     useXkbConfig = true; # use xkb.options in tty.
+
+    # Nord theme colors for the console
     colors = [
       "292d3e"
       "ff5370"
