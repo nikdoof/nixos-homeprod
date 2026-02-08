@@ -6,7 +6,7 @@ Hardware is being repurposed from the old Kubernetes worker nodes.
 
 | Device               | Count | OS disk     | Data disk(s)          | RAM   | OS            | Purpose                          |
 | -------------------- | ----- | ----------- | --------------------- | ----- | ------------- | -------------------------------- |
-| HP Prodesk 600 G3 DM | 1     | 128 GB SATA | 512GB NVME            | 16 GB | NixOS 25.11   |                                  |
+| HP Prodesk 600 G3 DM | 1     | 128 GB SATA |                       | 16 GB | NixOS 25.11   |                                  |
 
 ## Storage
 
@@ -31,4 +31,4 @@ Backups are managed by `borgmatic` and stored on a remote server. Only files und
 
 ## Monitoring
 
-No decision on monitoring or alerting as of yet.
+* Prometheus node exporter for host metrics

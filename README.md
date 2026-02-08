@@ -14,3 +14,7 @@ For the longest time I ran a Kubernetes cluster at home for almost all of my 'pr
 This is just to get the cluster in a daily managable state.
 
 So it is time to simplify, and with that I like the defined state of Kubernetes, so why not keep to that with using NixOS to manage containers and services?
+
+## Details
+
+* [Base Host configuration](./docs/base_host.md)
