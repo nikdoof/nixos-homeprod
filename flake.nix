@@ -14,6 +14,10 @@
       agenix,
       ...
     }@inputs:
+    let
+      inherit (nixpkgs) lib;
+      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+    in
     {
       nixosConfigurations = {
         svc-01 = nixpkgs.lib.nixosSystem {
@@ -29,5 +33,17 @@
           ];
         };
       };
+
+      devShells = forAllSystems (system: {
+        default =
+          let
+            pkgs = nixpkgs.legacyPackages.${system};
+          in
+          pkgs.mkShell {
+            packages = [
+              agenix
+            ];
+          };
+      });
     };
 }
