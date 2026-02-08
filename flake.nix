@@ -1,5 +1,5 @@
 {
-  description = "Homeprod";
+  description = "nikdoof's home production NixOS configuration";
 
   inputs = {
     # NixOS official package source, using the nixos-25.11 branch here
