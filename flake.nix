@@ -41,7 +41,7 @@
           in
           pkgs.mkShell {
             packages = [
-              agenix
+              agenix.packages.${system}.agenix
             ];
           };
       });
