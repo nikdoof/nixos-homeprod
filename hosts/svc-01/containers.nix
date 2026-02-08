@@ -42,7 +42,10 @@ let
         "traefik.http.services.radarr.loadbalancer.server.port" = "7878";
       };
       image = "ghcr.io/home-operations/radarr:6.1.1.10317";
-      volumes = [ "/srv/data/radarr/config:/config:U" ];
+      volumes = [
+        "/srv/data/radarr/config:/config:U"
+        "/mnt/nas-03/media/:/data"
+      ];
     };
 
     sonarr = {
@@ -52,7 +55,10 @@ let
         "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
       };
       image = "ghcr.io/home-operations/sonarr:4.0.16.2946";
-      volumes = [ "/srv/data/sonarr/config:/config:U" ];
+      volumes = [
+        "/srv/data/sonarr/config:/config:U"
+        "/mnt/nas-03/media/:/data"
+      ];
     };
 
     # Openbooks and Calibre-Web
