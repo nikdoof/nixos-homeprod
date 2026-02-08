@@ -1,12 +1,10 @@
-{
-  ...
-}:
+{ lib, ... }:
 
-{
-  virtualisation.oci-containers.containers = {
+let
+  # Extract all /srv/data paths from container volumes
+  containers = {
 
-    # Jellyfin
-    "jellyfin" = {
+    jellyfin = {
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.jellyfin.rule" = "Host(`jellyfin.svc.doofnet.uk`)";
@@ -25,8 +23,37 @@
       extraOptions = [ "--network=host" ];
     };
 
-    # Openbooks
-    "openbooks" = {
+    prowlarr = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.prowlarr.rule" = "Host(`prowlarr.svc.doofnet.uk`)";
+        "traefik.http.services.prowlarr.loadbalancer.server.port" = "9696";
+      };
+      image = "ghcr.io/home-operations/prowlarr:2.3.2.5245";
+      volumes = [ "/srv/data/prowlarr/config:/config" ];
+    };
+
+    radarr = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.radarr.rule" = "Host(`radarr.svc.doofnet.uk`)";
+        "traefik.http.services.radarr.loadbalancer.server.port" = "7878";
+      };
+      image = "ghcr.io/home-operations/radarr:6.1.1.10317";
+      volumes = [ "/srv/data/radarr/config:/config" ];
+    };
+
+    sonarr = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.sonarr.rule" = "Host(`sonarr.svc.doofnet.uk`)";
+        "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
+      };
+      image = "ghcr.io/home-operations/sonarr:4.0.16.2946";
+      volumes = [ "/srv/data/sonarr/config:/config" ];
+    };
+
+    openbooks = {
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.openbooks.rule" = "Host(`openbooks.svc.doofnet.uk`)";
@@ -48,8 +75,7 @@
       ];
     };
 
-    #calibre-web
-    "calibre-web" = {
+    calibre-web = {
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.calibre-web.rule" = "Host(`calibre-web.svc.doofnet.uk`)";
@@ -63,4 +89,34 @@
       ];
     };
   };
+
+  # Extract local /srv/data paths from all volumes
+  srvDataDirs = lib.unique (
+    lib.flatten (
+      lib.mapAttrsToList (
+        _name: container:
+        lib.filter (path: path != null) (
+          map (
+            volume:
+            let
+              localPath = lib.head (lib.splitString ":" volume);
+            in
+            if lib.hasPrefix "/srv/data/" localPath then localPath else null
+          ) (container.volumes or [ ])
+        )
+      ) containers
+    )
+  );
+
+in
+{
+  virtualisation.oci-containers.containers = containers;
+
+  # Automatically create /srv/data directories from container definitions
+  system.activationScripts.createContainerDirs = lib.stringAfter [ "var" ] ''
+    ${lib.concatMapStringsSep "\n" (dir: ''
+      mkdir -p "${dir}"
+      chmod 755 "${dir}"
+    '') srvDataDirs}
+  '';
 }
