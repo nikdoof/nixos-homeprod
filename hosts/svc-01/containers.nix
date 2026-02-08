@@ -30,7 +30,7 @@ let
         "traefik.http.services.prowlarr.loadbalancer.server.port" = "9696";
       };
       image = "ghcr.io/home-operations/prowlarr:2.3.2.5245";
-      volumes = [ "/srv/data/prowlarr/config:/config" ];
+      volumes = [ "/srv/data/prowlarr/config:/config:U" ];
     };
 
     radarr = {
@@ -40,7 +40,7 @@ let
         "traefik.http.services.radarr.loadbalancer.server.port" = "7878";
       };
       image = "ghcr.io/home-operations/radarr:6.1.1.10317";
-      volumes = [ "/srv/data/radarr/config:/config" ];
+      volumes = [ "/srv/data/radarr/config:/config:U" ];
     };
 
     sonarr = {
@@ -50,7 +50,7 @@ let
         "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
       };
       image = "ghcr.io/home-operations/sonarr:4.0.16.2946";
-      volumes = [ "/srv/data/sonarr/config:/config" ];
+      volumes = [ "/srv/data/sonarr/config:/config:U" ];
     };
 
     openbooks = {
