@@ -3,7 +3,11 @@ let
   users = [ nikdoof ];
 
   svc-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILPHbFY5oPMjAinz46BD8qHTuMgjymS3Vo+57h+iKKWu";
-  systems = [ svc-01 ];
+  svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
+  systems = [
+    svc-01
+    svc-02
+  ];
 in
 {
   "digitalOceanApiToken.age".publicKeys = users ++ systems;
