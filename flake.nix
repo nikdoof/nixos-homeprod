@@ -22,6 +22,11 @@
             agenix.nixosModules.default
           ];
         };
+        svc-02 = nixpkgs.lib.nixosSystem {
+          modules = [
+            ./hosts/svc-02/configuration.nix
+            agenix.nixosModules.default
+          ];
       };
     };
 }

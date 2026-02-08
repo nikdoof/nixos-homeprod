@@ -20,7 +20,7 @@
 
   # Networking
   networking.useDHCP = false;
-  networking.hostName = "svc-01"; # Define your hostname.
+  networking.hostName = "svc-02";
   networking.nameservers = [
     "10.101.1.2"
     "2001:8b0:bd9:101::2"
