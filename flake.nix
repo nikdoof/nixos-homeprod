@@ -27,6 +27,7 @@
             ./hosts/svc-02/configuration.nix
             agenix.nixosModules.default
           ];
+        };
       };
     };
 }
