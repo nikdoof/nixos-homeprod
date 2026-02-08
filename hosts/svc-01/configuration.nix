@@ -35,7 +35,7 @@
   networking.domain = "int.doofnet.uk";
   networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
-  systemd.network.systemd.network.networks."10-lan" = {
+  systemd.network.networks."10-lan" = {
     matchConfig.Name = "eno1";
     networkConfig = {
       DHCP = "ipv4";
