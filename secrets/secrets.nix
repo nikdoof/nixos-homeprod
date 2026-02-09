@@ -16,4 +16,5 @@ in
   "borgmaticSSHKey.age".publicKeys = users ++ systems;
 
   "swarmMirrorConfig.age".publicKeys = users ++ [ svc-01 ];
+  "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];
 }
