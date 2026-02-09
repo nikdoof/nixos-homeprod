@@ -19,7 +19,7 @@ let
         "--provider=oidc"
         "--oidc-issuer-url=https://id.doofnet.uk"
         "--provider-display-name=Doofnet Auth"
-        #"--code-challenge-method=S256"
+        "--code-challenge-method=S256"
         "--email-domain=*"
         "--upstream=static://202"
         "--http-address=0.0.0.0:4180"
@@ -32,6 +32,8 @@ let
         "--skip-provider-button"
         "--allowed-group=home"
         "--real-client-ip-header=X-Forwarded-For"
+        "--cookie-csrf-per-request=true"
+        "--cookie-csrf-expire=5m"
       ];
     };
 
