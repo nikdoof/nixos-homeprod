@@ -36,6 +36,7 @@ let
         "--cookie-csrf-expire=5m"
         "--cookie-domain=doofnet.uk"
       ];
+      ports = [ "127.0.0.1:4180:4180" ];
     };
 
     # Jellyfin
