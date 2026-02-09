@@ -21,7 +21,7 @@ let
         "--provider-display-name=Doofnet Auth"
         "--code-challenge-method=S256"
         "--email-domain=*"
-        "--upstream=static://200"
+        "--upstream=static://202"
         "--http-address=0.0.0.0:4180"
         "--pass-user-headers=true"
         "--pass-authorization-header=true"
