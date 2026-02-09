@@ -9,7 +9,7 @@ let
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.oauth2-proxy.rule" =
-          "Host(`oauth2-proxy.svc.doofnet.uk`, `sonarr.svc.doofnet.uk`, `radarr.svc.doofnet.uk`, `prowlarr.svc.doofnet.uk`) && PathPrefix(`/oauth2/`)";
+          "Host(`oauth2-proxy.svc.doofnet.uk`) || PathPrefix(`/oauth2/`)";
         "traefik.http.routers.oauth2-proxy.middlewares" = "auth-headers@file";
         "traefik.http.services.oauth2-proxy.loadbalancer.server.port" = "4180";
       };
