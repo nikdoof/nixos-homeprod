@@ -70,7 +70,7 @@
         # NixOS
         nrs = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#$(hostname)";
         cat = "bat --paging=never";
-        less = "bat --paging=never";
+        less = "bat";
       };
     };
     ssh.startAgent = true;
