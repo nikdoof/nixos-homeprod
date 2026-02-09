@@ -27,7 +27,7 @@
       entryPoints = {
         web = {
           address = ":80";
-          asDefault = false;
+          asDefault = true;
           http.redirections.entrypoint = {
             to = "websecure";
             scheme = "https";
