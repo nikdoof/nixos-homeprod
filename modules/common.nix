@@ -62,12 +62,15 @@
   };
 
   programs = {
+    bat.enable = true;
     git.enable = true;
     zsh = {
       enable = true;
       shellAliases = {
         # NixOS
         nrs = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#$(hostname)";
+        cat = "bat --paging=never";
+        less = "bat --paging=never";
       };
     };
     ssh.startAgent = true;
