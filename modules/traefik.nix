@@ -22,7 +22,7 @@
     group = "podman";
 
     staticConfigOptions = {
-      api.dashboard = true;
+      api = true;
 
       entryPoints = {
         web = {
