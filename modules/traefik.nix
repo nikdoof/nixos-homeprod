@@ -112,7 +112,7 @@
         # Redirects if not authenticated
         oauth-auth-redirect = {
           forwardAuth = {
-            address = "https://127.0.0.1:4180/oauth2/";
+            address = "http://127.0.0.1:4180/oauth2/";
             trustForwardHeader = true;
             authResponseHeaders = [
               "X-Auth-Request-Access-Token"
@@ -124,7 +124,7 @@
         # Throws 401 without redirecting
         oauth-auth-wo-redirect = {
           forwardAuth = {
-            address = "https://127.0.0.1:4180/oauth2/auth";
+            address = "http://127.0.0.1:4180/oauth2/auth";
             trustForwardHeader = true;
             authResponseHeaders = [
               "X-Auth-Request-Access-Token"
