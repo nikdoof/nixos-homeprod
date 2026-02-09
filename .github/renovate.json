@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":enablePreCommit",
+    ":disableRateLimiting",
+    "github>nikdoof/renovate-config:github",
+    "github>nikdoof/flux-gitops//.github/renovate/labels.json"
+  ],
+  "timezone": "UTC",
+  "dependencyDashboard": true,
+  "dependencyDashboardAutoclose": false,
+  "prCreation": "not-pending",
+  "suppressNotifications": ["prIgnoreNotification"],
+  "rebaseWhen": "conflicted",
+  "assigneesFromCodeOwners": true,
+  "nix": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["containers.nix"],
+      "matchStrings": [
+        "image *= *\"(?<depName>.*?):(?<currentValue>.*?)(@(?<currentDigest>sha256:[a-f0-9]+))?\""
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}

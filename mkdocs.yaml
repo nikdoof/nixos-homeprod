@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+
+# Project information
+site_name: NixOS Homeprod
+site_author: Andrew Williams
+site_url: https://nikdoof.github.io/nixos-homeprod/
+
+# Repository
+repo_name: nikdoof/nixos-homeprod
+repo_url: https://github.com/nikdoof/nixos-homeprod
+edit_uri: "edit/main/docs/"
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: blue grey
+    accent: blue grey
+  icon:
+    repo: fontawesome/brands/git-alt
+
+docs_dir: ./docs
+
+extra:
+  version:
+    provider: mike
+
+# Extensions
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde

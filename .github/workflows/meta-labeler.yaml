@@ -1,0 +1,31 @@
+---
+name: Meta - Labeler
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/labeler.yaml"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  labeler:
+    name: Labeler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Sync Labels
+        uses: EndBug/label-sync@v2
+        with:
+          config-file: .github/labels.yaml
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          delete-other-labels: true
+      - name: Labeler
+        if: github.event_name == 'pull_request'
+        uses: actions/labeler@v6
+        with:
+          configuration-path: .github/labeler.yaml
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
