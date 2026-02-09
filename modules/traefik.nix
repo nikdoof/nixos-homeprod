@@ -89,7 +89,7 @@
 
       http.routers = {
         api = {
-          rule = "Host(`traefik.svc.doofnet.uk`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))";
+          rule = "Host(`traefik.svc.doofnet.uk`)";
           service = "api@internal";
         };
       };
