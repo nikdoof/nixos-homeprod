@@ -72,6 +72,7 @@ let
         "traefik.enable" = "true";
         "traefik.http.routers.radarr.rule" = "Host(`radarr.svc.doofnet.uk`)";
         "traefik.http.services.radarr.loadbalancer.server.port" = "7878";
+        "traefik.http.routers.radarr.middlewares" = "oauth-auth@file,oauth-errors@file";
       };
       image = "ghcr.io/home-operations/radarr:6.1.1.10317";
       volumes = [
@@ -85,6 +86,7 @@ let
         "traefik.enable" = "true";
         "traefik.http.routers.sonarr.rule" = "Host(`sonarr.svc.doofnet.uk`)";
         "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
+        "traefik.http.routers.sonarr.middlewares" = "oauth-auth@file,oauth-errors@file";
       };
       image = "ghcr.io/home-operations/sonarr:4.0.16.2946";
       volumes = [
