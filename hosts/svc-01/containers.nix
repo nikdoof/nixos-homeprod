@@ -34,6 +34,7 @@ let
         "--real-client-ip-header=X-Forwarded-For"
         "--cookie-csrf-per-request=true"
         "--cookie-csrf-expire=5m"
+        "--cookie-domain=doofnet.uk"
       ];
     };
 
