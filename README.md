@@ -9,7 +9,7 @@ For the longest time I ran a Kubernetes cluster at home for almost all of my 'pr
 * Longhorn for persistent storage
 * Prometheus stack for monitoring
 * MetalLB, Traefik, external DNS, cert-manager for Ingress
-* Kured, system-upgrade 
+* Kured, system-upgrade
 
 This is just to get the cluster in a daily managable state.
 
