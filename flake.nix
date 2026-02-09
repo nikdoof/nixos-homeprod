@@ -32,6 +32,11 @@
             agenix.nixosModules.default
           ];
         };
+        talos = nixpkgs.lib.nixosSystem {
+          modules = [
+            ./hosts/talos/configuration.nix
+          ];
+        };
       };
 
       devShells = forAllSystems (system: {
