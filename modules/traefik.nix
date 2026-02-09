@@ -108,17 +108,28 @@
             frameDeny = true;
           };
         };
-        oauth-auth = {
+
+        # Redirects if not authenticated
+        oauth-auth-redirect = {
+          forwardAuth = {
+            address = "https://oauth2-proxy.svc.doofnet.uk/oauth2/";
+            trustForwardHeader = true;
+            authResponseHeaders = [
+              "X-Auth-Request-Access-Token"
+              "Authorization"
+            ];
+          };
+        };
+
+        # Throws 401 without redirecting
+        oauth-auth-wo-redirect = {
           forwardAuth = {
             address = "https://oauth2-proxy.svc.doofnet.uk/oauth2/auth";
             trustForwardHeader = true;
-          };
-        };
-        oauth-errors = {
-          errors = {
-            status = [ "401-403" ];
-            service = "oauth2-proxy@docker";
-            query = "/oauth2/sign_in?rd={url}";
+            authResponseHeaders = [
+              "X-Auth-Request-Access-Token"
+              "Authorization"
+            ];
           };
         };
       };
