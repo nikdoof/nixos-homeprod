@@ -81,6 +81,7 @@ let
         "--searchbot"
         "search"
         "--persist"
+        "--debug"
       ];
     };
 
