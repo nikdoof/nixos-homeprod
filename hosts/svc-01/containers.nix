@@ -1,8 +1,36 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 let
   # Follows the same structure as virtualisation.oci-containers.containers
   containers = {
+
+    # OAuth2-Proxy
+    oauth2-proxy = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.oauth2-proxy.rule" = "Host(`oauth2-proxy.svc.doofnet.uk`)";
+        "traefik.http.services.oauth2-proxy.loadbalancer.server.port" = "4180";
+      };
+      image = "quay.io/oauth2-proxy/oauth2-proxy:v7.4.0";
+      environmentFiles = [ config.age.secrets.oauth2ClientSecret.path ];
+      cmd = [
+        "--provider=oidc"
+        "--oidc-issuer-url=https://id.doofnet.uk"
+        "--provider-display-name=Doofnet Auth"
+        "--email-domain=*"
+        "--upstream=static://200"
+        "--http-address=0.0.0.0:4180"
+        "--pass-user-headers=true"
+        "--pass-authorization-header=true"
+        "--set-authorization-header=true"
+        "--pass-access-token=true"
+        "--set-xauthrequest=true"
+        "--reverse-proxy=true"
+        "--skip-provider-button"
+        "--allowed-group=home"
+        "--real-client-ip-header=X-Forwarded-For"
+      ];
+    };
 
     # Jellyfin
     jellyfin = {
@@ -120,6 +148,12 @@ let
 
 in
 {
+  age.secrets = {
+    oauth2ClientSecret = {
+      file = ../../secrets/oauth2ClientSecret.age;
+    };
+  };
+
   virtualisation.oci-containers.containers = containers;
 
   # Automatically create /srv/data directories from container definitions
