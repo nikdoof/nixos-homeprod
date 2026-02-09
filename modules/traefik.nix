@@ -22,6 +22,8 @@
     group = "podman";
 
     staticConfigOptions = {
+      api.dashboard = true;
+
       entryPoints = {
         web = {
           address = ":80";
