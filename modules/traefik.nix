@@ -78,31 +78,40 @@
         };
       };
 
-      middlewares = {
-        auth-headers = {
-          headers = {
-            sslRedirect = true;
-            stsSeconds = 315360000;
-            browserXssFilter = true;
-            contentTypeNosniff = true;
-            forceSTSHeader = true;
-            sslHost = "doofnet.uk";
-            stsIncludeSubdomains = true;
-            stsPreload = true;
-            frameDeny = true;
+      http = {
+        routers = {
+          api = {
+            rule = "Host(`traefik.svc.doofnet.uk`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))";
+            service = "api@internal";
           };
         };
-        oauth-auth = {
-          forwardAuth = {
-            address = "https://oauth2-proxy.svc.doofnet.uk/oauth2/auth";
-            trustForwardHeader = true;
+
+        middlewares = {
+          auth-headers = {
+            headers = {
+              sslRedirect = true;
+              stsSeconds = 315360000;
+              browserXssFilter = true;
+              contentTypeNosniff = true;
+              forceSTSHeader = true;
+              sslHost = "doofnet.uk";
+              stsIncludeSubdomains = true;
+              stsPreload = true;
+              frameDeny = true;
+            };
           };
-        };
-        oauth-errors = {
-          errors = {
-            status = [ "401-403" ];
-            service = "oauth-backend";
-            query = "/oauth2/sign_in?rd={url}";
+          oauth-auth = {
+            forwardAuth = {
+              address = "https://oauth2-proxy.svc.doofnet.uk/oauth2/auth";
+              trustForwardHeader = true;
+            };
+          };
+          oauth-errors = {
+            errors = {
+              status = [ "401-403" ];
+              service = "oauth-backend";
+              query = "/oauth2/sign_in?rd={url}";
+            };
           };
         };
       };
