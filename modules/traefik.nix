@@ -27,7 +27,7 @@
       entryPoints = {
         web = {
           address = ":80";
-          asDefault = true;
+          asDefault = false;
           http.redirections.entrypoint = {
             to = "websecure";
             scheme = "https";
@@ -57,7 +57,7 @@
       };
 
       log = {
-        level = "INFO";
+        level = "DEBUG";
         filePath = "${config.services.traefik.dataDir}/traefik.log";
         format = "json";
       };
