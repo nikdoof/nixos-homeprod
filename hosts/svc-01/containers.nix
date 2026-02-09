@@ -8,7 +8,9 @@ let
     oauth2-proxy = {
       labels = {
         "traefik.enable" = "true";
-        "traefik.http.routers.oauth2-proxy.rule" = "Host(`oauth2-proxy.svc.doofnet.uk`)";
+        "traefik.http.routers.oauth2-proxy.rule" =
+          "Host(`oauth2-proxy.svc.doofnet.uk`, `sonarr.svc.doofnet.uk`, `radarr.svc.doofnet.uk`, `prowlarr.svc.doofnet.uk`) && PathPrefix(`/oauth2/`)";
+        "traefik.http.routers.oauth2-proxy.middlewares" = "auth-headers";
         "traefik.http.services.oauth2-proxy.loadbalancer.server.port" = "4180";
       };
       image = "quay.io/oauth2-proxy/oauth2-proxy:v7.4.0";
@@ -59,6 +61,7 @@ let
         "traefik.enable" = "true";
         "traefik.http.routers.prowlarr.rule" = "Host(`prowlarr.svc.doofnet.uk`)";
         "traefik.http.services.prowlarr.loadbalancer.server.port" = "9696";
+        "traefik.http.routers.prowlarr.middlewares" = "oauth-auth,oauth-errors";
       };
       image = "ghcr.io/home-operations/prowlarr:2.3.2.5245";
       volumes = [ "/srv/data/prowlarr/config:/config:U" ];

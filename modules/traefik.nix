@@ -76,6 +76,35 @@
         };
       };
 
+      middlewares = {
+        auth-headers = {
+          headers = {
+            sslRedirect = true;
+            stsSeconds = 315360000;
+            browserXssFilter = true;
+            contentTypeNosniff = true;
+            forceSTSHeader = true;
+            sslHost = "doofnet.uk";
+            stsIncludeSubdomains = true;
+            stsPreload = true;
+            frameDeny = true;
+          };
+        };
+        oauth-auth = {
+          forwardAuth = {
+            address = "https://oauth2-proxy.svc.doofnet.uk/oauth2/auth";
+            trustForwardHeader = true;
+          };
+        };
+        oauth-errors = {
+          errors = {
+            status = [ "401-403" ];
+            service = "oauth-backend";
+            query = "/oauth2/sign_in?rd={url}";
+          };
+        };
+      };
+
       providers = {
         docker = {
           exposedByDefault = false;
