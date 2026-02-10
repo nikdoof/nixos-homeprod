@@ -13,7 +13,7 @@ let
       };
       image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
       volumes = [
-        "/srv/data/pocket-id/config:/config:U"
+        "/srv/data/pocket-id/data:/app/data:U"
         "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey:U"
         "${config.age.secrets.maxmindLicenseKey.path}:/secrets/maxmindLicenseKey:U"
       ];
