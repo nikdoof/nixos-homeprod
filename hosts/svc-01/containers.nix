@@ -189,11 +189,11 @@ in
     };
     pocketIdEncryptionKey = {
       file = ../../secrets/pocketIdEncryptionKey.age;
-      owner = 1000;
+      owner = "nikdoof";
     };
     maxmindLicenseKey = {
       file = ../../secrets/maxmindLicenseKey.age;
-      owner = 1000;
+      owner = "nikdoof";
     };
   };
 
