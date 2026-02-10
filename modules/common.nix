@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -9,19 +10,20 @@
     ./users.nix
   ];
 
-  nix.settings = {
-    max-jobs = lib.mkDefault 1;
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
-    auto-optimise-store = true;
-  };
+  nix = {
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      auto-optimise-store = true;
+    };
 
-  nix.gc = {
-    automatic = true;
-    dates = "daily";
-    options = "--delete-older-than 7d";
+    gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 7d";
+    };
   };
 
   users.motdFile = builtins.path {
@@ -88,8 +90,8 @@
   services = {
     openssh = {
       enable = true;
+      openFirewall = true;
     };
+    fstrim.enable = true;
   };
-
-  networking.firewall.allowedTCPPorts = [ 22 ];
 }
