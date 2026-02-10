@@ -4,6 +4,29 @@ let
   # Follows the same structure as virtualisation.oci-containers.containers
   containers = {
 
+    # Pocket ID
+    pocket-id = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.pocket-id.rule" = "Host(`id.doofnet.uk`)";
+        "traefik.http.services.pocket-id.loadbalancer.server.port" = "3000";
+      };
+      image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
+      volumes = [
+        "/srv/data/pocket-id/config:/config:U"
+      ];
+      environment = {
+        APP_URL = "https://id.doofnet.uk";
+        ENCRYPTION_KEY_FILE = config.age.secrets.pocketIdEncryptionKey.path;
+        MAXMIND_LICENSE_KEY_FILE = config.age.secrets.maxmindLicenseKey.path;
+        METRICS_ENABLED = true;
+        OTEL_EXPORTER_PROMETHEUS_HOST = "0.0.0.0";
+        OTEL_METRICS_EXPORTER = "prometheus";
+        PORT = "8081";
+        TRUST_PROXY = true;
+      };
+    };
+
     # OAuth2-Proxy
     oauth2-proxy = {
       labels = {
@@ -161,6 +184,12 @@ in
   age.secrets = {
     oauth2ClientSecret = {
       file = ../../secrets/oauth2ClientSecret.age;
+    };
+    pocketIdEncryptionKey = {
+      file = ../../secrets/pocketIdEncryptionKey.age;
+    };
+    maxmindLicenseKey = {
+      file = ../../secrets/maxmindLicenseKey.age;
     };
   };
 
