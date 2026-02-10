@@ -14,8 +14,8 @@ let
       image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
       volumes = [
         "/srv/data/pocket-id/data:/app/data:U"
-        "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey:U"
-        "${config.age.secrets.maxmindLicenseKey.path}:/secrets/maxmindLicenseKey:U"
+        "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey"
+        "${config.age.secrets.maxmindLicenseKey.path}:/secrets/maxmindLicenseKey"
       ];
       environment = {
         APP_URL = "https://id.doofnet.uk";
@@ -189,11 +189,11 @@ in
     };
     pocketIdEncryptionKey = {
       file = ../../secrets/pocketIdEncryptionKey.age;
-      owner = "nikdoof";
+      owner = "1000";
     };
     maxmindLicenseKey = {
       file = ../../secrets/maxmindLicenseKey.age;
-      owner = "nikdoof";
+      owner = "1000";
     };
   };
 
