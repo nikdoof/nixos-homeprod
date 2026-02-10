@@ -19,11 +19,11 @@ let
         APP_URL = "https://id.doofnet.uk";
         ENCRYPTION_KEY_FILE = config.age.secrets.pocketIdEncryptionKey.path;
         MAXMIND_LICENSE_KEY_FILE = config.age.secrets.maxmindLicenseKey.path;
-        METRICS_ENABLED = true;
+        METRICS_ENABLED = "true";
         OTEL_EXPORTER_PROMETHEUS_HOST = "0.0.0.0";
         OTEL_METRICS_EXPORTER = "prometheus";
         PORT = "8081";
-        TRUST_PROXY = true;
+        TRUST_PROXY = "true";
       };
     };
 
