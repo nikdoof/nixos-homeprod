@@ -11,10 +11,12 @@ let
 in
 {
   "digitalOceanApiToken.age".publicKeys = users ++ systems;
+  "maxmindLicenseKey.age".publicKeys = users ++ systems;
 
   "borgmaticEncryptionKey.age".publicKeys = users ++ systems;
   "borgmaticSSHKey.age".publicKeys = users ++ systems;
 
   "swarmMirrorConfig.age".publicKeys = users ++ [ svc-01 ];
   "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];
+  "pocketIdEncryptionKey.age".publicKeys = users ++ [ svc-01 ];
 }
