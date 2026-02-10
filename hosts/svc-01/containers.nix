@@ -14,11 +14,13 @@ let
       image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
       volumes = [
         "/srv/data/pocket-id/config:/config:U"
+        "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey:ro"
+        "${config.age.secrets.maxmindLicenseKey.path}:/secrets/maxmindLicenseKey:ro"
       ];
       environment = {
         APP_URL = "https://id.doofnet.uk";
-        ENCRYPTION_KEY_FILE = config.age.secrets.pocketIdEncryptionKey.path;
-        MAXMIND_LICENSE_KEY_FILE = config.age.secrets.maxmindLicenseKey.path;
+        ENCRYPTION_KEY_FILE = "/secrets/pocketIdEncryptionKey";
+        MAXMIND_LICENSE_KEY_FILE = "/secrets/maxmindLicenseKey";
         METRICS_ENABLED = "true";
         OTEL_EXPORTER_PROMETHEUS_HOST = "0.0.0.0";
         OTEL_METRICS_EXPORTER = "prometheus";
