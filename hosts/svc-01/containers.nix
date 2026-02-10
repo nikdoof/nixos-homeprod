@@ -30,6 +30,23 @@ let
       };
     };
 
+    simple-webfinger = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.webfinger.rule" =
+          "Host(`id.doofnet.uk`) && PathPrefix(`/.well-known/webfinger`)";
+        "traefik.http.services.webfinger.loadbalancer.server.port" = "8000";
+        "traefik.http.routers.webfinger.entrypoints" = "websecure,extwebsecure";
+      };
+      image = "ghcr.io/nikdoof/simple-webfinger";
+      volumes = [
+        "/srv/data/simple-webfinger/config.yaml:/app/config.yaml:U"
+      ];
+      environment = {
+        SIMPLE_WEBFINGER_CONFIG_FILE = "/app/config.yaml";
+      };
+    };
+
     # OAuth2-Proxy
     oauth2-proxy = {
       labels = {
