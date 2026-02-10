@@ -14,8 +14,8 @@ let
       image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
       volumes = [
         "/srv/data/pocket-id/config:/config:U"
-        "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey:ro"
-        "${config.age.secrets.maxmindLicenseKey.path}:/secrets/maxmindLicenseKey:ro"
+        "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey:Uro"
+        "${config.age.secrets.maxmindLicenseKey.path}:/secrets/maxmindLicenseKey:Uro"
       ];
       environment = {
         APP_URL = "https://id.doofnet.uk";
