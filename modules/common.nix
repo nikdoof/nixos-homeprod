@@ -73,6 +73,7 @@
         nrs = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#$(hostname)";
         cat = "bat --paging=never";
         less = "bat";
+        ls = "eza";
       };
     };
     ssh.startAgent = true;
@@ -85,6 +86,7 @@
 
   environment.systemPackages = with pkgs; [
     gnupg
+    eza
   ];
 
   services = {
