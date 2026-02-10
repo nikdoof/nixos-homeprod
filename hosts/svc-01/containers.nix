@@ -40,10 +40,10 @@ let
       };
       image = "ghcr.io/nikdoof/simple-webfinger";
       volumes = [
-        "/srv/data/simple-webfinger/config.yaml:/app/config.yaml:U"
+        "/srv/data/simple-webfinger/config:/app/config:U"
       ];
       environment = {
-        SIMPLE_WEBFINGER_CONFIG_FILE = "/app/config.yaml";
+        SIMPLE_WEBFINGER_CONFIG_FILE = "/app/config/config.yaml";
       };
     };
 
