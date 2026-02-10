@@ -5,7 +5,7 @@
     ":enablePreCommit",
     ":disableRateLimiting",
     "github>nikdoof/renovate-config:github",
-    "github>nikdoof/flux-gitops//.github/renovate/labels.json"
+    "github>nikdoof/nixos-homeprod//.github/renovate/labels.json"
   ],
   "timezone": "UTC",
   "dependencyDashboard": true,
