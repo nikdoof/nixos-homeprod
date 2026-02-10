@@ -10,6 +10,7 @@ let
         "traefik.enable" = "true";
         "traefik.http.routers.pocket-id.rule" = "Host(`id.doofnet.uk`)";
         "traefik.http.services.pocket-id.loadbalancer.server.port" = "8081";
+        "traefik.http.routers.pocket-id.entrypoints" = "websecure,extwebsecure";
       };
       image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
       volumes = [
