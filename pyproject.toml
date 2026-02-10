@@ -1,0 +1,12 @@
+[project]
+name = "nixos-homeprod"
+version = "0.1.0"
+description = "Managing a NixOS Homeprod configuration using NixOS."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[dependency-groups]
+docs = [
+    "mkdocs-material>=9.7.1",
+]
