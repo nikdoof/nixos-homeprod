@@ -3,11 +3,6 @@
 }:
 
 {
-  # Add Intel UHD vaapi support
-  imports = [
-    ./intel-uhd.nix
-  ];
-
   # Extra kernel modules
   boot.initrd.availableKernelModules = [
     "nvme"
