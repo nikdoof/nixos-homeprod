@@ -64,19 +64,19 @@
       enable = true;
       userServices = true;
     };
-  };
-
-  services.ipp-usb = {
-    enable = true;
+    extraServiceFiles = {
+      zebra = ./Airprint-Zebra_GK420d.service;
+    };
   };
 
   services.printing = {
     enable = true;
     openFirewall = true;
-    defaultShared = true;
+    defaultShared = false;
     browsing = true;
     listenAddresses = [ "10.101.3.20:631" ];
     allowFrom = [ "all" ];
+    stateless = true;
   };
 
   hardware.printers = {
