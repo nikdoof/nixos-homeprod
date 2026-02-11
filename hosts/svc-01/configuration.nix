@@ -63,7 +63,6 @@
     openFirewall = true;
     publish = {
       enable = true;
-      userServices = true;
     };
     extraServiceFiles = {
       zebra = ./AirPrint-Zebra_GK420d.service;
@@ -74,7 +73,7 @@
     enable = true;
     openFirewall = true;
     defaultShared = true;
-    browsing = true;
+    browsing = false;
     listenAddresses = [ "10.101.3.20:631" ];
     allowFrom = [ "all" ];
 
