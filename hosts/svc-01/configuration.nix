@@ -65,7 +65,7 @@
       userServices = true;
     };
     extraServiceFiles = {
-      zebra = ./Airprint-Zebra_GK420d.service;
+      zebra = ./AirPrint-Zebra_GK420d.service;
     };
   };
 
