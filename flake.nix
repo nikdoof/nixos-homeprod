@@ -5,6 +5,7 @@
     # NixOS official package source, using the nixos-25.11 branch here
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     agenix.url = "github:ryantm/agenix";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
   outputs =
@@ -12,6 +13,7 @@
       self,
       nixpkgs,
       agenix,
+      nixos-hardware,
       ...
     }@inputs:
     let
@@ -34,6 +36,10 @@
         };
         talos = nixpkgs.lib.nixosSystem {
           modules = [
+            nixos-hardware.nixosModules.common-cpu-intel
+            nixos-hardware.nixosModules.common-pc-laptop
+            nixos-hardware.nixosModules.common-hidpi
+            nixos-hardware.nixosModules.common-pc-laptop-ssd
             ./hosts/talos/configuration.nix
           ];
         };

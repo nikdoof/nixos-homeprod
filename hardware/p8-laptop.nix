@@ -1,5 +1,4 @@
 {
-  pkgs,
   ...
 }:
 
@@ -26,7 +25,6 @@
   boot.extraModprobeConfig = ''
     options intel_hid enable_sw_tablet_mode=2
   '';
-  boot.kernelPackages = pkgs.linuxPackages_testing;
 
   # Fix the font rendering
   fonts.fontconfig = {
