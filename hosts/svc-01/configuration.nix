@@ -71,7 +71,21 @@
     openFirewall = true;
     defaultShared = true;
     browsing = true;
-    listenAddresses = [ "*:631" ];
+    listenAddresses = [ "10.101.3.20:631" ];
+  };
+
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "Zebra_GK420d";
+        location = "Games Room";
+        deviceUri = "usb://Zebra%20Technologies/ZTC%20GK420d?serial=28J120703625";
+        model = "drv:///sample.drv/zebra.ppd";
+        ppdOptions = {
+          PageSize = "6.00x4.00";
+        };
+      }
+    ];
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
