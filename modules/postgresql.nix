@@ -3,7 +3,7 @@
 }:
 
 {
-  config.services.postgresql = {
+  services.postgresql = {
     enable = true;
     enableTCPIP = true;
     dataDir = "/srv/data/postgresql";
