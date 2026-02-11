@@ -56,11 +56,22 @@
   };
 
   # Printing
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      userServices = true;
+    };
+  };
+
   services.printing = {
     enable = true;
     openFirewall = true;
     defaultShared = true;
     browsing = true;
+    listenAddresses = [ "*:631" ];
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
