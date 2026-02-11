@@ -72,6 +72,7 @@
     defaultShared = true;
     browsing = true;
     listenAddresses = [ "10.101.3.20:631" ];
+    allowFrom = [ "all" ];
   };
 
   hardware.printers = {
