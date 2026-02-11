@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -77,6 +78,10 @@
     listenAddresses = [ "10.101.3.20:631" ];
     allowFrom = [ "all" ];
     stateless = true;
+
+    drivers = [
+      (pkgs.writeTextDir "share/cups/model/Zebra_GK420d.ppd" (builtins.readFile ./Zebra_GK420d.ppd))
+    ];
   };
 
   hardware.printers = {
@@ -86,7 +91,7 @@
         description = "Zebra GK420d";
         location = "Games Room";
         deviceUri = "usb://Zebra%20Technologies/ZTC%20GK420d?serial=28J120703625";
-        model = "drv:///sample.drv/zebra.ppd";
+        model = "Zebra_GK420d.ppd";
 
         ppdOptions = {
           PageSize = "6.00x4.00";
