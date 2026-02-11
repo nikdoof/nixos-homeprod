@@ -77,7 +77,6 @@
     browsing = true;
     listenAddresses = [ "10.101.3.20:631" ];
     allowFrom = [ "all" ];
-    stateless = true;
 
     drivers = [
       (pkgs.writeTextDir "share/cups/model/Zebra_GK420d.ppd" (builtins.readFile ./Zebra_GK420d.ppd))
