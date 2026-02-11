@@ -50,4 +50,23 @@
     fwupd.enable = true;
     smartd.enable = true;
   };
+
+  # Horrible bodge workaround for the blank screen issue
+  systemd.services."p8-laptop-fix" = {
+    enable = true;
+    description = "Fix the blank screen issue on the P8 laptop by suspending and resuming the system";
+    unitConfig = {
+      DefaultDependencies = "no";
+      Before = "basic.target";
+      After = "local-fs.target";
+    };
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "/usr/bin/rtcwake -u -s 3 -m mem";
+      RemainAfterExit = "yes";
+    };
+    installConfig = {
+      WantedBy = "basic.target";
+    };
+  };
 }
