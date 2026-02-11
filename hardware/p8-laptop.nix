@@ -63,7 +63,7 @@
     };
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.utillinux}/bin/rtcwake -u -s 3 -m mem";
+      ExecStart = "${pkgs.util-linux}/bin/rtcwake -u -s 3 -m mem";
       RemainAfterExit = "yes";
     };
     wantedBy = [ "basic.target" ];
