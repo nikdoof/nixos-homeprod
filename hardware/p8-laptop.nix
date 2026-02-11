@@ -65,8 +65,6 @@
       ExecStart = "/usr/bin/rtcwake -u -s 3 -m mem";
       RemainAfterExit = "yes";
     };
-    installConfig = {
-      WantedBy = "basic.target";
-    };
+    wantedBy = [ "basic.target" ];
   };
 }
