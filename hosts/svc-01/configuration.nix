@@ -63,6 +63,7 @@
     openFirewall = true;
     publish = {
       enable = true;
+      userServices = true;
     };
     extraServiceFiles = {
       zebra = ./AirPrint-Zebra_GK420d.service;
