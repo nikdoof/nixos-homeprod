@@ -25,47 +25,33 @@ THE SOFTWARE.
 import argparse
 import logging
 import os
-import os.path
 import re
 import sys
-from io import StringIO
-from urllib.parse import urlparse
-from xml.dom import minidom
-from xml.dom.minidom import parseString
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+from urllib.parse import ParseResult, urlparse
+from xml.etree.ElementTree import Element, ElementTree, indent, tostring
 
 import cups
 
-try:
-    import lxml.etree as etree
-    from lxml.etree import Element, ElementTree
-except ImportError:
-    etree = None
-    try:
-        from xml.etree.ElementTree import Element, ElementTree
-    except ImportError:
-        try:
-            from elementtree import Element, ElementTree
-        except ImportError:
-            raise ImportError(
-                "Failed to find python libxml or elementtree, please install one of those or use python >= 2.5"
-            )
-
-# Configure logging
+# Configure logging first
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-XML_TEMPLATE = """<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
-<service-group>
-<name replace-wildcards="yes"></name>
-<service>
-	<type>_ipp._tcp</type>
-	<subtype>_universal._sub._ipp._tcp</subtype>
-	<port>631</port>
-	<txt-record>txtvers=1</txt-record>
-	<txt-record>qtotal=1</txt-record>
-	<txt-record>Transparent=T</txt-record>
-</service>
-</service-group>"""
+
+# Version information
+__version__ = "1.2.0"
+
+# Named constants
+MAX_TXT_RECORD_LENGTH = 255
+DEFAULT_CUPS_PORT = 631
+EXIT_CODE_USER_CANCELLED = 130
+EXIT_CODE_ERROR = 1
+
+# Service type constants
+IPP_SERVICE_TYPE = "_ipp._tcp"
+IPP_SERVICE_SUBTYPE = "_universal._sub._ipp._tcp"
 
 DOCUMENT_TYPES = {
     # These content-types will be at the front of the list
@@ -98,138 +84,138 @@ DOCUMENT_TYPES = {
 }
 
 
-class AirPrintGenerate(object):
-    def __init__(
-        self,
-        host=None,
-        user=None,
-        port=None,
-        verbose=False,
-        directory=None,
-        prefix="AirPrint-",
-        adminurl=False,
-        descName=False,
-        insecure=False,
-    ):
-        self.host = host
-        self.user = user
-        self.port = port
-        self.verbose = verbose
-        self.directory = directory
-        self.prefix = prefix
-        self.adminurl = adminurl
-        self.descName = descName
-        self.insecure = insecure
+@dataclass
+class AirPrintConfig:
+    """Configuration for AirPrint service generation."""
 
-        if self.user:
-            cups.setUser(self.user)
-            logger.debug(f"Set CUPS user to: {self.user}")
+    host: Optional[str] = None
+    user: Optional[str] = None
+    port: Optional[int] = None
+    verbose: bool = False
+    directory: Optional[Path] = None
+    prefix: str = "AirPrint-"
+    adminurl: bool = False
+    descName: bool = False
+    insecure: bool = False
+
+
+class AirPrintGenerate:
+    """Generate Avahi service files for AirPrint from CUPS printers."""
+
+    def __init__(self, config: AirPrintConfig) -> None:
+        self.config = config
+
+        if self.config.user:
+            cups.setUser(self.config.user)
+            logger.debug(f"Set CUPS user to: {self.config.user}")
 
         # Disable SSL certificate verification if insecure flag is set
-        if self.insecure:
+        if self.config.insecure:
             os.environ["CUPS_SSL_VERIFY"] = "0"
             logger.warning("SSL certificate verification disabled - this is insecure!")
 
         # Set logging level based on verbose flag
-        if self.verbose:
+        if self.config.verbose:
             logger.setLevel(logging.DEBUG)
 
-    def _connect_to_cups(self):
+    def _connect_to_cups(self) -> cups.Connection:
         """Establish connection to CUPS server."""
         try:
-            if not self.host:
+            if not self.config.host:
                 logger.debug("Connecting to local CUPS server")
                 conn = cups.Connection()
             else:
-                if not self.port:
-                    self.port = 631
-                logger.debug(f"Connecting to CUPS server at {self.host}:{self.port}")
-                conn = cups.Connection(self.host, self.port)
+                port = self.config.port or DEFAULT_CUPS_PORT
+                logger.debug(f"Connecting to CUPS server at {self.config.host}:{port}")
+                conn = cups.Connection(self.config.host, port)
             return conn
+        except RuntimeError as e:
+            error_msg = str(e).lower()
+            if "certificate" in error_msg or "ssl" in error_msg or "tls" in error_msg:
+                logger.error(f"SSL/TLS certificate error: {e}")
+                logger.info(
+                    "Hint: Try using the --insecure (-k) flag to disable certificate verification for self-signed certificates"
+                )
+                logger.info(
+                    "      Example: airprint-generate.py -H cups.example.com -k"
+                )
+            else:
+                logger.error(f"Failed to connect to CUPS server: {e}")
+            raise
         except Exception as e:
             logger.error(f"Failed to connect to CUPS server: {e}")
+            if self.config.host and not self.config.insecure:
+                logger.info(
+                    "If the server uses a self-signed certificate, try the --insecure (-k) flag"
+                )
             raise
 
-    def _get_port_number(self, uri):
+    def _get_port_number(self, uri: ParseResult) -> int:
         """Extract port number from URI or use defaults."""
-        port_no = None
-        if hasattr(uri, "port"):
-            port_no = uri.port
-        if not port_no:
-            port_no = self.port
-        if not port_no:
-            port_no = cups.getPort()
-
+        port_no = uri.port or self.config.port or cups.getPort()
         logger.debug(f"Using port: {port_no}")
         return port_no
 
-    def _extract_resource_path(self, uri):
+    def _extract_resource_path(self, uri: ParseResult) -> str:
         """Extract and clean the resource path from URI."""
-        if hasattr(uri, "path"):
-            rp = uri.path
-        else:
-            rp = uri[2]
+        path = uri.path if hasattr(uri, "path") else uri[2]
 
-        re_match = re.match(r"^//(.*):(\d+)(/.*)", rp)
-        if re_match:
-            rp = re_match.group(3)
+        # Extract path from format: //host:port/path
+        if match := re.match(r"^//(.*):(\d+)(/.*)", path):
+            path = match.group(3)
 
-        # Remove leading slashes from path
-        rp = re.sub(r"^/+", "", rp)
-        logger.debug(f"Resource path: {rp}")
-        return rp
+        # Remove leading slashes
+        path = path.lstrip("/")
+        logger.debug(f"Resource path: {path}")
+        return path
 
-    def _add_color_support(self, service, attrs):
+    def _add_txt_record(
+        self, service: Any, text: str, log_msg: Optional[str] = None
+    ) -> None:
+        """Add a TXT record to the service."""
+        txt_record = Element("txt-record")
+        txt_record.text = text
+        service.append(txt_record)
+        if log_msg:
+            logger.debug(log_msg)
+
+    def _add_color_support(self, service: Any, attrs: Dict[str, Any]) -> None:
         """Add color support attribute if available."""
         if attrs.get("color-supported"):
-            color = Element("txt-record")
-            color.text = "Color=T"
-            service.append(color)
-            logger.debug("Added color support")
+            self._add_txt_record(service, "Color=T", "Added color support")
 
-    def _add_paper_size(self, service, attrs):
+    def _add_paper_size(self, service: Any, attrs: Dict[str, Any]) -> None:
         """Add paper size attribute if using A4."""
         if attrs.get("media-default") == "iso_a4_210x297mm":
-            max_paper = Element("txt-record")
-            max_paper.text = "PaperMax=legal-A4"
-            service.append(max_paper)
-            logger.debug("Added paper size: legal-A4")
+            self._add_txt_record(
+                service, "PaperMax=legal-A4", "Added paper size: legal-A4"
+            )
 
-    def _add_urf_support(self, service, attrs):
+    def _add_urf_support(self, service: Any, attrs: Dict[str, Any]) -> bool:
         """Add URF (Universal Raster Format) support."""
-        if "urf-supported" in attrs:
-            urf = Element("txt-record")
-            delimiter = ","
-            urf_attr_join_str = delimiter.join(attrs["urf-supported"])
-            urf.text = f"URF={urf_attr_join_str}"
-            service.append(urf)
-            logger.debug(f"Added URF support: {urf_attr_join_str}")
+        if urf_supported := attrs.get("urf-supported"):
+            urf_str = ",".join(urf_supported)
+            self._add_txt_record(
+                service, f"URF={urf_str}", f"Added URF support: {urf_str}"
+            )
             return True
         return False
 
-    def _add_duplex_support(self, service, attrs):
+    def _add_duplex_support(self, service: Any, attrs: Dict[str, Any]) -> bool:
         """Add duplex printing support."""
-        if "sides-supported" in attrs and any(
-            "two-sided" in element for element in attrs["sides-supported"]
-        ):
-            duplex = Element("txt-record")
-            duplex.text = "Duplex=T"
-            service.append(duplex)
-            logger.debug("Added duplex support")
+        sides = attrs.get("sides-supported", [])
+        if any("two-sided" in side for side in sides):
+            self._add_txt_record(service, "Duplex=T", "Added duplex support")
             return True
         return False
 
-    def _build_pdl_list(self, attrs, printer_name):
+    def _build_pdl_list(self, attrs: Dict[str, Any], printer_name: str) -> List[str]:
         """Build the PDL (Page Description Language) list."""
-        fmts = []
-        defer = []
+        supported_formats = attrs["document-format-supported"]
 
-        for mime_type in attrs["document-format-supported"]:
-            if mime_type in DOCUMENT_TYPES:
-                if DOCUMENT_TYPES[mime_type]:
-                    fmts.append(mime_type)
-            else:
-                defer.append(mime_type)
+        # Separate into priority and deferred formats
+        fmts = [mt for mt in supported_formats if DOCUMENT_TYPES.get(mt) is True]
+        defer = [mt for mt in supported_formats if mt not in DOCUMENT_TYPES]
 
         if "image/urf" not in fmts:
             logger.warning(
@@ -238,55 +224,61 @@ class AirPrintGenerate(object):
                 f"(see https://github.com/tjfontaine/airprint-generate/issues/5)"
             )
 
-        all_formats = fmts + defer
+        all_formats = [*fmts, *defer]
         logger.debug(
             f"Supported formats ({len(all_formats)}): {', '.join(all_formats)}"
         )
-
         return all_formats
 
-    def _truncate_pdl_if_needed(self, fmts, printer_name):
-        """Truncate PDL list if it exceeds 255 character limit."""
+    def _truncate_pdl_if_needed(self, fmts: List[str], printer_name: str) -> str:
+        """Truncate PDL list if it exceeds MAX_TXT_RECORD_LENGTH character limit."""
         fmts_str = ",".join(fmts)
         dropped = []
 
-        while len(f"pdl={fmts_str}") >= 255:
-            fmts_list = fmts_str.split(",")
-            dropped.append(fmts_list.pop())
-            fmts_str = ",".join(fmts_list)
+        while len(f"pdl={fmts_str}") >= MAX_TXT_RECORD_LENGTH:
+            fmts_list = fmts_str.rsplit(",", 1)
+            if len(fmts_list) == 2:
+                fmts_str, last = fmts_list
+                dropped.append(last)
+            else:
+                break
 
         if dropped:
             logger.warning(
                 f"Printer '{printer_name}': Dropped {len(dropped)} format(s) due to "
-                f"255 char limit: {', '.join(reversed(dropped))}"
+                f"{MAX_TXT_RECORD_LENGTH} char limit: {', '.join(reversed(dropped))}"
             )
 
         return fmts_str
 
-    def _write_service_file(self, tree, fname):
+    def _write_service_file(self, tree: ElementTree, fname: str) -> None:
         """Write the service file to disk."""
         try:
-            with open(fname, "w") as f:
-                if etree:
-                    tree.write(
-                        f, pretty_print=True, xml_declaration=True, encoding="UTF-8"
-                    )
-                else:
-                    from xml.etree.ElementTree import tostring
+            # Add DOCTYPE declaration
+            xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>\n'
+            doctype = '<!DOCTYPE service-group SYSTEM "avahi-service.dtd">\n'
 
-                    xmlstr = tostring(tree.getroot())
-                    doc = parseString(xmlstr)
-                    dt = minidom.getDOMImplementation("").createDocumentType(
-                        "service-group", None, "avahi-service.dtd"
-                    )
-                    doc.insertBefore(dt, doc.documentElement)
-                    doc.writexml(f)
+            # Pretty print the XML
+            root = tree.getroot()
+            if root is not None:
+                indent(root, space="  ")
+                xml_str = tostring(root, encoding="unicode")  # type: ignore[call-overload]
+            else:
+                xml_str = ""
+
+            # Write with DOCTYPE
+            with open(fname, "w", encoding="utf-8") as f:
+                f.write(xml_declaration)
+                f.write(doctype)
+                f.write(xml_str)
+                f.write("\n")
+
             logger.info(f"Created service file: {fname}")
         except IOError as e:
             logger.error(f"Failed to write service file '{fname}': {e}")
             raise
 
-    def generate(self):
+    def generate(self) -> None:
         """Generate Avahi service files for all shared CUPS printers."""
         conn = self._connect_to_cups()
 
@@ -313,10 +305,12 @@ class AirPrintGenerate(object):
                 self._generate_printer_service(conn, printer_name, printer_info)
             except Exception as e:
                 logger.error(f"Failed to generate service for '{printer_name}': {e}")
-                if self.verbose:
+                if self.config.verbose:
                     logger.exception("Detailed error:")
 
-    def _generate_printer_service(self, conn, printer_name, printer_info):
+    def _generate_printer_service(
+        self, conn: cups.Connection, printer_name: str, printer_info: Dict[str, Any]
+    ) -> None:
         """Generate service file for a single printer."""
         attrs = conn.getPrinterAttributes(printer_name)
         uri = urlparse(printer_info["printer-uri-supported"])
@@ -325,39 +319,53 @@ class AirPrintGenerate(object):
         logger.debug(f"Printer info: {printer_info.get('printer-info', 'N/A')}")
         logger.debug(f"Printer location: {printer_info.get('printer-location', 'N/A')}")
 
-        tree = ElementTree()
-        tree.parse(
-            StringIO(XML_TEMPLATE.replace("\n", "").replace("\r", "").replace("\t", ""))
-        )
+        # Build XML structure programmatically
+        root = Element("service-group")
 
         # Set service name
-        name = tree.find("name")
-        if self.descName:
-            name.text = f"{printer_info['printer-info']}"
+        name = Element("name")
+        name.set("replace-wildcards", "yes")
+        if self.config.descName:
+            name.text = printer_info["printer-info"]
         else:
             name.text = f"AirPrint {printer_name} @ %h"
         logger.debug(f"Service name: {name.text}")
+        root.append(name)
 
-        service = tree.find("service")
+        # Create service element
+        service = Element("service")
+        root.append(service)
+
+        # Add service type and subtype
+        service_type = Element("type")
+        service_type.text = IPP_SERVICE_TYPE
+        service.append(service_type)
+
+        service_subtype = Element("subtype")
+        service_subtype.text = IPP_SERVICE_SUBTYPE
+        service.append(service_subtype)
 
         # Set port
-        port = service.find("port")
+        port = Element("port")
         port_no = self._get_port_number(uri)
-        port.text = f"{port_no}"
+        port.text = str(port_no)
+        service.append(port)
 
-        # Set resource path
+        # Add base TXT records
+        for txt in ("txtvers=1", "qtotal=1", "Transparent=T"):
+            self._add_txt_record(service, txt)
+
+        # Add resource path
         rp = self._extract_resource_path(uri)
-        path = Element("txt-record")
-        path.text = f"rp={rp}"
-        service.append(path)
+        self._add_txt_record(service, f"rp={rp}")
 
-        # Set description
-        desc = Element("txt-record")
-        if self.descName:
-            desc.text = f"note={printer_info['printer-location']}"
-        else:
-            desc.text = f"note={printer_info['printer-info']}"
-        service.append(desc)
+        # Add description/note
+        note = (
+            printer_info["printer-location"]
+            if self.config.descName
+            else printer_info["printer-info"]
+        )
+        self._add_txt_record(service, f"note={note}")
 
         # Add printer capabilities
         self._add_color_support(service, attrs)
@@ -368,53 +376,48 @@ class AirPrintGenerate(object):
 
         # Add hardcoded URF if duplex but no URF
         if has_duplex and not has_urf:
-            urf = Element("txt-record")
-            urf.text = "URF=DM3"
-            service.append(urf)
-            logger.debug("Added hardcoded URF=DM3 for duplex support")
+            self._add_txt_record(
+                service, "URF=DM3", "Added hardcoded URF=DM3 for duplex support"
+            )
 
-        # Add product info
-        product = Element("txt-record")
-        product.text = "product=(GPL Ghostscript)"
-        service.append(product)
-
-        # Add printer state
-        state = Element("txt-record")
-        state.text = f"printer-state={printer_info['printer-state']}"
-        service.append(state)
-
-        # Add printer type
-        ptype = Element("txt-record")
-        ptype.text = f"printer-type={hex(printer_info['printer-type'])}"
-        service.append(ptype)
+        # Add standard printer information
+        self._add_txt_record(service, "product=(GPL Ghostscript)")
+        self._add_txt_record(service, f"printer-state={printer_info['printer-state']}")
+        self._add_txt_record(
+            service, f"printer-type={hex(printer_info['printer-type'])}"
+        )
 
         # Build and add PDL list
         all_formats = self._build_pdl_list(attrs, printer_name)
         fmts_str = self._truncate_pdl_if_needed(all_formats, printer_name)
-
-        pdl = Element("txt-record")
-        pdl.text = f"pdl={fmts_str}"
-        service.append(pdl)
+        self._add_txt_record(service, f"pdl={fmts_str}")
 
         # Add admin URL if requested
-        if self.adminurl:
-            admin = Element("txt-record")
-            admin.text = f"adminurl={printer_info['printer-uri-supported']}"
-            service.append(admin)
-            logger.debug(f"Added admin URL: {printer_info['printer-uri-supported']}")
+        if self.config.adminurl:
+            admin_url = printer_info["printer-uri-supported"]
+            self._add_txt_record(
+                service, f"adminurl={admin_url}", f"Added admin URL: {admin_url}"
+            )
 
         # Write service file
-        fname = f"{self.prefix}{printer_name}.service"
-        if self.directory:
-            fname = os.path.join(self.directory, fname)
+        fname = f"{self.config.prefix}{printer_name}.service"
+        if self.config.directory:
+            fname = str(self.config.directory / fname)
 
+        tree = ElementTree(root)
         self._write_service_file(tree, fname)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate Avahi service files for AirPrint from CUPS printers",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+        help="Show program version and exit",
     )
     parser.add_argument(
         "-H",
@@ -442,6 +445,7 @@ def main():
         "-d",
         "--directory",
         dest="directory",
+        type=Path,
         help="Directory to create service files",
         metavar="DIRECTORY",
     )
@@ -491,18 +495,17 @@ def main():
 
     # Create directory if needed
     if args.directory:
-        if not os.path.exists(args.directory):
-            try:
-                os.makedirs(args.directory)
-                logger.info(f"Created directory: {args.directory}")
-            except OSError as e:
-                logger.error(f"Failed to create directory '{args.directory}': {e}")
-                sys.exit(1)
+        try:
+            args.directory.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Created directory: {args.directory}")
+        except OSError as e:
+            logger.error(f"Failed to create directory '{args.directory}': {e}")
+            sys.exit(EXIT_CODE_ERROR)
 
     try:
-        apg = AirPrintGenerate(
-            user=args.username,
+        config = AirPrintConfig(
             host=args.hostname,
+            user=args.username,
             port=args.port,
             verbose=args.verbose,
             directory=args.directory,
@@ -512,14 +515,15 @@ def main():
             insecure=args.insecure,
         )
 
+        apg = AirPrintGenerate(config)
         apg.generate()
         logger.info("Service generation completed successfully")
     except KeyboardInterrupt:
         logger.info("Operation cancelled by user")
-        sys.exit(130)
+        sys.exit(EXIT_CODE_USER_CANCELLED)
     except Exception as e:
         logger.error(f"Failed to generate service files: {e}")
-        sys.exit(1)
+        sys.exit(EXIT_CODE_ERROR)
 
 
 if __name__ == "__main__":
