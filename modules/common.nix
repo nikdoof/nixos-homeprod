@@ -65,7 +65,6 @@
 
   programs = {
     bat.enable = true;
-    fzf.enable = true;
     git.enable = true;
     zsh = {
       enable = true;
@@ -90,6 +89,7 @@
     eza
     jq
     yq
+    fzf
   ];
 
   services = {
