@@ -179,6 +179,21 @@ let
         "/mnt/nas-03/media/:/data"
       ];
     };
+
+    # Rustical
+    rustical = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.rustical.rule" = "Host(`cal.doofnet.uk`)";
+        "traefik.http.services.rustical.loadbalancer.server.port" = "4000";
+      };
+      image = "ghcr.io/lennart-k/rustical:0.12.5";
+      environmentFiles = [ config.age.secrets.rusticalClientSecret.path ];
+      volumes = [
+        "/srv/data/rustical/config/config.toml:/etc/rustical/config.toml:U"
+        "/srv/data/rustical/data:/var/lib/rustical:U"
+      ];
+    };
   };
 
   # Extract local /srv/data paths from all volumes defined in any containers
@@ -212,6 +227,9 @@ in
     maxmindLicenseKey = {
       file = ../../secrets/maxmindLicenseKey.age;
       owner = "1000";
+    };
+    rusticalClientSecret = {
+      file = ../../secrets/rusticalClientSecret.age;
     };
   };
 
