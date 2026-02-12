@@ -44,4 +44,8 @@
     ghostty
     chafa
   ];
+
+  programs.zsh.shellAliases = {
+    startx = "uwsm start default"; # Old habits die hard
+  };
 }
