@@ -66,7 +66,7 @@
       userServices = true;
     };
     extraServiceFiles = {
-      zebra = ./AirPrint-Zebra_GK420d.service;
+      zebra = ./cups/AirPrint-Zebra_GK420d.service;
     };
   };
 
@@ -79,7 +79,7 @@
     allowFrom = [ "all" ];
 
     drivers = [
-      (pkgs.writeTextDir "share/cups/model/Zebra_GK420d.ppd" (builtins.readFile ./Zebra_GK420d.ppd))
+      (pkgs.writeTextDir "share/cups/model/Zebra_GK420d.ppd" (builtins.readFile ./cups/Zebra_GK420d.ppd))
     ];
   };
 
