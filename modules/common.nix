@@ -65,6 +65,7 @@
 
   programs = {
     bat.enable = true;
+    fzf.enable = true;
     git.enable = true;
     zsh = {
       enable = true;
@@ -87,6 +88,8 @@
   environment.systemPackages = with pkgs; [
     gnupg
     eza
+    jq
+    yq
   ];
 
   services = {

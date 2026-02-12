@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -38,4 +39,9 @@
     xwayland.enable = true; # Xwayland can be disabled.
   };
 
+  environment.systemPackages = with pkgs; [
+    kitty
+    ghostty
+    chafa
+  ];
 }
