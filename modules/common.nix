@@ -90,6 +90,7 @@
     jq
     yq
     fzf
+    starship
   ];
 
   services = {
