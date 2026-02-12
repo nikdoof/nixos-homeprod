@@ -39,7 +39,7 @@
   services.acpid.enable = true;
 
   # Enable sound.
-  services.pulseaudio.enable = true;
+  #services.pulseaudio.enable = true;
 
   # Enable touch input
   services.libinput.enable = true;
