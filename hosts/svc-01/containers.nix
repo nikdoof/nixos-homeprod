@@ -186,6 +186,7 @@ let
         "traefik.enable" = "true";
         "traefik.http.routers.rustical.rule" = "Host(`cal.doofnet.uk`)";
         "traefik.http.services.rustical.loadbalancer.server.port" = "4000";
+        "traefik.http.routers.rustical.entrypoints" = "websecure,extwebsecure";
       };
       image = "ghcr.io/lennart-k/rustical:0.12.5";
       environmentFiles = [ config.age.secrets.rusticalClientSecret.path ];
