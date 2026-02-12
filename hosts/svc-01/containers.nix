@@ -239,8 +239,8 @@ in
   # Automatically create /srv/data directories from container definitions
   system.activationScripts.createContainerDirs = lib.stringAfter [ "var" ] ''
     ${lib.concatMapStringsSep "\n" (dir: ''
-      mkdir -p "${dir}"
-      chmod 755 "${dir}"
+      if ! [ -f ${dir} ]; then mkdir -p "${dir}"; fi
+      chmod u+rwX,g+rX,o+rX "${dir}"
     '') srvDataDirs}
   '';
 }
