@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   ...
 }:
 
@@ -92,18 +93,23 @@
 
   services.postgresql = {
     ensureDatabases = [ "gotosocial" ];
-    ensureUsers = [
+    ensureUsers = lib.mkAfter [
       {
         name = "gotosocial";
         ensureDBOwnership = true;
         ensureClauses = {
+          createrole = true;
+          createdb = true;
           login = true;
-          password = "SCRAM-SHA-256$4096:ccdHuoEyjh5gKX550FCOdQ==$jAm1/d9IRySXwdsb2uby5F71ZY9gFkOK/Sc77W9klBI=:6tN57xZCQIwPtZk9DwmRkjpPa8jVTBTFQj+T7V3HlLc=";
+          #password = "SCRAM-SHA-256$4096:ccdHuoEyjh5gKX550FCOdQ==$jAm1/d9IRySXwdsb2uby5F71ZY9gFkOK/Sc77W9klBI=:6tN57xZCQIwPtZk9DwmRkjpPa8jVTBTFQj+T7V3HlLc=";
         };
       }
     ];
 
     authentication = pkgs.lib.mkOverride 10 ''
+      local all all trust
+      host sameuser all 127.0.0.1/32 scram-sha-256
+      host sameuser all ::1/128 scram-sha-256
       host all all 10.0.0.0/8 scram-sha-256
     '';
   };
