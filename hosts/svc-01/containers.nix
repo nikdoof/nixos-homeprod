@@ -204,7 +204,7 @@ let
         "traefik.http.services.gotosocial.loadbalancer.server.port" = "8080";
         "traefik.http.routers.gotosocial.entrypoints" = "websecure,extwebsecure";
       };
-      image = "ghcr.io/superseriousbusiness/gotosocial:0.20.3";
+      image = "superseriousbusiness/gotosocial:0.20.3";
       environment = {
         GTS_ADVANCED_RATE_LIMIT_REQUESTS = "0";
         GTS_ALLOW_IPS = "10.101.10.6/32";
