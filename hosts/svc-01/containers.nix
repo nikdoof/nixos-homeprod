@@ -195,6 +195,42 @@ let
         "/srv/data/rustical/data:/var/lib/rustical:U"
       ];
     };
+
+    # GoToSocial
+    gotosocial = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.gotosocial.rule" = "Host(`social.doofnet.uk`)";
+        "traefik.http.services.gotosocial.loadbalancer.server.port" = "8080";
+        "traefik.http.routers.gotosocial.entrypoints" = "websecure,extwebsecure";
+      };
+      image = "ghcr.io/superseriousbusiness/gotosocial:0.20.3";
+      environment = {
+        GTS_ADVANCED_RATE_LIMIT_REQUESTS = "0";
+        GTS_ALLOW_IPS = "10.101.10.6/32";
+        GTS_DB_TYPE = "postgres";
+        GTS_HOST = "social.doofnet.uk";
+        GTS_INSTANCE_LANGUAGES = "en-gb";
+        GTS_INSTANCE_STATS_MODE = "serve";
+        GTS_LETSENCRYPT_ENABLED = "false";
+        GTS_METRICS_ENABLED = "true";
+        GTS_OIDC_ADMIN_GROUPS = "admin";
+        GTS_OIDC_ENABLED = "true";
+        GTS_OIDC_IDP_NAME = "Doofnet";
+        GTS_OIDC_ISSUER = "https://id.doofnet.uk";
+        GTS_SMTP_FROM = "no-reply@doofnet.uk";
+        GTS_SMTP_HOST = "mx-01.doofnet.uk";
+        GTS_SMTP_PORT = "25";
+        GTS_STORAGE_BACKEND = "s3";
+        GTS_TRUSTED_PROXIES = "10.0.0.0/8,::1";
+        GTS_WAZERO_COMPILATION_CACHE = "/gotosocial/.cache";
+        OTEL_EXPORTER_PROMETHEUS_HOST = "0.0.0.0";
+        OTEL_METRICS_EXPORTER = "prometheus";
+        OTEL_METRICS_PRODUCERS = "prometheus";
+        TZ = "Europe/London";
+      };
+      environmentFiles = [ config.age.secrets.goToSocialEnvironment.path ];
+    };
   };
 
   # Extract local /srv/data paths from all volumes defined in any containers
@@ -231,6 +267,9 @@ in
     };
     rusticalClientSecret = {
       file = ../../secrets/rusticalClientSecret.age;
+    };
+    goToSocialEnvironment = {
+      file = ../../secrets/goToSocialEnvironment.age;
     };
   };
 
