@@ -111,6 +111,7 @@
       host sameuser all 127.0.0.1/32 scram-sha-256
       host sameuser all ::1/128 scram-sha-256
       host all all 10.0.0.0/8 scram-sha-256
+      host all all 2001:8b0:bd9:101::/64 scram-sha-256
     '';
   };
 
