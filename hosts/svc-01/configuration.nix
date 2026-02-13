@@ -13,6 +13,7 @@
     ../../modules/server.nix
     ../../modules/podman.nix
     ../../modules/traefik.nix
+    ../../modules/nfs/media.nix
     ./containers.nix
     ./timers.nix
   ];
@@ -42,18 +43,6 @@
       DHCP = "ipv4";
       IPv6AcceptRA = true;
     };
-  };
-
-  # Media
-  fileSystems."/mnt/nas-03/media" = {
-    device = "nas-03.int.doofnet.uk:/mnt/media";
-    fsType = "nfs";
-    options = [
-      "rw"
-      "noatime"
-      "nfsvers=4"
-      "proto=tcp"
-    ];
   };
 
   # Printing

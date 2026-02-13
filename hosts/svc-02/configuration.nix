@@ -9,6 +9,7 @@
     ../../hardware/prodesk-600-g3-dm.nix
     ../../modules/common.nix
     ../../modules/server.nix
+    ../../modules/nfs/media.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
@@ -36,18 +37,6 @@
       DHCP = "ipv4";
       IPv6AcceptRA = true;
     };
-  };
-
-  # Media
-  fileSystems."/mnt/nas-03/media" = {
-    device = "nas-03.int.doofnet.uk:/mnt/media";
-    fsType = "nfs";
-    options = [
-      "rw"
-      "noatime"
-      "nfsvers=4"
-      "proto=tcp"
-    ];
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
