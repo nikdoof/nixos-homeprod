@@ -20,4 +20,5 @@ in
   "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];
   "pocketIdEncryptionKey.age".publicKeys = users ++ [ svc-01 ];
   "rusticalClientSecret.age".publicKeys = users ++ [ svc-01 ];
+  "goToSocialEnvironment.age".publicKeys = users ++ [ svc-01 ];
 }

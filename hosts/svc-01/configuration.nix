@@ -13,6 +13,7 @@
     ../../modules/server.nix
     ../../modules/podman.nix
     ../../modules/traefik.nix
+    ../../modules/postgresql.nix
     ../../modules/nfs/media.nix
     ./containers.nix
     ./timers.nix
@@ -87,6 +88,24 @@
       }
     ];
     ensureDefaultPrinter = "Zebra_GK420d";
+  };
+
+  services.postgresql = {
+    ensureDatabases = [ "gotosocial" ];
+    ensureUsers = [
+      {
+        name = "gotosocial";
+        ensureDBOwnership = true;
+        ensureClauses = {
+          login = true;
+          password = "SCRAM-SHA-256$4096:ccdHuoEyjh5gKX550FCOdQ==$jAm1/d9IRySXwdsb2uby5F71ZY9gFkOK/Sc77W9klBI=:6tN57xZCQIwPtZk9DwmRkjpPa8jVTBTFQj+T7V3HlLc=";
+        };
+      }
+    ];
+
+    authentication = pkgs.lib.mkOverride 10 ''
+      host all all 10.0.0.0/8 scram-sha-256
+    '';
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
