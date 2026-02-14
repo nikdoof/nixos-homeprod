@@ -43,11 +43,6 @@
   services.prometheus = {
     enable = true;
 
-    alertmanager = {
-      enable = true;
-      openFirewall = true;
-    };
-
     scrapeConfigs = [
       {
         job_name = "node_exporter";
@@ -68,25 +63,25 @@
               "hs-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
             ];
           }
+        ];
+      }
+      {
+        job_name = "jrouter";
+        static_configs = [
           {
-            job_name = "jrouter";
-            static_configs = [
-              {
-                targets = [
-                  "jrouter.int.doofnet.uk:9459"
-                ];
-              }
+            targets = [
+              "jrouter.int.doofnet.uk:9459"
             ];
           }
+        ];
+      }
+      {
+        job_name = "bind";
+        static_configs = [
           {
-            job_name = "bind";
-            static_configs = [
-              {
-                targets = [
-                  "ns1.int.doofnet.uk:9119"
-                  "ns2.int.doofnet.uk:9119"
-                ];
-              }
+            targets = [
+              "ns1.int.doofnet.uk:9119"
+              "ns2.int.doofnet.uk:9119"
             ];
           }
         ];
