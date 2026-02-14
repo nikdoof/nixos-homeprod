@@ -101,6 +101,17 @@
 
   services.grafana = {
     enable = true;
+
+    settings = {
+      server = {
+        http_addr = "0.0.0.0";
+        http_port = 3000;
+        enforce_domain = false;
+        enable_gzip = true;
+        domain = "svc-02.int.doofnet.uk";
+      };
+    };
+
     provision = {
       enable = true;
 
