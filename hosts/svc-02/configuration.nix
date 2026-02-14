@@ -161,7 +161,7 @@
       ./grafana/dashboards/truenas-temperatures.json;
   };
 
-  service.traefik = {
+  services.traefik = {
     dynamicConfigOptions = {
       http = {
         routers.grafana = {
