@@ -89,6 +89,13 @@
     ];
   };
 
+  # Workaround for prometheus to store data in another place
+  # https://www.freedesktop.org/software/systemd/man/latest/tmpfiles.d.html#Type
+  systemd.tmpfiles.rules = [
+    "D /srv/data/prometheus/data 0751 prometheus prometheus - -"
+    "L+ /var/lib/prometheus - - - - /srv/data/prometheus/data"
+  ];
+
   services.grafana = {
     enable = true;
   };
