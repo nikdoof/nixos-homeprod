@@ -92,10 +92,34 @@
   };
 
   services.postgresql = {
-    ensureDatabases = [ "gotosocial" ];
+    ensureDatabases = [
+      "gotosocial"
+      "miniflux"
+      "linkding"
+    ];
     ensureUsers = lib.mkAfter [
       {
         name = "gotosocial";
+        ensureDBOwnership = true;
+        ensureClauses = {
+          createrole = true;
+          createdb = true;
+          login = true;
+          #password = "SCRAM-SHA-256$4096:ccdHuoEyjh5gKX550FCOdQ==$jAm1/d9IRySXwdsb2uby5F71ZY9gFkOK/Sc77W9klBI=:6tN57xZCQIwPtZk9DwmRkjpPa8jVTBTFQj+T7V3HlLc=";
+        };
+      }
+      {
+        name = "miniflux";
+        ensureDBOwnership = true;
+        ensureClauses = {
+          createrole = true;
+          createdb = true;
+          login = true;
+          #password = "SCRAM-SHA-256$4096:ccdHuoEyjh5gKX550FCOdQ==$jAm1/d9IRySXwdsb2uby5F71ZY9gFkOK/Sc77W9klBI=:6tN57xZCQIwPtZk9DwmRkjpPa8jVTBTFQj+T7V3HlLc=";
+        };
+      }
+      {
+        name = "linkding";
         ensureDBOwnership = true;
         ensureClauses = {
           createrole = true;
