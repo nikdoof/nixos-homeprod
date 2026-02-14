@@ -89,12 +89,11 @@
     ];
   };
 
-  # Workaround for prometheus to store data in another place
-  # https://www.freedesktop.org/software/systemd/man/latest/tmpfiles.d.html#Type
-  systemd.tmpfiles.rules = [
-    "D /srv/data/prometheus/data 0751 prometheus prometheus - -"
-    "L+ /var/lib/prometheus2 - - - - /srv/data/prometheus/data"
-  ];
+  # Bind Prometheus home folder to the NVMe.
+  fileSystems."/var/lib/prometheus2" = {
+    device = "/srv/data/prometheus/data";
+    options = [ "bind" ];
+  };
 
   services.grafana = {
     enable = true;
