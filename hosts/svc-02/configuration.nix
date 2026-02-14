@@ -110,7 +110,7 @@
         http_port = 3000;
         enforce_domain = false;
         enable_gzip = true;
-        domain = "svc-02.int.doofnet.uk";
+        domain = "grafana.svc.doofnet.uk";
       };
     };
 
@@ -159,6 +159,21 @@
     "grafana/dashboards/truenas-overview.json".source = ./grafana/dashboards/truenas-overview.json;
     "grafana/dashboards/truenas-temperatures.json".source =
       ./grafana/dashboards/truenas-temperatures.json;
+  };
+
+  service.traefik = {
+    dynamicConfigOptions = {
+      http = {
+        routers.grafana = {
+          rule = "Host(`grafana.svc.doofnet.uk`)";
+          service = "grafana";
+        };
+
+        services.grafana.loadBalancer.servers = [
+          { url = "http://localhost:3000"; }
+        ];
+      };
+    };
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
