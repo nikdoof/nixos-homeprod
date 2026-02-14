@@ -13,6 +13,9 @@
     ../../modules/nfs/media.nix
   ];
 
+  # Allows for cross compling for Pis
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   # Networking
   networking.useDHCP = false;
   networking.hostName = "svc-02";
