@@ -37,7 +37,13 @@
 
         # Nameservers
         ns-01 = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
           modules = [
+            {
+              nixpkgs.config.allowUnsupportedSystem = true;
+              nixpkgs.hostPlatform.system = "aarch64-linux";
+              nixpkgs.buildPlatform.system = "x86_64-linux";
+            }
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             ./hosts/ns-01/configuration.nix
             agenix.nixosModules.default
