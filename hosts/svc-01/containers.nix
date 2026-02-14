@@ -235,9 +235,9 @@ let
     miniflux = {
       labels = {
         "traefik.enable" = "true";
-        "traefik.http.routers.gotosocial.rule" = "Host(`rss.doofnet.uk`)";
-        "traefik.http.services.gotosocial.loadbalancer.server.port" = "8080";
-        "traefik.http.routers.gotosocial.entrypoints" = "websecure,extwebsecure";
+        "traefik.http.routers.miniflux.rule" = "Host(`rss.doofnet.uk`)";
+        "traefik.http.services.miniflux.loadbalancer.server.port" = "8080";
+        "traefik.http.routers.miniflux.entrypoints" = "websecure,extwebsecure";
       };
       image = "miniflux/miniflux:2.2.16";
       environment = {
@@ -258,17 +258,17 @@ let
     linkding = {
       labels = {
         "traefik.enable" = "true";
-        "traefik.http.routers.gotosocial.rule" = "Host(`link.doofnet.uk`)";
-        "traefik.http.services.gotosocial.loadbalancer.server.port" = "9090";
-        "traefik.http.routers.gotosocial.entrypoints" = "websecure,extwebsecure";
+        "traefik.http.routers.linkding.rule" = "Host(`link.doofnet.uk`)";
+        "traefik.http.services.linkding.loadbalancer.server.port" = "9090";
+        "traefik.http.routers.linkding.entrypoints" = "websecure,extwebsecure";
       };
       image = "sissbruecker/linkding:1.45.0";
       environment = {
         LD_DB_ENGINE = "postgres";
-        LD_DB_HOST= "10.88.0.1";
-        LD_DB_PORT= "5432";
-        LD_DB_USER="linkding";
-        LD_DB_DATABASE="linkding";
+        LD_DB_HOST = "10.88.0.1";
+        LD_DB_PORT = "5432";
+        LD_DB_USER = "linkding";
+        LD_DB_DATABASE = "linkding";
         LD_ENABLE_OIDC = "True";
         OIDC_OP_AUTHORIZATION_ENDPOINT = "https://id.doofnet.uk/authorize";
         OIDC_OP_TOKEN_ENDPOINT = "https://id.doofnet.uk/api/oidc/token";
