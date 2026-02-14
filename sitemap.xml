@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://nikdoof.github.io/nixos-homeprod/base_host/</loc>
+         <lastmod>2026-02-14</lastmod>
+    </url>
+    <url>
+         <loc>https://nikdoof.github.io/nixos-homeprod/macos/</loc>
+         <lastmod>2026-02-14</lastmod>
+    </url>
+    <url>
+         <loc>https://nikdoof.github.io/nixos-homeprod/raspberry_pi/</loc>
+         <lastmod>2026-02-14</lastmod>
+    </url>
+</urlset>
