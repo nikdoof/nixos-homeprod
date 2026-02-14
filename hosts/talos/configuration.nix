@@ -47,7 +47,7 @@
     chafa
     rofi
     hyprpaper
-    font-font-awesome
+    font-awesome
   ];
 
   programs.zsh.shellAliases = {
