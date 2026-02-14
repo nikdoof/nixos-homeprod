@@ -95,6 +95,10 @@
     options = [ "bind" ];
   };
 
+  networking.firewall.allowedTCPPorts = [
+    9090
+  ];
+
   services.grafana = {
     enable = true;
   };
