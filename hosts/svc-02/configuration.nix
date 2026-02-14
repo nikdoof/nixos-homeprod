@@ -60,7 +60,7 @@
 
               "web-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "mx-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "hs-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "hs.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
             ];
           }
         ];
