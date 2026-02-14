@@ -7,8 +7,8 @@
     enable = true;
     enableTCPIP = true;
     dataDir = "/srv/data/postgresql";
-    port = 5432;
     settings = {
+      port = 5432;
       ssl = true;
     };
   };
