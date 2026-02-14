@@ -36,13 +36,13 @@
         };
 
         # Nameservers
-        # ns-01 = nixpkgs.lib.nixosSystem {
-        #   modules = [
-        #     "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-        #     ./hosts/ns-01/configuration.nix
-        #     agenix.nixosModules.default
-        #   ];
-        # };
+        ns-01 = nixpkgs.lib.nixosSystem {
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+            ./hosts/ns-01/configuration.nix
+            agenix.nixosModules.default
+          ];
+        };
         ns-02 = nixpkgs.lib.nixosSystem {
           modules = [
             ./hosts/ns-02/configuration.nix
