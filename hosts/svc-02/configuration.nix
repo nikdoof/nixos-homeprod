@@ -101,6 +101,7 @@
 
   services.grafana = {
     enable = true;
+    openFirewall = true;
 
     settings = {
       server = {
