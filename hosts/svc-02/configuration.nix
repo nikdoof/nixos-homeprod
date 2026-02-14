@@ -13,13 +13,6 @@
     ../../modules/nfs/media.nix
   ];
 
-  # Use the systemd-boot EFI boot loader.
-  boot.loader = {
-    systemd-boot.enable = true;
-    systemd-boot.configurationLimit = 2;
-    efi.canTouchEfiVariables = true;
-  };
-
   # Networking
   networking.useDHCP = false;
   networking.hostName = "svc-02";

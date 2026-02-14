@@ -14,13 +14,6 @@
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
 
-  # Use the systemd-boot EFI boot loader.
-  boot.loader = {
-    systemd-boot.enable = true;
-    systemd-boot.configurationLimit = 2;
-    efi.canTouchEfiVariables = true;
-  };
-
   networking.hostName = "talos";
   networking.networkmanager.enable = true;
 

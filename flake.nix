@@ -34,6 +34,23 @@
             agenix.nixosModules.default
           ];
         };
+
+        # Nameservers
+        # ns-01 = nixpkgs.lib.nixosSystem {
+        #   modules = [
+        #     "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+        #     ./hosts/ns-01/configuration.nix
+        #     agenix.nixosModules.default
+        #   ];
+        # };
+        ns-02 = nixpkgs.lib.nixosSystem {
+          modules = [
+            ./hosts/ns-02/configuration.nix
+            agenix.nixosModules.default
+          ];
+        };
+
+        # Mini P8 Laptop
         talos = nixpkgs.lib.nixosSystem {
           modules = [
             nixos-hardware.nixosModules.common-cpu-intel

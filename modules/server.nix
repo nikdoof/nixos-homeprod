@@ -36,7 +36,6 @@
       keep_weekly = 4;
       keep_monthly = 6;
       keep_yearly = 1;
-
     };
   };
 }

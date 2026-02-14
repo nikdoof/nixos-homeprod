@@ -4,6 +4,13 @@
 }:
 
 {
+  # Use the systemd-boot EFI boot loader.
+  boot.loader = {
+    systemd-boot.enable = true;
+    systemd-boot.configurationLimit = 2;
+    efi.canTouchEfiVariables = true;
+  };
+
   # Extra kernel modules
   boot.initrd.availableKernelModules = [
     "nvme"
