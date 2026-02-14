@@ -101,6 +101,53 @@
 
   services.grafana = {
     enable = true;
+    provision = {
+      enable = true;
+
+      # Creates a *mutable* dashboard provider, pulling from /etc/grafana-dashboards.
+      # With this, you can manually provision dashboards from JSON with `environment.etc` like below.
+      dashboards.settings.providers = [
+        {
+          name = "Dashboards";
+          disableDeletion = true;
+          options = {
+            path = "/etc/grafana/dashboards";
+            foldersFromFilesStructure = true;
+          };
+        }
+      ];
+
+      datasources.settings.datasources = [
+        {
+          name = "Prometheus";
+          type = "prometheus";
+          url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
+          isDefault = true;
+          editable = false;
+        }
+      ];
+    };
+  };
+
+  # Provision Grafana dashboards via /etc
+  environment.etc = {
+    "grafana/dashboards/bind.json".source = ./grafana/dashboards/bind.json;
+    "grafana/dashboards/downloads.json".source = ./grafana/dashboards/downloads.json;
+    "grafana/dashboards/house-dashboard.json".source = ./grafana/dashboards/house-dashboard.json;
+    "grafana/dashboards/infra-dashboard.json".source = ./grafana/dashboards/infra-dashboard.json;
+    "grafana/dashboards/jrouter.json".source = ./grafana/dashboards/jrouter.json;
+    "grafana/dashboards/kube-router-dashboard.json".source =
+      ./grafana/dashboards/kube-router-dashboard.json;
+    "grafana/dashboards/mosquitto-broker.json".source = ./grafana/dashboards/mosquitto-broker.json;
+    "grafana/dashboards/pfsense.json".source = ./grafana/dashboards/pfsense.json;
+    "grafana/dashboards/postgresql-database.json".source =
+      ./grafana/dashboards/postgresql-database.json;
+    "grafana/dashboards/truenas-cgroups.json".source = ./grafana/dashboards/truenas-cgroups.json;
+    "grafana/dashboards/truenas-disk-insight.json".source =
+      ./grafana/dashboards/truenas-disk-insight.json;
+    "grafana/dashboards/truenas-overview.json".source = ./grafana/dashboards/truenas-overview.json;
+    "grafana/dashboards/truenas-temperatures.json".source =
+      ./grafana/dashboards/truenas-temperatures.json;
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
