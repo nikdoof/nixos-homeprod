@@ -1,4 +1,5 @@
 {
+  config,
   ...
 }:
 
@@ -37,6 +38,64 @@
       DHCP = "ipv4";
       IPv6AcceptRA = true;
     };
+  };
+
+  services.prometheus = {
+    enable = true;
+
+    alertmanager = {
+      enable = true;
+      openFirewall = true;
+    };
+
+    scrapeConfigs = [
+      {
+        job_name = "node_exporter";
+        static_configs = [
+          {
+            targets = [
+              "gw.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "ns1.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "ns2.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "svc-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "svc-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "nas-afp.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "jrouter.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "nexus.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+
+              "web-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "mx-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "hs-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+            ];
+          }
+          {
+            job_name = "jrouter";
+            static_configs = [
+              {
+                targets = [
+                  "jrouter.int.doofnet.uk:9459"
+                ];
+              }
+            ];
+          }
+          {
+            job_name = "bind";
+            static_configs = [
+              {
+                targets = [
+                  "ns1.int.doofnet.uk:9119"
+                  "ns2.int.doofnet.uk:9119"
+                ];
+              }
+            ];
+          }
+        ];
+      }
+    ];
+  };
+
+  services.grafana = {
+    enable = true;
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
