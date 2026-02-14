@@ -38,15 +38,16 @@
     withUWSM = true; # recommended for most users
     xwayland.enable = true; # Xwayland can be disabled.
   };
+  programs.waybar.enable = true;
+  programs.yazi.enable = true;
 
   environment.systemPackages = with pkgs; [
     kitty
     ghostty
     chafa
     rofi
-    waybar
     hyprpaper
-    yazi
+    font-font-awesome
   ];
 
   programs.zsh.shellAliases = {
