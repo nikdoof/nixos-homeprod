@@ -131,7 +131,7 @@
 
       datasources.settings.datasources = [
         {
-          name = "Prometheus";
+          name = "prometheus";
           type = "prometheus";
           url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
           isDefault = true;
