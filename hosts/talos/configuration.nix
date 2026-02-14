@@ -43,6 +43,10 @@
     kitty
     ghostty
     chafa
+    rofi
+    waybar
+    hyprpaper
+    yazi
   ];
 
   programs.zsh.shellAliases = {
