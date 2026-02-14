@@ -10,6 +10,7 @@
     ../../hardware/prodesk-600-g3-dm.nix
     ../../modules/common.nix
     ../../modules/server.nix
+    ../../modules/traefik.nix
     ../../modules/nfs/media.nix
   ];
 
@@ -148,8 +149,6 @@
     "grafana/dashboards/house-dashboard.json".source = ./grafana/dashboards/house-dashboard.json;
     "grafana/dashboards/infra-dashboard.json".source = ./grafana/dashboards/infra-dashboard.json;
     "grafana/dashboards/jrouter.json".source = ./grafana/dashboards/jrouter.json;
-    "grafana/dashboards/kube-router-dashboard.json".source =
-      ./grafana/dashboards/kube-router-dashboard.json;
     "grafana/dashboards/mosquitto-broker.json".source = ./grafana/dashboards/mosquitto-broker.json;
     "grafana/dashboards/pfsense.json".source = ./grafana/dashboards/pfsense.json;
     "grafana/dashboards/postgresql-database.json".source =

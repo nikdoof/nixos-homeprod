@@ -19,4 +19,18 @@
     dive
     podman-tui
   ];
+
+  # Configure Traefik to use Podman as a source
+  services.traefik = {
+    group = "podman";
+
+    staticConfigOptions = {
+      providers = {
+        docker = {
+          exposedByDefault = false;
+          endpoint = "unix:///run/podman/podman.sock";
+        };
+      };
+    };
+  };
 }
