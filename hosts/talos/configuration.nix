@@ -38,6 +38,7 @@
     withUWSM = true; # recommended for most users
     xwayland.enable = true; # Xwayland can be disabled.
   };
+  programs.hyprlock.enable = true;
   programs.waybar.enable = true;
   programs.yazi.enable = true;
 

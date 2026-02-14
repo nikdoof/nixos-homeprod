@@ -21,4 +21,6 @@ in
   "pocketIdEncryptionKey.age".publicKeys = users ++ [ svc-01 ];
   "rusticalClientSecret.age".publicKeys = users ++ [ svc-01 ];
   "goToSocialEnvironment.age".publicKeys = users ++ [ svc-01 ];
+  "minifluxEnvironment.age".publicKeys = users ++ [ svc-01 ];
+  "linkdingEnvironment.age".publicKeys = users ++ [ svc-01 ];
 }

@@ -231,6 +231,53 @@ let
       };
       environmentFiles = [ config.age.secrets.goToSocialEnvironment.path ];
     };
+
+    miniflux = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.gotosocial.rule" = "Host(`rss.doofnet.uk`)";
+        "traefik.http.services.gotosocial.loadbalancer.server.port" = "8080";
+        "traefik.http.routers.gotosocial.entrypoints" = "websecure,extwebsecure";
+      };
+      image = "miniflux/miniflux:2.2.16";
+      environment = {
+        TZ = "UTC";
+        BASE_URL = "https://rss.doofnet.uk/";
+        RUN_MIGRATIONS = "1";
+        METRICS_COLLECTOR = "1";
+        METRICS_ALLOWED_NETWORKS = "10.0.0.0/8";
+        OAUTH2_PROVIDER = "oidc";
+        OAUTH2_REDIRECT_URL = "https://rss.doofnet.uk/oauth2/oidc/callback";
+        OAUTH2_OIDC_DISCOVERY_ENDPOINT = "https://id.doofnet.uk";
+        OAUTH2_USER_CREATION = "1";
+        DISABLE_LOCAL_AUTH = "1";
+      };
+      environmentFiles = [ config.age.secrets.minifluxEnvironment.path ];
+    };
+
+    linkding = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.gotosocial.rule" = "Host(`link.doofnet.uk`)";
+        "traefik.http.services.gotosocial.loadbalancer.server.port" = "9090";
+        "traefik.http.routers.gotosocial.entrypoints" = "websecure,extwebsecure";
+      };
+      image = "sissbruecker/linkding:1.45.0";
+      environment = {
+        LD_DB_ENGINE = "postgres";
+        LD_DB_HOST= "10.88.0.1";
+        LD_DB_PORT= "5432";
+        LD_DB_USER="linkding";
+        LD_DB_DATABASE="linkding";
+        LD_ENABLE_OIDC = "True";
+        OIDC_OP_AUTHORIZATION_ENDPOINT = "https://id.doofnet.uk/authorize";
+        OIDC_OP_TOKEN_ENDPOINT = "https://id.doofnet.uk/api/oidc/token";
+        OIDC_OP_USER_ENDPOINT = "https://id.doofnet.uk/api/oidc/userinfo";
+        OIDC_OP_JWKS_ENDPOINT = "https://id.doofnet.uk/.well-known/jwks.json";
+        OIDC_USERNAME_CLAIM = "username";
+      };
+      environmentFiles = [ config.age.secrets.linkdingEnvironment.path ];
+    };
   };
 
   # Extract local /srv/data paths from all volumes defined in any containers
@@ -270,6 +317,12 @@ in
     };
     goToSocialEnvironment = {
       file = ../../secrets/goToSocialEnvironment.age;
+    };
+    minifluxEnvironment = {
+      file = ../../secrets/minifluxEnvironment.age;
+    };
+    linkdingEnvironment = {
+      file = ../../secrets/linkdingEnvironment.age;
     };
   };
 
