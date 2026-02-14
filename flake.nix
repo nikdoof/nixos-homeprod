@@ -48,10 +48,6 @@
                   "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
                 ];
               };
-
-              nixpkgs.crossSystem = {
-                system = "aarch64-linux";
-              };
             }
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             ./hosts/ns-01/configuration.nix
