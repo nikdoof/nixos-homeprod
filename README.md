@@ -18,3 +18,4 @@ So it is time to simplify, and with that I like the defined state of Kubernetes,
 ## Details
 
 * [Base Host configuration](./docs/base_host.md)
+* [Raspberry Pi Systems](./docs/raspberry_pi.md)
