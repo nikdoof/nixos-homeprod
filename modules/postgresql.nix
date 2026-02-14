@@ -8,6 +8,9 @@
     enableTCPIP = true;
     dataDir = "/srv/data/postgresql";
     port = 5432;
+    settings = {
+      ssl = true;
+    };
   };
 
   services.prometheus.exporters.postgres = {
