@@ -152,53 +152,52 @@
           http.tls.certResolver = "letsencrypt";
         };
       };
+    };
+    dynamicConfigOptions = {
 
-      dynamicConfigOptions = {
+      http.routers = {
+        api = {
+          rule = "Host(`traefik.svc.doofnet.uk`)";
+          service = "api@internal";
+        };
+      };
 
-        http.routers = {
-          api = {
-            rule = "Host(`traefik.svc.doofnet.uk`)";
-            service = "api@internal";
+      http.middlewares = {
+        auth-headers = {
+          headers = {
+            sslRedirect = true;
+            stsSeconds = 315360000;
+            browserXssFilter = true;
+            contentTypeNosniff = true;
+            forceSTSHeader = true;
+            sslHost = "doofnet.uk";
+            stsIncludeSubdomains = true;
+            stsPreload = true;
+            frameDeny = true;
           };
         };
 
-        http.middlewares = {
-          auth-headers = {
-            headers = {
-              sslRedirect = true;
-              stsSeconds = 315360000;
-              browserXssFilter = true;
-              contentTypeNosniff = true;
-              forceSTSHeader = true;
-              sslHost = "doofnet.uk";
-              stsIncludeSubdomains = true;
-              stsPreload = true;
-              frameDeny = true;
-            };
+        # Redirects if not authenticated
+        oauth-auth-redirect = {
+          forwardAuth = {
+            address = "http://127.0.0.1:4180/oauth2/";
+            trustForwardHeader = true;
+            authResponseHeaders = [
+              "X-Auth-Request-Access-Token"
+              "Authorization"
+            ];
           };
+        };
 
-          # Redirects if not authenticated
-          oauth-auth-redirect = {
-            forwardAuth = {
-              address = "http://127.0.0.1:4180/oauth2/";
-              trustForwardHeader = true;
-              authResponseHeaders = [
-                "X-Auth-Request-Access-Token"
-                "Authorization"
-              ];
-            };
-          };
-
-          # Throws 401 without redirecting
-          oauth-auth-wo-redirect = {
-            forwardAuth = {
-              address = "http://127.0.0.1:4180/oauth2/auth";
-              trustForwardHeader = true;
-              authResponseHeaders = [
-                "X-Auth-Request-Access-Token"
-                "Authorization"
-              ];
-            };
+        # Throws 401 without redirecting
+        oauth-auth-wo-redirect = {
+          forwardAuth = {
+            address = "http://127.0.0.1:4180/oauth2/auth";
+            trustForwardHeader = true;
+            authResponseHeaders = [
+              "X-Auth-Request-Access-Token"
+              "Authorization"
+            ];
           };
         };
       };
