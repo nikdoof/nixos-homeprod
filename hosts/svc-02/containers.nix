@@ -25,6 +25,7 @@ let
         UNIFI_GID = "999";
         JVM_INIT_HEAP_SIZE = "512M";
         JVM_MAX_HEAP_SIZE = "2048M";
+        SYSTEM_IP = "10.101.3.21";
       };
       extraOptions = [ "--network=host" ];
     };
