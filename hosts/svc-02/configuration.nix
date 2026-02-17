@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   ...
 }:
 
@@ -139,6 +140,12 @@
   services.grafana = {
     enable = true;
     openFirewall = true;
+
+    declarativePlugins = with pkgs.grafanaPlugins; [
+      marcusolsson-treemap-panel
+      grafana-clock-panel
+      marcusolsson-json-datasource
+    ];
 
     settings = {
       server = {
