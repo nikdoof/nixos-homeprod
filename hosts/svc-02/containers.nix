@@ -10,6 +10,7 @@ let
         "traefik.enable" = "true";
         "traefik.http.routers.unifi.rule" = "Host(`unifi.svc.doofnet.uk`)";
         "traefik.http.services.unifi.loadbalancer.server.port" = "8443";
+        "traefik.http.services.unifi.loadbalancer.server.scheme" = "https";
       };
       image = "jacobalberty/unifi:v10.0.162";
       volumes = [
