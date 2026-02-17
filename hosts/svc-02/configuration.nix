@@ -89,6 +89,27 @@
           }
         ];
       }
+      {
+        job_name = "postgres";
+        static_configs = [
+          {
+            targets = [
+              "svc-01.int.doofnet.uk:9187"
+              "svc-02.int.doofnet.uk:9187"
+            ];
+          }
+        ];
+      }
+      {
+        job_name = "unifi";
+        static_configs = [
+          {
+            targets = [
+              "127.0.0.1:9130"
+            ];
+          }
+        ];
+      }
     ];
   };
 
@@ -174,6 +195,25 @@
     "grafana/dashboards/truenas-overview.json".source = ./grafana/dashboards/truenas-overview.json;
     "grafana/dashboards/truenas-temperatures.json".source =
       ./grafana/dashboards/truenas-temperatures.json;
+  };
+
+  age.secrets = {
+    unpollerPassword = {
+      file = ../../secrets/unpollerPassword.age;
+    };
+  };
+
+  services.unpoller = {
+    enable = true;
+    prometheus.http_listen = "127.0.0.1:9130";
+    unifi.controllers = [
+      {
+        url = "https://127.0.0.1:8443";
+        user = "unpoller";
+        pass = config.age.secrets.unpollerPassword.path;
+        verify_ssl = false;
+      }
+    ];
   };
 
   services.traefik = {
