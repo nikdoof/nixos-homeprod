@@ -1,8 +1,6 @@
 { ... }:
 {
-
   services.bind = {
     enable = true;
   };
-
 }

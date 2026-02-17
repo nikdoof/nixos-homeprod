@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 
 let
   # Follows the same structure as virtualisation.oci-containers.containers
