@@ -13,6 +13,7 @@
     ../../modules/server.nix
     ../../modules/traefik.nix
     ../../modules/nfs/media.nix
+    ./containers.nix
   ];
 
   # Allows for cross compling for Pis
