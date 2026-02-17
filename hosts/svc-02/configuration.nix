@@ -199,6 +199,7 @@
     "grafana/dashboards/unifi_clients.json".source = ./grafana/dashboards/unifi_clients.json;
     "grafana/dashboards/unifi_sites.json".source = ./grafana/dashboards/unifi_sites.json;
     "grafana/dashboards/unifi_usw.json".source = ./grafana/dashboards/unifi_usw.json;
+    "grafana/dashboards/globaltalk.json".source = ./grafana/dashboards/globaltalk.json;
   };
 
   age.secrets = {
