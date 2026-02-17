@@ -98,9 +98,21 @@
     options = [ "bind" ];
   };
 
-  networking.firewall.allowedTCPPorts = [
-    9090
-  ];
+  networking.firewall = {
+    allowedTCPPorts = [
+      9090
+      0808
+      6789
+      8880
+      8843
+      8443
+    ];
+    allowedUDPPorts = [
+      10001
+      3478
+      5514
+    ];
+  };
 
   services.grafana = {
     enable = true;
