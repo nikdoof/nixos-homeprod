@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   ...
 }:
 
@@ -20,6 +21,14 @@
     "aarch64-linux"
     "arm-linux"
   ];
+
+  # Allow unifi-controller package
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "unifi-controller"
+      "mongodb"
+    ];
 
   # Networking
   networking.useDHCP = false;
