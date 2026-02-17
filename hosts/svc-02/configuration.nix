@@ -22,14 +22,6 @@
     "arm-linux"
   ];
 
-  # Allow unifi-controller package
-  nixpkgs.config.allowUnfreePredicate =
-    pkg:
-    builtins.elem (lib.getName pkg) [
-      "unifi-controller"
-      "mongodb"
-    ];
-
   # Networking
   networking.useDHCP = false;
   networking.hostName = "svc-02";
@@ -168,17 +160,6 @@
     "grafana/dashboards/truenas-overview.json".source = ./grafana/dashboards/truenas-overview.json;
     "grafana/dashboards/truenas-temperatures.json".source =
       ./grafana/dashboards/truenas-temperatures.json;
-  };
-
-  # Bind Prometheus home folder to the NVMe.
-  fileSystems."/var/lib/unifi" = {
-    device = "/srv/data/unifi/data";
-    options = [ "bind" ];
-  };
-
-  services.unifi = {
-    enable = true;
-    openFirewall = true;
   };
 
   services.traefik = {
