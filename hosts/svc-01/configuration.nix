@@ -134,8 +134,6 @@
 
   services.traefik = {
     staticConfigOptions = {
-      api = true;
-
       entryPoints = {
         extweb = {
           address = ":8080";
@@ -154,13 +152,6 @@
       };
     };
     dynamicConfigOptions = {
-
-      http.routers = {
-        api = {
-          rule = "Host(`traefik.svc.doofnet.uk`)";
-          service = "api@internal";
-        };
-      };
 
       http.middlewares = {
         auth-headers = {

@@ -2,7 +2,9 @@
   config,
   ...
 }:
-
+let
+  fqdn = with config.networking; "${hostName}.${domain}";
+in
 {
   age.secrets = {
     digitaloceanApiToken = {
@@ -21,6 +23,8 @@
     enable = true;
 
     staticConfigOptions = {
+      api = true;
+
       entryPoints = {
         web = {
           address = ":80";
@@ -57,6 +61,15 @@
               provider = "digitalocean";
             };
           };
+        };
+      };
+    };
+
+    dynamicConfigOptions = {
+      http.routers = {
+        api = {
+          rule = "Host(`${fqdn}`)";
+          service = "api@internal";
         };
       };
     };
