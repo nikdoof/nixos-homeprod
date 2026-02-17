@@ -142,7 +142,7 @@
     openFirewall = true;
 
     declarativePlugins = with pkgs.grafanaPlugins; [
-      marcusolsson-treemap-panel
+      #marcusolsson-treemap-panel
       grafana-clock-panel
       marcusolsson-json-datasource
     ];
