@@ -161,6 +161,17 @@
       ./grafana/dashboards/truenas-temperatures.json;
   };
 
+  # Bind Prometheus home folder to the NVMe.
+  fileSystems."/var/lib/unifi" = {
+    device = "/srv/data/unifi/data";
+    options = [ "bind" ];
+  };
+
+  services.unifi = {
+    enable = true;
+    openFirewall = true;
+  };
+
   services.traefik = {
     dynamicConfigOptions = {
       http = {
