@@ -200,6 +200,7 @@
   age.secrets = {
     unpollerPassword = {
       file = ../../secrets/unpollerPassword.age;
+      owner = "unifi-poller";
     };
   };
 
