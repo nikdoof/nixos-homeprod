@@ -195,6 +195,10 @@
     "grafana/dashboards/truenas-overview.json".source = ./grafana/dashboards/truenas-overview.json;
     "grafana/dashboards/truenas-temperatures.json".source =
       ./grafana/dashboards/truenas-temperatures.json;
+    "grafana/dashboards/unifi_ap.json".source = ./grafana/dashboards/unifi_ap.json;
+    "grafana/dashboards/unifi_clients.json".source = ./grafana/dashboards/unifi_client.json;
+    "grafana/dashboards/unifi_sites.json".source = ./grafana/dashboards/unifi_sites.json;
+    "grafana/dashboards/unifi_usw.json".source = ./grafana/dashboards/unifi_usw.json;
   };
 
   age.secrets = {
