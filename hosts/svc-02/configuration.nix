@@ -12,6 +12,7 @@
     ../../modules/common.nix
     ../../modules/server.nix
     ../../modules/traefik.nix
+    ../../modules/podman.nix
     ../../modules/nfs/media.nix
     ./containers.nix
   ];
