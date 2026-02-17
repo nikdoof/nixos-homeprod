@@ -72,9 +72,7 @@
       "icon": "external link",
       "includeVars": false,
       "keepTime": true,
-      "tags": [
-        "unifi-poller"
-      ],
+      "tags": ["unifi-poller"],
       "title": "UniFi Poller",
       "type": "dashboards"
     },
@@ -105,12 +103,8 @@
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
+      "colors": ["#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"],
+      "datasource": "prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -193,12 +187,8 @@
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
+      "colors": ["#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"],
+      "datasource": "prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -281,12 +271,8 @@
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
+      "colors": ["#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"],
+      "datasource": "prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -369,12 +355,8 @@
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
+      "colors": ["#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"],
+      "datasource": "prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -484,12 +466,8 @@
           "cacheTimeout": null,
           "colorBackground": false,
           "colorValue": false,
-          "colors": [
-            "#299c46",
-            "rgba(237, 129, 40, 0.89)",
-            "#d44a3a"
-          ],
-          "datasource": "${DS_PROMETHEUS}",
+          "colors": ["#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"],
+          "datasource": "prometheus",
           "decimals": null,
           "format": "s",
           "gauge": {
@@ -580,7 +558,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "decimals": 0,
           "description": "These are counters, totals, but they don't change much so the graph does not show rate.",
           "fill": 0,
@@ -725,7 +703,7 @@
         },
         {
           "cacheTimeout": null,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "gridPos": {
             "h": 8,
             "w": 3,
@@ -736,9 +714,7 @@
           "links": [],
           "options": {
             "fieldOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "defaults": {
                 "color": {
                   "mode": "thresholds"
@@ -806,7 +782,7 @@
         },
         {
           "cacheTimeout": null,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "gridPos": {
             "h": 8,
             "w": 3,
@@ -817,9 +793,7 @@
           "links": [],
           "options": {
             "fieldOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
+              "calcs": ["lastNotNull"],
               "defaults": {
                 "color": {
                   "mode": "thresholds"
@@ -888,7 +862,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "decimals": null,
           "description": "Shows data transfer for each subsystem on the site. RX is on the negative axis.",
           "fill": 0,
@@ -1004,7 +978,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "decimals": 0,
           "description": "This graphs shows clients connected to the site.",
           "fill": 0,
@@ -1133,7 +1107,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "decimals": 0,
           "description": "This graphs shows clients connected to the site.",
           "fill": 0,
@@ -1248,7 +1222,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "decimals": 0,
           "description": "This graph only works if DPI is enabled on the controller and DPI collection is enabled in UniFi Poller. Rx is on the negative axis.",
           "fill": 0,
@@ -1371,16 +1345,13 @@
   "refresh": "1m",
   "schemaVersion": 22,
   "style": "dark",
-  "tags": [
-    "unifi",
-    "unifi-poller"
-  ],
+  "tags": ["unifi", "unifi-poller"],
   "templating": {
     "list": [
       {
         "allValue": null,
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "prometheus",
         "definition": "label_values(unpoller_site_transmit_rate_bytes,source)",
         "hide": 0,
         "includeAll": true,
@@ -1402,7 +1373,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "prometheus",
         "definition": "label_values(unpoller_site_transmit_rate_bytes{source=~\"$Controller\"},site_name)",
         "hide": 2,
         "includeAll": true,
@@ -1424,7 +1395,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "prometheus",
         "definition": "label_values(subsystem)",
         "hide": 2,
         "includeAll": true,
@@ -1494,26 +1465,8 @@
   },
   "timepicker": {
     "nowDelay": "5s",
-    "refresh_intervals": [
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+    "refresh_intervals": ["30s", "1m", "5m", "15m", "30m", "1h", "2h"],
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "browser",
   "title": "UniFi-Poller: Network Sites - Prometheus",

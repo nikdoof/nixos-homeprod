@@ -103,9 +103,7 @@
         "orientation": "horizontal",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -188,9 +186,7 @@
         "orientation": "horizontal",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -2199,18 +2195,13 @@
   "preload": false,
   "refresh": "5s",
   "schemaVersion": 41,
-  "tags": [
-    "bind",
-    "bind-exporter",
-    "prometheus",
-    "networking"
-  ],
+  "tags": ["bind", "bind-exporter", "prometheus", "networking"],
   "templating": {
     "list": [
       {
         "current": {
           "text": "Prometheus",
-          "value": "Prometheus"
+          "value": "prometheus"
         },
         "includeAll": false,
         "label": "datasource",
