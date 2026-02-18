@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }:
 
@@ -144,6 +145,31 @@
     '';
   };
 
+  services.gitea = {
+    enable = true;
+    stateDir = "/srv/data/gitea/data";
+
+    settings = {
+      mailer = {
+        ENABLED = true;
+        PROTOCOL = "smtp+starttls";
+        SMTP_ADDR = "mx-01.doofnet.uk";
+        FROM = "Doofnet Gitea <gitea@doofnet.uk>";
+        USER = "gitea@doofnet.uk";
+      };
+      server = {
+        HTTP_ADDR = "127.0.0.1";
+        HTTP_PORT = 9990;
+        DOMAIN = "git.doofnet.uk";
+        ROOT_URL = "https://git.doofnet.uk";
+        DISABLE_SSH = true;
+      };
+      service = {
+        DISABLE_REGISTRATION = true;
+      };
+    };
+  };
+
   services.traefik = {
     staticConfigOptions = {
       entryPoints = {
@@ -164,43 +190,53 @@
       };
     };
     dynamicConfigOptions = {
-
-      http.middlewares = {
-        auth-headers = {
-          headers = {
-            sslRedirect = true;
-            stsSeconds = 315360000;
-            browserXssFilter = true;
-            contentTypeNosniff = true;
-            forceSTSHeader = true;
-            sslHost = "doofnet.uk";
-            stsIncludeSubdomains = true;
-            stsPreload = true;
-            frameDeny = true;
-          };
+      http = {
+        routers.gitea = {
+          rule = "Host(`git.doofnet.uk`)";
+          service = "gitea";
         };
 
-        # Redirects if not authenticated
-        oauth-auth-redirect = {
-          forwardAuth = {
-            address = "http://127.0.0.1:4180/oauth2/";
-            trustForwardHeader = true;
-            authResponseHeaders = [
-              "X-Auth-Request-Access-Token"
-              "Authorization"
-            ];
-          };
-        };
+        services.gitea.loadBalancer.servers = [
+          { url = "http://127.0.0.1:9990"; }
+        ];
 
-        # Throws 401 without redirecting
-        oauth-auth-wo-redirect = {
-          forwardAuth = {
-            address = "http://127.0.0.1:4180/oauth2/auth";
-            trustForwardHeader = true;
-            authResponseHeaders = [
-              "X-Auth-Request-Access-Token"
-              "Authorization"
-            ];
+        middlewares = {
+          auth-headers = {
+            headers = {
+              sslRedirect = true;
+              stsSeconds = 315360000;
+              browserXssFilter = true;
+              contentTypeNosniff = true;
+              forceSTSHeader = true;
+              sslHost = "doofnet.uk";
+              stsIncludeSubdomains = true;
+              stsPreload = true;
+              frameDeny = true;
+            };
+          };
+
+          # Redirects if not authenticated
+          oauth-auth-redirect = {
+            forwardAuth = {
+              address = "http://127.0.0.1:4180/oauth2/";
+              trustForwardHeader = true;
+              authResponseHeaders = [
+                "X-Auth-Request-Access-Token"
+                "Authorization"
+              ];
+            };
+          };
+
+          # Throws 401 without redirecting
+          oauth-auth-wo-redirect = {
+            forwardAuth = {
+              address = "http://127.0.0.1:4180/oauth2/auth";
+              trustForwardHeader = true;
+              authResponseHeaders = [
+                "X-Auth-Request-Access-Token"
+                "Authorization"
+              ];
+            };
           };
         };
       };
