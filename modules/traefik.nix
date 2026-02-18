@@ -48,6 +48,11 @@ in
         format = "json";
       };
 
+      accessLog = {
+        format = "common";
+        filePath = "${config.services.traefik.dataDir}/access.log";
+      };
+
       certificatesResolvers = {
         letsencrypt = {
           acme = {
