@@ -149,6 +149,11 @@
     enable = true;
     stateDir = "/srv/data/gitea/data";
 
+    database = {
+      type = "postgres";
+      createDatabase = true;
+    };
+
     settings = {
       mailer = {
         ENABLED = true;
