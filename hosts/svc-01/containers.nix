@@ -354,7 +354,6 @@ let
       image = "sbs20/scanservjs:latest";
       volumes = [
         "/dev/bus/usb:/dev/bus/usb"
-        "/dev/usb:/dev/usb"
         "/mnt/nas-03/paperless/inbox:/var/lib/scanservjs/output"
         "/etc/scanservjs/config.local.js:/etc/scanservjs/config.local.js"
       ];
