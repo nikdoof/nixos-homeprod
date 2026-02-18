@@ -16,6 +16,7 @@
     ../../modules/traefik.nix
     ../../modules/postgresql.nix
     ../../modules/nfs/media.nix
+    ../../modules/nfs/paperless.nix
     ./containers.nix
     ./timers.nix
   ];
