@@ -353,10 +353,11 @@ let
       };
       image = "sbs20/scanservjs:latest";
       volumes = [
-        "/dev/bus/usb:/dev/bus/usb"
+        "/var/run/dbus:/var/run/dbus"
         "/mnt/nas-03/paperless/inbox:/var/lib/scanservjs/output"
         "/etc/scanservjs/config.local.js:/etc/scanservjs/config.local.js"
       ];
+      extraOptions = [ "--privileged" ];
     };
   };
 
