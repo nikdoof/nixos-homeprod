@@ -411,7 +411,7 @@ in
   };
 
   environment.etc = {
-    "/etc/scanservjs/config.local.js".source = ./scanservjs/config.local.js;
+    "scanservjs/config.local.js".source = ./scanservjs/config.local.js;
   };
 
   virtualisation.oci-containers.containers = containers;
