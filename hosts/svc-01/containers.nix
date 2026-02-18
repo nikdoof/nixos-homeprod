@@ -345,6 +345,20 @@ let
       image = "valkey/valkey:9.0.2";
     };
 
+    scanservjs = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.scanservjs.rule" = "Host(`scan.svc.doofnet.uk`)";
+        "traefik.http.services.scanservjs.loadbalancer.server.port" = "8080";
+      };
+      image = "sbs20/scanservjs:latest";
+      volumes = [
+        "/dev/bus/usb:/dev/bus/usb"
+        "/dev/usb:/dev/usb"
+        "/mnt/nas-03/paperless/inbox:/var/lib/scanservjs/output"
+        "/etc/scanservjs/config.local.js:/etc/scanservjs/config.local.js"
+      ];
+    };
   };
 
   # Extract local /srv/data paths from all volumes defined in any containers
@@ -394,6 +408,10 @@ in
     paperlessClientSecret = {
       file = ../../secrets/paperlessClientSecret.age;
     };
+  };
+
+  environment.etc = {
+    "/etc/scanservjs/config.local.js" = ./scanservjs-config.local.js;
   };
 
   virtualisation.oci-containers.containers = containers;
