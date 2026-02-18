@@ -23,6 +23,7 @@ in
   "goToSocialEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "minifluxEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "linkdingEnvironment.age".publicKeys = users ++ [ svc-01 ];
+  "paperlessClientSecret.age".publicKeys = users ++ [ svc-01 ];
 
   "unpollerPassword.age".publicKeys = users ++ [ svc-02 ];
 }

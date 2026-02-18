@@ -292,6 +292,59 @@ let
         "/srv/data/copyparty/config/doofnet.conf:/cfg/doofnet.conf:U"
       ];
     };
+
+    paperless = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.paperless.rule" = "Host(`paperless.svc.doofnet.uk`)";
+        "traefik.http.services.paperless.loadbalancer.server.port" = "8000";
+      };
+      image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.6";
+      volumes = [
+        "/mnt/nas-03/paperless/:/data"
+      ];
+      environment = {
+        COMPOSE_PROJECT_NAME = "paperless";
+        PAPERLESS_DBHOST = "10.88.0.1";
+        PAPERLESS_DBNAME = "paperless";
+        PAPERLESS_DBUSER = "paperless";
+        PAPERLESS_OCR_LANGUAGE = "eng";
+        PAPERLESS_REDIS = "redis://valkey:6379";
+        PAPERLESS_CONSUMPTION_DIR = "/data/inbox/";
+        PAPERLESS_DATA_DIR = "/data/data/";
+        PAPERLESS_MEDIA_ROOT = "/data/media/";
+        PAPERLESS_CONSUMER_POLLING = "60";
+        PAPERLESS_CONSUMER_RECURSIVE = "true";
+        PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS = "true";
+        PAPERLESS_TIKA_ENABLED = "1";
+        PAPERLESS_TIKA_GOTENBERG_ENDPOINT = "http://gotenberg:3000";
+        PAPERLESS_TIKA_ENDPOINT = "http://tika:9998";
+        PAPERLESS_PORT = "8000";
+        PAPERLESS_URL = "https://paperless.svc.doofnet.uk";
+        PAPERLESS_DEBUG = "true";
+        PAPERLESS_APPS = "allauth.socialaccount.providers.openid_connect";
+        PAPERLESS_DISABLE_REGULAR_LOGIN = "true";
+      };
+      environmentFiles = [
+        config.age.secrets.paperlessClientSecret.path
+      ];
+    };
+
+    tika = {
+      image = "apache/tika";
+    };
+
+    gotenberg = {
+      image = "thecodingmachine/gotenberg:8.26.0";
+      environment = {
+        DISABLE_GOOGLE_CHROME = "1";
+      };
+    };
+
+    valkey = {
+      image = "valkey/valkey:9.0.2";
+    };
+
   };
 
   # Extract local /srv/data paths from all volumes defined in any containers
@@ -337,6 +390,9 @@ in
     };
     linkdingEnvironment = {
       file = ../../secrets/linkdingEnvironment.age;
+    };
+    paperlessClientSecret = {
+      file = ../../secrets/paperlessClientSecret.age;
     };
   };
 

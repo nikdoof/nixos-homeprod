@@ -2,8 +2,8 @@
 
 {
   # Media
-  fileSystems."/mnt/nas-03/photos" = {
-    device = "nas-03.int.doofnet.uk:/mnt/tank02/photos";
+  fileSystems."/mnt/nas-03/paperless" = {
+    device = "nas-03.int.doofnet.uk:/mnt/ssd-mirror/shares/paperless";
     fsType = "nfs";
     options = [
       "rw"
