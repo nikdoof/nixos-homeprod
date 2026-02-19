@@ -128,7 +128,6 @@
     graphite = {
       enable = true;
       openFirewall = true;
-      listenAddress = "127.0.0.1";
       mappingSettings = builtins.fromJSON (builtins.readFile ./prometheus/exporters/truenas_mapping.json);
     };
   };
