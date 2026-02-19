@@ -111,7 +111,30 @@
           }
         ];
       }
+      {
+        job_name = "graphite";
+        static_configs = [
+          {
+            targets = [
+              "127.0.0.1:9108"
+            ];
+          }
+        ];
+      }
     ];
+  };
+
+  services.prometheus.exporters = {
+    graphite = {
+      enable = true;
+      openFirewall = true;
+      listenAddress = "127.0.0.1";
+      extraFlags = [ "--graphite.mapping-config=/etc/graphite-exporter/graphite_mapping.yaml" ];
+    };
+  };
+
+  environment.etc = {
+    "graphite-exporter/graphite_mapping.yaml".source = ./prometheus/exporters/graphite_mapping.yaml;
   };
 
   # Bind Prometheus home folder to the NVMe.
