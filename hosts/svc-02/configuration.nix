@@ -129,12 +129,8 @@
       enable = true;
       openFirewall = true;
       listenAddress = "127.0.0.1";
-      extraFlags = [ "--graphite.mapping-config=/etc/graphite-exporter/graphite_mapping.yaml" ];
+      mappingSettings = builtins.fromJSON (builtins.readFile ./prometheus/exporters/truenas_mapping.json);
     };
-  };
-
-  environment.etc = {
-    "graphite-exporter/graphite_mapping.yaml".source = ./prometheus/exporters/graphite_mapping.yaml;
   };
 
   # Bind Prometheus home folder to the NVMe.
