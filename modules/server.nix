@@ -13,6 +13,11 @@
   services.prometheus.exporters.node = {
     enable = true;
     openFirewall = true;
+    enabledCollectors = [
+      "logind"
+      "processes"
+      "systemd"
+    ];
   };
 
   services.borgmatic = {
