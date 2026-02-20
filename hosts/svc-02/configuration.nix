@@ -121,6 +121,18 @@
           }
         ];
       }
+      {
+        job_name = "homeassistant";
+
+        metrics_path = "/api/prometheus";
+
+        scheme = "https";
+        static_configs = [
+          {
+            targets = [ "homeassistant.int.doofnet.uk:443" ];
+          }
+        ];
+      }
     ];
   };
 
