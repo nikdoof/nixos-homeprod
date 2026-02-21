@@ -12,49 +12,49 @@
         "name": "OpenBooks",
         "uri": "https://openbooks.svc.doofnet.uk",
         "description": "Search for books",
-        "icon": ""
+        "icon": "openreads"
       },
       {
         "name": "Calibre",
         "uri": "https://calibre-web.svc.doofnet.uk",
         "description": "Organise books",
-        "icon": ""
+        "icon": "calibre-web"
       },
       {
         "name": "Miniflux",
         "uri": "https://rss.doofnet.uk",
         "description": "RSS reader",
-        "icon": ""
+        "icon": "miniflux"
       },
       {
         "name": "Linkding",
         "uri": "https://link.doofnet.uk",
         "description": "Bookmark Manager",
-        "icon": ""
+        "icon": "linkding"
       },
       {
         "name": "Paperless",
         "uri": "https://paperless.svc.doofnet.uk",
         "description": "Document Storage",
-        "icon": ""
+        "icon": "paperless-ng"
       },
       {
         "name": "ScanservJS",
         "uri": "https://scan.svc.doofnet.uk",
         "description": "Scanner",
-        "icon": ""
+        "icon": "scanservjs"
       },
       {
         "name": "Home Assistant",
         "uri": "https://homeassistant.int.doofnet.uk",
         "description": "",
-        "icon": ""
+        "icon": "home-assistant"
       },
       {
         "name": "Grafana",
         "uri": "https://grafana.int.doofnet.uk",
         "description": "",
-        "icon": ""
+        "icon": "grafana"
       }
     ]
   }
