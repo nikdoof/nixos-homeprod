@@ -107,13 +107,15 @@
         ];
         non_smtpd_milters = "$smtpd_milters";
 
+        tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
         smtpd_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
         smtpd_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/privkey.pem";
+        smtpd_tls_received_header = "yes";
+        smtpd_tls_security_level = "may";
+        smtpd_tls_auth_only = "yes";
+
         smtp_tls_note_starttls_offer = "yes";
         smtp_tls_security_level = "may";
-        tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
-        smtpd_tls_received_header = "yes";
-        smtpd_tls_auth_only = "yes";
 
         smtpd_helo_required = "yes";
         smtpd_helo_restrictions = lib.strings.concatMapStrings (x: x + ",") [
