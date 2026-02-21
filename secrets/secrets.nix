@@ -26,4 +26,5 @@ in
   "paperlessClientSecret.age".publicKeys = users ++ [ svc-01 ];
 
   "unpollerPassword.age".publicKeys = users ++ [ svc-02 ];
+  "alertManagerTelegramToken.age".publicKeys = users ++ [ svc-02 ];
 }

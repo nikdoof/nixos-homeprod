@@ -47,6 +47,18 @@
   services.prometheus = {
     enable = true;
 
+    alertmanagers = [
+      {
+        scheme = "https";
+        static_configs = [
+          {
+            targets = [
+              "127.0.0.1:${toString config.services.prometheus.alertmanager.port}"
+            ];
+          }
+        ];
+      }
+    ];
     scrapeConfigs = [
       {
         job_name = "node_exporter";
@@ -136,6 +148,64 @@
     ];
   };
 
+  services.prometheus.alertmanager = {
+    enable = true;
+
+    listenAddress = "127.0.0.1";
+    webExternalUrl = "https://alertmanager.svc.doofnet.uk";
+
+    configuration = {
+      global = {
+        telegram_bot_token_file = config.age.secrets.alertManagerTelegramToken.path;
+      };
+
+      templates = [
+        "/etc/alertmanager/config/*.tmpl"
+      ];
+
+      receivers = [
+        {
+          name = "telegram";
+          telegram_configs = [
+            {
+              chat_id = -655795395;
+              disable_notifications = true;
+              send_resolved = true;
+              parse_mode = "HTML";
+              message = "{{ template \"telegram.doofnet.message\" . }}";
+            }
+          ];
+        }
+      ];
+
+      route = {
+        group_by = [ "job" ];
+        group_wait = "30s";
+        group_interval = "5m";
+        repeat_interval = "12h";
+        receiver = "telegram";
+        routes = [
+          {
+            receiver = "null";
+            match = {
+              severity = "none";
+            };
+          }
+        ];
+      };
+    };
+  };
+
+  environment.etc = {
+    "alertmanager/config/telegram.tmpl".source = ./prometheus/alertmanager/telegram.tmpl;
+  };
+
+  age.secrets = {
+    alertManagerTelegramToken = {
+      file = ../../secrets/alertManagerTelegramToken.age;
+    };
+  };
+
   services.prometheus.exporters = {
     graphite = {
       enable = true;
@@ -171,7 +241,6 @@
 
   services.grafana = {
     enable = true;
-    openFirewall = true;
 
     declarativePlugins = with pkgs.grafanaPlugins; [
       #marcusolsson-treemap-panel
@@ -181,7 +250,7 @@
 
     settings = {
       server = {
-        http_addr = "0.0.0.0";
+        http_addr = "127.0.0.1";
         http_port = 3000;
         enforce_domain = false;
         enable_gzip = true;
@@ -271,7 +340,16 @@
         };
 
         services.grafana.loadBalancer.servers = [
-          { url = "http://localhost:3000"; }
+          { url = "http://localhost:${toString config.services.grafana.settings.server.http_port}"; }
+        ];
+
+        routers.alertmanager = {
+          rule = "Host(`alertmanager.svc.doofnet.uk`)";
+          service = "alertmanager";
+        };
+
+        services.alertmanager.loadBalancer.servers = [
+          { url = "http://localhost:${toString config.services.prometheus.alertmanager.port}"; }
         ];
       };
     };

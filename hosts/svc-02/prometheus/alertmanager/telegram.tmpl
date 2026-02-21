@@ -1,0 +1,23 @@
+{{ define "doofnet.alert" }}
+
+{{ if eq .Status "resolved" }}✅{{ else }}{{ if eq .Labels.severity "critical" }}🚨{{- else -}}{{- if eq .Labels.severity "warning" }}⚠️{{- else -}}🛎️{{ end }}{{ end }}{{ end }} <b>{{ .Labels.alertname }}</b> {{ if .Annotations.summary }} - {{ .Annotations.summary }}{{ end }}
+
+<i>{{ .Annotations.description }}</i>
+{{- if .Labels.pod }}
+
+🐳 Pod: <code>{{ .Labels.namespace }}/{{ .Labels.pod  }}</code>
+{{- end }}
+{{- if .Annotations.runbook_url }}
+
+📖 <a href="{{ .Annotations.runbook_url }}">Runbook</a>
+{{- end }}
+{{- end }}
+
+{{ define "doofnet.alert_list" }}
+{{ range . -}}{{ template "doofnet.alert" . }}{{ end }}
+{{ end }}
+
+{{ define "telegram.doofnet.message" }}
+{{ template "doofnet.alert_list" .Alerts }}
+🛠 <a href="https://grafana.svc.doofnet.uk">Grafana</a> 💊 <a href="https://alertmanager.svc.doofnet.uk">Alertmanager</a>
+{{ end }}
