@@ -168,6 +168,11 @@
     selector = builtins.hashString "sha1" "${config.services.postfix.settings.main.myhostname}";
     domains = config.networking.domain;
     inherit (config.services.postfix) user group;
+    settings = {
+      InternalHosts = lib.strings.concatMapStrings (
+        x: x + ","
+      ) config.services.postfix.settings.main.mynetworks;
+    };
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
