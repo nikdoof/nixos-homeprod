@@ -61,7 +61,9 @@
       "${config.networking.hostName}.${config.networking.domain}" = {
         dnsProvider = "digitalocean";
         dnsResolver = "1.1.1.1:53";
-        credentialsFile = config.age.secrets.digitaloceanApiToken.path;
+        environmentFile = pkgs.writeText "acme-env" ''
+          DO_AUTH_TOKEN_FILE=${config.age.secrets.digitalocean}
+        '';
         postRun = ''
           # set permission on dir
           ${pkgs.acl}/bin/setfacl -m \
