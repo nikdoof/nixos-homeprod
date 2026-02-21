@@ -15,11 +15,12 @@ let
       volumes = [
         "/etc/starbase80/config.json:/app/src/config/config.json"
         "/srv/data/starbase80/data/favicon.ico:/app/public/favicon.ico"
-        "/srv/data/starbase80/data/logo.png:/app/public/logo.png"
         "/srv/data/starbase80/data/icons:/app/public/icons"
       ];
       environment = {
         "TITLE" = "Doofnet";
+        "LOGO" = "https://id.doofnet.uk/api/application-images/logo";
+        "THEME" = "dark";
       };
     };
 
