@@ -20,7 +20,6 @@ let
       environment = {
         "TITLE" = "Doofnet";
         "LOGO" = "https://id.doofnet.uk/api/application-images/logo";
-        "THEME" = "dark";
       };
     };
 
