@@ -155,10 +155,6 @@
     webExternalUrl = "https://alertmanager.svc.doofnet.uk";
 
     configuration = {
-      global = {
-        telegram_bot_token_file = config.age.secrets.alertManagerTelegramToken.path;
-      };
-
       templates = [
         "/etc/alertmanager/config/*.tmpl"
       ];
@@ -168,6 +164,7 @@
           name = "telegram";
           telegram_configs = [
             {
+              bot_token_file = config.age.secrets.alertManagerTelegramToken.path;
               chat_id = -655795395;
               disable_notifications = true;
               send_resolved = true;
