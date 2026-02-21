@@ -62,7 +62,7 @@
         dnsProvider = "digitalocean";
         dnsResolver = "1.1.1.1:53";
         environmentFile = pkgs.writeText "acme-env" ''
-          DO_AUTH_TOKEN_FILE=${config.age.secrets.digitalocean}
+          DO_AUTH_TOKEN_FILE=${config.age.secrets.digitaloceanApiToken.path}
         '';
         postRun = ''
           # set permission on dir
