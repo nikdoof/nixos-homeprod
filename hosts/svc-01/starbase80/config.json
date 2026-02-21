@@ -3,10 +3,58 @@
     "category": "Services",
     "services": [
       {
-        "name": "Archivebox",
-        "uri": "https://archivebox.mywebsite.com",
-        "description": "Backup webpages",
-        "icon": "/icons/archivebox.jpg"
+        "name": "ID",
+        "uri": "https://id.doofnet.uk",
+        "description": "Authentication",
+        "icon": "https://id.doofnet.uk/api/application-images/logo"
+      },
+      {
+        "name": "OpenBooks",
+        "uri": "https://openbooks.svc.doofnet.uk",
+        "description": "Search for books",
+        "icon": ""
+      },
+      {
+        "name": "Calibre",
+        "uri": "https://calibre-web.svc.doofnet.uk",
+        "description": "Organise books",
+        "icon": ""
+      },
+      {
+        "name": "Miniflux",
+        "uri": "https://rss.doofnet.uk",
+        "description": "RSS reader",
+        "icon": ""
+      },
+      {
+        "name": "Linkding",
+        "uri": "https://link.doofnet.uk",
+        "description": "Bookmark Manager",
+        "icon": ""
+      },
+      {
+        "name": "Paperless",
+        "uri": "https://paperless.svc.doofnet.uk",
+        "description": "Document Storage",
+        "icon": ""
+      },
+      {
+        "name": "ScanservJS",
+        "uri": "https://scan.svc.doofnet.uk",
+        "description": "Scanner",
+        "icon": ""
+      },
+      {
+        "name": "Home Assistant",
+        "uri": "https://homeassistant.int.doofnet.uk",
+        "description": "",
+        "icon": ""
+      },
+      {
+        "name": "Grafana",
+        "uri": "https://grafana.int.doofnet.uk",
+        "description": "",
+        "icon": ""
       }
     ]
   }
