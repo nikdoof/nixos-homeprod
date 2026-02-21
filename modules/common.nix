@@ -24,6 +24,10 @@
     };
   };
 
+  networking.firewall = {
+    logRefusedConnections = false;
+  };
+
   users.motdFile = builtins.path {
     path = ../files/motd;
     name = "motd";
