@@ -4,36 +4,36 @@
   inputs = {
     # NixOS official package source, using the nixos-25.11 branch here
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    agenix.url = "github:ryantm/agenix";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    agenix.url = "github:ryantm/agenix";
+    agenix.inputs.nixpkgs.follows = "nixpkgs";
+    microvm.url = "github:microvm-nix/microvm.nix";
+    microvm.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     {
       self,
       nixpkgs,
-      agenix,
-      nixos-hardware,
       ...
     }@inputs:
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+      mkSystem =
+        name:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = [
+            "${self}/hosts/${name}/configuration.nix"
+            inputs.agenix.nixosModules.default
+          ];
+        };
     in
     {
       nixosConfigurations = {
-        svc-01 = nixpkgs.lib.nixosSystem {
-          modules = [
-            ./hosts/svc-01/configuration.nix
-            agenix.nixosModules.default
-          ];
-        };
-        svc-02 = nixpkgs.lib.nixosSystem {
-          modules = [
-            ./hosts/svc-02/configuration.nix
-            agenix.nixosModules.default
-          ];
-        };
+        svc-01 = mkSystem "svc-01";
+        svc-02 = mkSystem "svc-02";
 
         # Nameservers
         ns-01 = nixpkgs.lib.nixosSystem {
@@ -51,26 +51,13 @@
             }
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             ./hosts/ns-01/configuration.nix
-            agenix.nixosModules.default
+            inputs.agenix.nixosModules.default
           ];
         };
-        ns-02 = nixpkgs.lib.nixosSystem {
-          modules = [
-            ./hosts/ns-02/configuration.nix
-            agenix.nixosModules.default
-          ];
-        };
+        ns-02 = mkSystem "ns-02";
 
         # Mini P8 Laptop
-        talos = nixpkgs.lib.nixosSystem {
-          modules = [
-            nixos-hardware.nixosModules.common-cpu-intel
-            nixos-hardware.nixosModules.common-pc-laptop
-            nixos-hardware.nixosModules.common-hidpi
-            nixos-hardware.nixosModules.common-pc-laptop-ssd
-            ./hosts/talos/configuration.nix
-          ];
-        };
+        talos = mkSystem "talos";
       };
 
       devShells = forAllSystems (system: {
@@ -80,7 +67,7 @@
           in
           pkgs.mkShell {
             packages = [
-              agenix.packages.${system}.agenix
+              inputs.agenix.packages.${system}.agenix
             ];
           };
       });

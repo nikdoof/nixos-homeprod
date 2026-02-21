@@ -1,11 +1,16 @@
 {
   pkgs,
+  inputs,
   ...
 }:
 
 {
   imports = [
     # Include the results of the hardware scan.
+    inputs.nixos-hardware.nixosModules.common-cpu-intel
+    inputs.nixos-hardware.nixosModules.common-pc-laptop
+    inputs.nixos-hardware.nixosModules.common-hidpi
+    inputs.nixos-hardware.nixosModules.common-pc-laptop-ssd
     ./hardware-configuration.nix
     ../../hardware/p8-laptop.nix
     ../../modules/common.nix
