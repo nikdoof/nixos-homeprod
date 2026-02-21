@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -46,6 +47,37 @@
     ];
   };
 
+  age.secrets = {
+    digitaloceanApiToken = {
+      file = ../../secrets/digitalOceanApiToken.age;
+      owner = "traefik";
+    };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "certs@doofnet.uk";
+    certs = {
+      "${config.networking.hostName}.${config.networking.domain}" = {
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        credentialsFile = config.age.secrets.digitaloceanApiToken.path;
+        postRun = ''
+          # set permission on dir
+          ${pkgs.acl}/bin/setfacl -m \
+          u:postfix:rx \
+          /var/lib/acme/${config.networking.hostName}.${config.networking.domain}
+
+          # set permission on key file
+          ${pkgs.acl}/bin/setfacl -m \
+          u:postfix:r \
+          /var/lib/acme/${config.networking.hostName}.${config.networking.domain}/*.pem
+        '';
+        reloadServices = [ "postfix" ];
+      };
+    };
+  };
+
   services.postfix = {
     enable = true;
     enableSmtp = true;
@@ -73,6 +105,8 @@
         ];
         non_smtpd_milters = "$smtpd_milters";
 
+        smtpd_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
+        smtpd_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/privkey.pem";
         smtp_tls_note_starttls_offer = "yes";
         smtp_tls_security_level = "may";
         tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
