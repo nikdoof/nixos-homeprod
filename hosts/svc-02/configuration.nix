@@ -160,6 +160,7 @@
       ];
 
       receivers = [
+        { name = "null "; }
         {
           name = "telegram";
           telegram_configs = [
