@@ -4,6 +4,25 @@ let
   # Follows the same structure as virtualisation.oci-containers.containers
   containers = {
 
+    # Starbase-80
+    starbase80 = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.starbase80.rule" = "Host(`home.svc.doofnet.uk`)";
+        "traefik.http.services.starbase80.loadbalancer.server.port" = "4173";
+      };
+      image = "docker.io/jordanroher/starbase-80:latest";
+      volumes = [
+        "/etc/starbase80/config.json:/app/src/config/config.json"
+        "/srv/data/starbase80/data/favicon.ico:/app/public/favicon.ico"
+        "/srv/data/starbase80/data/logo.png:/app/public/logo.png"
+        "/srv/data/starbase80/data/icons:/app/public/icons"
+      ];
+      environment = {
+        "TITLE" = "Doofnet";
+      };
+    };
+
     # Pocket ID
     pocket-id = {
       labels = {
@@ -412,6 +431,7 @@ in
 
   environment.etc = {
     "scanservjs/config.local.js".source = ./scanservjs/config.local.js;
+    "starbase80/config.json".source = ./starbase80/config.json;
   };
 
   virtualisation.oci-containers.containers = containers;

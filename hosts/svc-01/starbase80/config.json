@@ -1,0 +1,13 @@
+[
+  {
+    "category": "Services",
+    "services": [
+      {
+        "name": "Archivebox",
+        "uri": "https://archivebox.mywebsite.com",
+        "description": "Backup webpages",
+        "icon": "/icons/archivebox.jpg"
+      }
+    ]
+  }
+]
