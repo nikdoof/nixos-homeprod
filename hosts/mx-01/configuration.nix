@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   ...
 }:
 
@@ -38,28 +39,77 @@
 
   services.postfix = {
     enable = true;
+    enableSmtp = true;
 
-    hostname = "${config.networking.hostName}.${config.networking.domain}";
-    domain = "${config.networking.domain}";
+    settings = {
+      main = {
+        myhostname = "${config.networking.hostName}.${config.networking.domain}";
+        mydomain = "${config.networking.domain}";
 
-    networks = [
-      "127.0.0.0/8"
-      "[::ffff:127.0.0.0]/104"
-      "[::1]/128"
-      "10.101.0.0/16"
-      "217.169.25.8/29"
-      "[2001:8b0:bd9:101::]/64"
-      "[2001:8b0:bd9:106::]/64"
-    ];
+        mynetworks = [
+          "127.0.0.0/8"
+          "[::ffff:127.0.0.0]/104"
+          "[::1]/128"
+          "10.101.0.0/16"
+          "217.169.25.8/29"
+          "[2001:8b0:bd9:101::]/64"
+          "[2001:8b0:bd9:106::]/64"
+        ];
 
-    extraAliases = [
+        # OpenDKIM
+        milter_default_action = "accept";
+        milter_protocol = "6";
+        smtpd_milters = [
+          "unix:${lib.removePrefix "local:" config.services.opendkim.socket}"
+        ];
+        non_smtpd_milters = "$smtpd_milters";
+
+        smtp_tls_note_starttls_offer = "yes";
+        smtp_tls_security_level = "may";
+        tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
+        smtpd_tls_received_header = "yes";
+        smtpd_tls_auth_only = "yes";
+
+        smtpd_helo_required = "yes";
+        smtpd_helo_restrictions = lib.strings.concatMapStrings (x: x + ",") [
+          "permit_mynetworks"
+          "reject_non_fqdn_helo_hostname"
+          "reject_invalid_helo_hostname"
+          "permit"
+        ];
+        smtpd_sender_restrictions = lib.strings.concatMapStrings (x: x + ",") [
+          "permit_mynetworks"
+          "reject_non_fqdn_sender"
+          "reject_unknown_sender_domain"
+          "permit"
+        ];
+        smtpd_recipient_restrictions = lib.strings.concatMapStrings (x: x + ",") [
+          "reject_invalid_hostname"
+          "reject_unknown_recipient_domain"
+          "reject_unauth_pipelining"
+          "permit_mynetworks"
+          "reject_non_fqdn_recipient"
+          "reject_unauth_destination"
+          "reject_rbl_client dnsbl.dronebl.org"
+          "reject_rbl_client zen.spamhaus.org"
+          "reject_rbl_client bl.spamcop.net"
+          "reject_rbl_client dnsbl.sorbs.net"
+          "reject_rbl_client cbl.abuseat.org"
+          "reject_rbl_client b.barracudacentral.org"
+          "reject_rbl_client dnsbl-1.uceprotect.net"
+          "permit"
+        ];
+      };
+    };
+
+    extraAliases = lib.strings.concatMapStrings (x: x + "\n") [
       "root: root-mail@m.tensixtyone.com"
       "inbox: paperless,household@williams.id"
       "nikdoof: andy@williams.id"
       "salkunh: jo@williams.id"
     ];
 
-    virtual = [
+    virtual = lib.strings.concatMapStrings (x: x + "\n") [
       "root@int.${config.networking.domain} root-mail@m.tensixtyone.com"
       "root@lab.${config.networking.domain} root-mail@m.tensixtyone.com"
       "root@pub.${config.networking.domain} root-mail@m.tensixtyone.com"
@@ -69,20 +119,9 @@
 
   services.opendkim = {
     enable = true;
-    signingTable = [
-      "${config.networking.domain} 20220504._domainkey.${config.networking.domain} ${config.networking.domain}"
-    ];
-    keyTable = [
-      "20220504._domainkey.${config.networking.domain} ${config.networking.domain}:20220504:/etc/opendkim/keys/${config.networking.domain}/20220504.private"
-    ];
-    signingConfig = {
-      "default" = {
-        selector = "20220504";
-        domain = "${config.networking.domain}";
-        key = "/etc/opendkim/keys/${config.networking.domain}/default.private";
-      };
-    };
-    trustedHosts = config.services.postfix.networks + [ "*.${config.networking.domain}" ];
+    selector = builtins.hashString "sha1" "${config.services.postfix.settings.main.myhostname}";
+    domains = config.networking.domain;
+    inherit (config.services.postfix) user group;
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
