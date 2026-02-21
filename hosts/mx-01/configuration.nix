@@ -37,6 +37,15 @@
     };
   };
 
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [
+      25
+      465
+      587
+    ];
+  };
+
   services.postfix = {
     enable = true;
     enableSmtp = true;

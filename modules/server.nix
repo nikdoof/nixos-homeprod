@@ -10,6 +10,15 @@
     borgmaticSSHKey.file = ../secrets/borgmaticSSHKey.age;
   };
 
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+
   services.prometheus.exporters.node = {
     enable = true;
     openFirewall = true;
