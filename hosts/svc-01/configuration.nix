@@ -178,6 +178,17 @@
   services.glance = {
     enable = true;
     settings = {
+      server = {
+        port = 9991;
+        proxied = true;
+      };
+      theme = {
+        background-color = "229 19 23";
+        contrast-multiplier = "1.2";
+        primary-color = "222 74 74";
+        positive-color = "96 44 68";
+        negative-color = "359 68 71";
+      };
       pages = [
         {
           name = "Startpage";
@@ -248,7 +259,7 @@
         };
 
         services.glance.loadBalancer.servers = [
-          { url = "http://127.0.0.1:${toString config.services.glance.port}"; }
+          { url = "http://127.0.0.1:${toString config.services.glance.settings.server.port}"; }
         ];
 
         middlewares = {
