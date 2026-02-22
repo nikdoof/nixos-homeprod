@@ -122,6 +122,7 @@
         tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
         smtpd_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
         smtpd_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
+        smtpd_tls_CAfile = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
         smtpd_tls_received_header = "yes";
         smtpd_tls_security_level = "may";
         smtpd_tls_auth_only = "yes";
@@ -220,7 +221,7 @@
 
     sslServerCert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
     sslServerKey = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
-    sslCACert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/chain.pem";
+    sslCACert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
 
     createMailUser = true;
     mailUser = "vmail";
