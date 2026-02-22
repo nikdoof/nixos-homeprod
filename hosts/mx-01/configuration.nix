@@ -100,7 +100,6 @@
         ];
 
         mydestination = [
-          "${config.networking.domain}"
           "${config.networking.hostName}.${config.networking.domain}"
         ];
 
