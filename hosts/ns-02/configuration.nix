@@ -22,7 +22,7 @@
   networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
-    matchConfig.Name = "eth0";
+    matchConfig.Name = "ens32";
     address = [
       "10.101.1.2/24"
       "2001:8b0:bd9:101::2/64"
