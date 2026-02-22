@@ -212,12 +212,12 @@
                     {
                       title = "Pocket ID";
                       url = "https://id.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "sh:pocket-id";
                     }
                     {
                       title = "OpenBooks";
                       url = "https://openbooks.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "sh:openbooks-dark";
                     }
                     {
                       title = "Jellyfin";
@@ -227,57 +227,57 @@
                     {
                       title = "Prowlarr";
                       url = "https://prowlarr.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "sh:prowlarr-dark";
                     }
                     {
                       title = "Sonarr";
                       url = "https://sonarr.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "si:sonarr";
                     }
                     {
                       title = "Radarr";
                       url = "https://radarr.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "si:radarr";
                     }
                     {
                       title = "Calibre Web";
                       url = "https://calibre-web.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "sh:calibre-web-dark";
                     }
                     {
                       title = "Miniflux";
                       url = "https://rss.doofnet.uk";
-                      icon = "si:miniflux";
+                      icon = "sh:miniflux-dark";
                     }
                     {
                       title = "Linkding";
                       url = "https://link.doofnet.uk";
-                      icon = "si:linkding";
+                      icon = "sh:linkding-dark";
                     }
                     {
                       title = "CopyParty";
                       url = "https://files.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "sh:copyparty-dark";
                     }
                     {
                       title = "Paperless";
                       url = "https://paperless.svc.doofnet.uk";
-                      icon = "si:paperless";
+                      icon = "si:paperlessngx";
                     }
                     {
                       title = "ScanServJS";
                       url = "https://scan.svc.doofnet.uk";
-                      icon = "si:scanservjs";
+                      icon = "sh:";
                     }
                     {
                       title = "UniFi";
                       url = "https://unifi.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "si:ubiquiti";
                     }
                     {
                       title = "Grafana";
                       url = "https://grafana.svc.doofnet.uk";
-                      icon = "si:pocket-id";
+                      icon = "sh:grafana-dark";
                     }
                   ];
                 }
