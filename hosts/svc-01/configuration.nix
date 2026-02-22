@@ -175,6 +175,43 @@
     };
   };
 
+  services.glance = {
+    enable = true;
+    settings = {
+      pages = [
+        {
+          name = "Startpage";
+          width = "slim";
+          hide-desktop-navigation = "true";
+          center-vertically = "true";
+          columns = [
+            {
+              size = "full";
+              widgets = [
+                {
+                  type = "search";
+                  autofocus = true;
+                }
+                {
+                  type = "monitor";
+                  cache = "1m";
+                  title = "Services";
+                  sites = [
+                    {
+                      title = "Jellyfin";
+                      url = "https://jellyfin.svc.doofnet.uk";
+                      icon = "si:jellyfin";
+                    }
+                  ];
+                }
+              ];
+            }
+          ];
+        }
+      ];
+    };
+  };
+
   services.traefik = {
     staticConfigOptions = {
       entryPoints = {
@@ -203,6 +240,15 @@
 
         services.gitea.loadBalancer.servers = [
           { url = "http://127.0.0.1:9990"; }
+        ];
+
+        routers.glances = {
+          rule = "Host(`home.svc.doofnet.uk`)";
+          service = "glances";
+        };
+
+        services.glances.loadBalancer.servers = [
+          { url = "http://127.0.0.1:${toString config.services.glances.port}"; }
         ];
 
         middlewares = {
