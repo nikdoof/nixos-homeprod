@@ -34,14 +34,14 @@
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnBootSec = "5m";
-      OnUnitActiveSec = "5m";
+      OnUnitActiveSec = "30m";
       Unit = "gitea-mirror.service";
     };
   };
 
   systemd.services."gitea-mirror" = {
     script = ''
-      ${pkgs.podman}/bin/podman run --rm jaedle/mirror-to-gitea:latest
+      ${pkgs.podman}/bin/podman run --env-host --rm jaedle/mirror-to-gitea:latest
     '';
     serviceConfig = {
       Type = "oneshot";
