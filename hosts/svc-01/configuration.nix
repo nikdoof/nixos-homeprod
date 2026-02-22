@@ -212,12 +212,12 @@
                     {
                       title = "Pocket ID";
                       url = "https://id.doofnet.uk";
-                      icon = "sh:pocket-id";
+                      icon = "auto-invert sh:pocket-id";
                     }
                     {
                       title = "OpenBooks";
                       url = "https://openbooks.svc.doofnet.uk";
-                      icon = "sh:openbooks-dark";
+                      icon = "auto-invert sh:openbooks-dark";
                     }
                     {
                       title = "Jellyfin";
@@ -227,7 +227,7 @@
                     {
                       title = "Prowlarr";
                       url = "https://prowlarr.svc.doofnet.uk";
-                      icon = "sh:prowlarr-dark";
+                      icon = "auto-invert sh:prowlarr-dark";
                     }
                     {
                       title = "Sonarr";
@@ -242,22 +242,22 @@
                     {
                       title = "Calibre Web";
                       url = "https://calibre-web.svc.doofnet.uk";
-                      icon = "sh:calibre-web-dark";
+                      icon = "auto-invert sh:calibre-web-dark";
                     }
                     {
                       title = "Miniflux";
                       url = "https://rss.doofnet.uk";
-                      icon = "sh:miniflux-dark";
+                      icon = "auto-invert sh:miniflux-dark";
                     }
                     {
                       title = "Linkding";
                       url = "https://link.doofnet.uk";
-                      icon = "sh:linkding-dark";
+                      icon = "auto-invert sh:linkding-dark";
                     }
                     {
                       title = "CopyParty";
                       url = "https://files.doofnet.uk";
-                      icon = "sh:copyparty-dark";
+                      icon = "auto-invert sh:copyparty-dark";
                     }
                     {
                       title = "Paperless";
@@ -267,7 +267,7 @@
                     {
                       title = "ScanServJS";
                       url = "https://scan.svc.doofnet.uk";
-                      icon = "sh:";
+                      icon = "auto-invert mdi:scanner";
                     }
                     {
                       title = "UniFi";
@@ -277,7 +277,41 @@
                     {
                       title = "Grafana";
                       url = "https://grafana.svc.doofnet.uk";
-                      icon = "sh:grafana-dark";
+                      icon = "auto-invert sh:grafana-dark";
+                    }
+                  ];
+                }
+              ];
+            }
+            {
+              size = "small";
+              widgets = [
+                {
+                  type = "clock";
+                  hour-format = "24h";
+                  timezones = [
+                    {
+                      timezone = "Europe/Paris";
+                      label = "Paris";
+                    }
+                    {
+                      timezone = "America/New_York";
+                      label = "Orlando";
+                    }
+                  ];
+                }
+                {
+                  type = "weather";
+                  units = "metric";
+                  hour-format = "24h";
+                  location = "Saint Helens, United Kingdom";
+                }
+                {
+                  type = "markets";
+                  markets = [
+                    {
+                      symbol = "SPG";
+                      name = "GBPUSD=X";
                     }
                   ];
                 }
