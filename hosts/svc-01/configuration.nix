@@ -184,7 +184,7 @@
       };
       theme = {
         background-color = "229 19 23";
-        contrast-multiplier = "1.2";
+        contrast-multiplier = 1.2;
         primary-color = "222 74 74";
         positive-color = "96 44 68";
         negative-color = "359 68 71";
