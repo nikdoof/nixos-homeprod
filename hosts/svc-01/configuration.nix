@@ -202,6 +202,7 @@
                 {
                   type = "search";
                   autofocus = true;
+                  search-engine = "kagi";
                 }
                 {
                   type = "monitor";
@@ -209,9 +210,74 @@
                   title = "Services";
                   sites = [
                     {
+                      title = "Pocket ID";
+                      url = "https://id.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "OpenBooks";
+                      url = "https://openbooks.svc.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
                       title = "Jellyfin";
                       url = "https://jellyfin.svc.doofnet.uk";
                       icon = "si:jellyfin";
+                    }
+                    {
+                      title = "Prowlarr";
+                      url = "https://prowlarr.svc.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "Sonarr";
+                      url = "https://sonarr.svc.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "Radarr";
+                      url = "https://radarr.svc.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "Calibre Web";
+                      url = "https://calibre-web.svc.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "Miniflux";
+                      url = "https://rss.doofnet.uk";
+                      icon = "si:miniflux";
+                    }
+                    {
+                      title = "Linkding";
+                      url = "https://link.doofnet.uk";
+                      icon = "si:linkding";
+                    }
+                    {
+                      title = "CopyParty";
+                      url = "https://files.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "Paperless";
+                      url = "https://paperless.svc.doofnet.uk";
+                      icon = "si:paperless";
+                    }
+                    {
+                      title = "ScanServJS";
+                      url = "https://scan.svc.doofnet.uk";
+                      icon = "si:scanservjs";
+                    }
+                    {
+                      title = "UniFi";
+                      url = "https://unifi.svc.doofnet.uk";
+                      icon = "si:pocket-id";
+                    }
+                    {
+                      title = "Grafana";
+                      url = "https://grafana.svc.doofnet.uk";
+                      icon = "si:pocket-id";
                     }
                   ];
                 }
