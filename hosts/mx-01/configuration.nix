@@ -106,6 +106,13 @@
         ];
         non_smtpd_milters = "$smtpd_milters";
 
+        # Dovecot
+        mailbox_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
+        virtual_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
+        smtpd_sasl_type = "dovecot";
+        smtpd_sasl_path = "/var/spool/postfix/auth";
+        smtpd_sasl_auth_enable = "yes";
+
         tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
         smtpd_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
         smtpd_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
@@ -125,6 +132,7 @@
         ];
         smtpd_sender_restrictions = lib.strings.concatMapStrings (x: x + ",") [
           "permit_mynetworks"
+          "permit_sasl_authenticated"
           "reject_non_fqdn_sender"
           "reject_unknown_sender_domain"
           "permit"
@@ -173,6 +181,120 @@
         x: x + ","
       ) config.services.postfix.settings.main.mynetworks;
     };
+  };
+
+  users.groups.vmail = { };
+  users.users."vmail" = {
+    createHome = true;
+    home = "/var/spool/mail/vmail";
+    isSystemUser = true;
+    group = "vmail";
+  };
+
+  age.secrets.dovecot = {
+    file = ../../secrets/mx01DovecotPasswd.age;
+    # -rw-------
+    mode = "600";
+    owner = "dovecot2";
+    group = "dovecot2";
+  };
+
+  services.dovecot2 = {
+
+    # connection to postfix
+    enableLmtp = true;
+    enablePAM = false;
+
+    sslServerCert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
+    sslServerKey = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
+    sslCACert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/chain.pem";
+
+    createMailUser = true;
+    mailUser = "vmail";
+    mailGroup = "vmail";
+
+    # implement virtual users
+    # https://doc.dovecot.org/2.3/configuration_manual/howto/simple_virtual_install/
+    # store virtual mail under
+    # /var/spool/mail/vmail/<DOMAIN>/<USER>/Maildir/
+    mailLocation = "maildir:~/Maildir";
+
+    mailboxes = {
+      # use rfc standard https://apple.stackexchange.com/a/201346
+      All = {
+        auto = "create";
+        autoexpunge = null;
+        specialUse = "All";
+      };
+      Archive = {
+        auto = "create";
+        autoexpunge = null;
+        specialUse = "Archive";
+      };
+      Drafts = {
+        auto = "create";
+        autoexpunge = null;
+        specialUse = "Drafts";
+      };
+      Flagged = {
+        auto = "create";
+        autoexpunge = null;
+        specialUse = "Flagged";
+      };
+      Junk = {
+        auto = "create";
+        autoexpunge = "60d";
+        specialUse = "Junk";
+      };
+      Sent = {
+        auto = "create";
+        autoexpunge = null;
+        specialUse = "Sent";
+      };
+      Trash = {
+        auto = "create";
+        autoexpunge = "60d";
+        specialUse = "Trash";
+      };
+    };
+
+    extraConfig = ''
+      # force to use full user name plus domain name
+      # for disambiguation
+      auth_username_format = %Lu
+
+      # Authentication configuration:
+      auth_mechanisms = plain
+      passdb {
+        driver = passwd-file
+        args = ${config.age.secrets.dovecot.path}
+      }
+
+      userdb {
+        driver = static
+        # the full e-mail address inside passwd-file is the username (%u)
+        # user@example.com
+        # %d for domain_name %n for user_name
+        args = uid=vmail gid=vmail username_format=%u home=/var/spool/mail/vmail/%d/%n
+      }
+
+      # connection to postfix via lmtp
+      service lmtp {
+       unix_listener /var/spool/postfix/dovecot-lmtp {
+         mode = 0600
+         user = postfix
+         group = postfix
+        }
+      }
+      service auth {
+        unix_listener /var/spool/postfix/auth {
+          mode = 0600
+          user = postfix
+          group = postfix
+        }
+      }
+    '';
+
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
