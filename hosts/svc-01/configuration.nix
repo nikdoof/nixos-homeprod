@@ -255,7 +255,7 @@
 
         routers.glance = {
           rule = "Host(`home.svc.doofnet.uk`)";
-          service = "glances";
+          service = "glance";
         };
 
         services.glance.loadBalancer.servers = [
