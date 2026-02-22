@@ -113,6 +113,7 @@
         non_smtpd_milters = "$smtpd_milters";
 
         # Dovecot
+        virtual_mailbox_domains = "${config.networking.domain}";
         mailbox_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
         virtual_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
         smtpd_sasl_type = "dovecot";
