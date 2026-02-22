@@ -321,6 +321,7 @@ let
       image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.6";
       volumes = [
         "/mnt/nas-03/paperless/:/data"
+        "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt"
       ];
       environment = {
         COMPOSE_PROJECT_NAME = "paperless";
@@ -343,6 +344,7 @@ let
         PAPERLESS_DEBUG = "true";
         PAPERLESS_APPS = "allauth.socialaccount.providers.openid_connect";
         PAPERLESS_DISABLE_REGULAR_LOGIN = "true";
+        PAPERLESS_EMAIL_CERTIFICATE_LOCATION = "/etc/ssl/certs/ca-certificates.crt"
       };
       environmentFiles = [
         config.age.secrets.paperlessClientSecret.path
