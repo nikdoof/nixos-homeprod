@@ -51,6 +51,7 @@
   age.secrets = {
     digitaloceanApiToken = {
       file = ../../secrets/digitalOceanApiToken.age;
+      owner = "acme";
     };
   };
 
