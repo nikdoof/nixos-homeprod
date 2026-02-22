@@ -10,5 +10,12 @@
     efi.canTouchEfiVariables = true;
   };
 
+  boot.initrd.availableKernelModules = [
+    "ata_piix"
+    "mptspi"
+    "sd_mod"
+    "sr_mod"
+  ];
+
   virtualisation.vmware.guest.enable = true;
 }
