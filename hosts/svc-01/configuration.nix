@@ -310,8 +310,8 @@
                   type = "markets";
                   markets = [
                     {
-                      symbol = "SPG";
-                      name = "GBPUSD=X";
+                      symbol = "GBPUSD=X";
+                      name = "GBP->USD";
                     }
                   ];
                 }
