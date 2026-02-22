@@ -191,6 +191,10 @@
     isSystemUser = true;
     group = "vmail";
   };
+  users.users."postfix" = {
+    createHome = true;
+    home = "/var/spool/postfix";
+  };
 
   age.secrets.dovecot = {
     file = ../../secrets/mx01DovecotPasswd.age;
