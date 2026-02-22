@@ -344,7 +344,7 @@ let
         PAPERLESS_DEBUG = "true";
         PAPERLESS_APPS = "allauth.socialaccount.providers.openid_connect";
         PAPERLESS_DISABLE_REGULAR_LOGIN = "true";
-        PAPERLESS_EMAIL_CERTIFICATE_LOCATION = "/etc/ssl/certs/ca-certificates.crt"
+        PAPERLESS_EMAIL_CERTIFICATE_LOCATION = "/etc/ssl/certs/ca-certificates.crt";
       };
       environmentFiles = [
         config.age.secrets.paperlessClientSecret.path
