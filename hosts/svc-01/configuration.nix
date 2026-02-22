@@ -182,8 +182,8 @@
         {
           name = "Startpage";
           width = "slim";
-          hide-desktop-navigation = "true";
-          center-vertically = "true";
+          hide-desktop-navigation = true;
+          center-vertically = true;
           columns = [
             {
               size = "full";
@@ -242,13 +242,13 @@
           { url = "http://127.0.0.1:9990"; }
         ];
 
-        routers.glances = {
+        routers.glance = {
           rule = "Host(`home.svc.doofnet.uk`)";
           service = "glances";
         };
 
-        services.glances.loadBalancer.servers = [
-          { url = "http://127.0.0.1:${toString config.services.glances.port}"; }
+        services.glance.loadBalancer.servers = [
+          { url = "http://127.0.0.1:${toString config.services.glance.port}"; }
         ];
 
         middlewares = {
