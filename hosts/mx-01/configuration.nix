@@ -200,6 +200,7 @@
   };
 
   services.dovecot2 = {
+    enable = true;
 
     # connection to postfix
     enableLmtp = true;
