@@ -41,26 +41,11 @@
 
   systemd.services."gitea-mirror" = {
     script = ''
-      ${pkgs.podman}/bin/podman run --env-host --rm jaedle/mirror-to-gitea:latest
+      ${pkgs.podman}/bin/podman run --env-file ${config.age.secrets.gitSecrets.path} --rm jaedle/mirror-to-gitea:latest
     '';
     serviceConfig = {
       Type = "oneshot";
     };
-    environment = {
-      GITHUB_USERNAME = "nikdoof";
-      GITEA_URL = "https://git.doofnet.uk";
-      MIRROR_PRIVATE_REPOSITORIES = "true";
-      SINGLE_RUN = "true";
-      MIRROR_STARRED = "true";
-      SKIP_STARRED_ISSUES = "true";
-      GITEA_STARRED_ORGANIZATION = "nikdoof-stars";
-      MIRROR_ORGANIZATIONS = "true";
-      PRESERVE_ORG_STRUCTURE = "true";
-      GITEA_ORG_VISIBILITY = "private";
-    };
-    serviceConfig.environmentFile = [
-      config.age.secrets.gitSecrets.path
-    ];
   };
 
 }
