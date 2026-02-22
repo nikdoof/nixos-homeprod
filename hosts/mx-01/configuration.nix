@@ -99,6 +99,11 @@
           "[2001:8b0:bd9:106::]/64"
         ];
 
+        mydestination = [
+          "${config.networking.domain}"
+          "${config.networking.hostName}.${config.networking.domain}"
+        ];
+
         # OpenDKIM
         milter_default_action = "accept";
         milter_protocol = "6";
