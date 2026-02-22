@@ -67,15 +67,18 @@
         postRun = ''
           # set permission on dir
           ${pkgs.acl}/bin/setfacl -m \
-          u:postfix:rx \
+          u:dovecot2:rx,u:postfix:rx \
           /var/lib/acme/${config.networking.hostName}.${config.networking.domain}
 
           # set permission on key file
           ${pkgs.acl}/bin/setfacl -m \
-          u:postfix:r \
+          u:dovecot2:r,u:postfix:r \
           /var/lib/acme/${config.networking.hostName}.${config.networking.domain}/*.pem
         '';
-        reloadServices = [ "postfix" ];
+        reloadServices = [
+          "postfix"
+          "dovecot"
+        ];
       };
     };
   };
