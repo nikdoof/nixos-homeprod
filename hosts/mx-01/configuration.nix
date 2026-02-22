@@ -44,6 +44,7 @@
       25
       465
       587
+      993
     ];
   };
 
@@ -204,6 +205,8 @@
 
     # connection to postfix
     enableLmtp = true;
+    enableImap = true;
+    enablePop3 = false;
     enablePAM = false;
 
     sslServerCert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/cert.pem";
