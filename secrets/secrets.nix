@@ -26,6 +26,7 @@ in
   "minifluxEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "linkdingEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "paperlessClientSecret.age".publicKeys = users ++ [ svc-01 ];
+  "gitSecrets.age".publicKeys = users ++ [ svc-01 ];
 
   "unpollerPassword.age".publicKeys = users ++ [ svc-02 ];
   "alertManagerTelegramToken.age".publicKeys = users ++ [ svc-02 ];
