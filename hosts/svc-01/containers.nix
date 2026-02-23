@@ -188,7 +188,7 @@ let
         "traefik.http.services.rustical.loadbalancer.server.port" = "4000";
         "traefik.http.routers.rustical.entrypoints" = "websecure,extwebsecure";
       };
-      image = "ghcr.io/lennart-k/rustical:0.12.5";
+      image = "ghcr.io/lennart-k/rustical:0.12.9";
       environmentFiles = [ config.age.secrets.rusticalClientSecret.path ];
       volumes = [
         "/srv/data/rustical/config/config.toml:/etc/rustical/config.toml:U"
