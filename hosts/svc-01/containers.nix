@@ -12,7 +12,7 @@ let
         "traefik.http.services.pocket-id.loadbalancer.server.port" = "8081";
         "traefik.http.routers.pocket-id.entrypoints" = "websecure,extwebsecure";
       };
-      image = "ghcr.io/pocket-id/pocket-id:v2.2.0";
+      image = "ghcr.io/pocket-id/pocket-id:v2.3.0";
       volumes = [
         "/srv/data/pocket-id/data:/app/data:U"
         "${config.age.secrets.pocketIdEncryptionKey.path}:/secrets/pocketIdEncryptionKey"
