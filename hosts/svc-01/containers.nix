@@ -239,7 +239,7 @@ let
         "traefik.http.services.miniflux.loadbalancer.server.port" = "8080";
         "traefik.http.routers.miniflux.entrypoints" = "websecure,extwebsecure";
       };
-      image = "miniflux/miniflux:2.2.16";
+      image = "miniflux/miniflux:2.2.17";
       environment = {
         TZ = "UTC";
         BASE_URL = "https://rss.doofnet.uk/";
