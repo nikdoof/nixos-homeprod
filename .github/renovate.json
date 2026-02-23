@@ -11,7 +11,9 @@
   "dependencyDashboard": true,
   "dependencyDashboardAutoclose": false,
   "prCreation": "not-pending",
-  "suppressNotifications": ["prIgnoreNotification"],
+  "suppressNotifications": [
+    "prIgnoreNotification"
+  ],
   "rebaseWhen": "conflicted",
   "assigneesFromCodeOwners": true,
   "nix": {
@@ -20,7 +22,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["containers.nix"],
+      "managerFilePatterns": [
+        "/containers.nix/"
+      ],
       "matchStrings": [
         "image *= *\"(?<depName>.*?):(?<currentValue>.*?)(@(?<currentDigest>sha256:[a-f0-9]+))?\""
       ],
