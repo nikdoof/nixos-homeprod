@@ -11,8 +11,7 @@ let
         "traefik.http.routers.unifi.rule" = "Host(`unifi.svc.doofnet.uk`)";
         "traefik.http.services.unifi.loadbalancer.server.port" = "8443";
         "traefik.http.services.unifi.loadbalancer.server.scheme" = "https";
-        "traefik.http.services.unifi.loadbalancer.serversTransport" = "unifi";
-        "traefik.http.serverstransports.unifi.insecureskipverify" = "true";
+        "traefik.http.services.unifi.loadbalancer.serversTransport" = "insecureTransport";
       };
       image = "jacobalberty/unifi:v10.0.162";
       volumes = [

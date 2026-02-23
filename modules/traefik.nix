@@ -71,10 +71,18 @@ in
     };
 
     dynamicConfigOptions = {
-      http.routers = {
-        api = {
-          rule = "Host(`${fqdn}`)";
-          service = "api@internal";
+      http = {
+        routers = {
+          api = {
+            rule = "Host(`${fqdn}`)";
+            service = "api@internal";
+          };
+        };
+
+        serversTransports = {
+          insecureTransport = {
+            insecureSkipVerify = true;
+          };
         };
       };
     };
