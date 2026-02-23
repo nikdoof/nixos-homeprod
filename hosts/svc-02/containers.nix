@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 let
   # Follows the same structure as virtualisation.oci-containers.containers
@@ -29,6 +29,17 @@ let
       };
       extraOptions = [ "--network=host" ];
     };
+
+    hcloud_exporter = {
+      image = "ghcr.io/promhippie/hcloud-exporter:3.9.2";
+      environment = {
+        HCLOUD_EXPORTER_COLLECTOR_STORAGEBOXES = "true";
+      };
+      environmentFiles = [
+        config.age.secrets.hcloudExporterEnvironment.path
+      ];
+      ports = [ "9501:9501" ];
+    };
   };
 
   # Extract local /srv/data paths from all volumes defined in any containers
@@ -52,6 +63,12 @@ let
 in
 {
   virtualisation.oci-containers.containers = containers;
+
+  age.secrets = {
+    hcloudExporterEnvironment = {
+      file = ../../secrets/hcloudExporterEnvironment.age;
+    };
+  };
 
   # Automatically create /srv/data directories from container definitions
   system.activationScripts.createContainerDirs = lib.stringAfter [ "var" ] ''
