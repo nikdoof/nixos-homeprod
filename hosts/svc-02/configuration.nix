@@ -268,6 +268,8 @@
       #marcusolsson-treemap-panel
       grafana-clock-panel
       marcusolsson-json-datasource
+      grafana-lokiexplore-app
+      grafana-exploretraces-app
     ];
 
     settings = {
