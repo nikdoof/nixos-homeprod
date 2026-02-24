@@ -348,6 +348,84 @@
     };
   };
 
+  services.loki = {
+    enable = true;
+
+    configuration = {
+      server.http_listen_port = 3030;
+      auth_enabled = false;
+
+      ingester = {
+        lifecycler = {
+          address = "127.0.0.1";
+          ring = {
+            kvstore = {
+              store = "inmemory";
+            };
+            replication_factor = 1;
+          };
+        };
+        chunk_idle_period = "1h";
+        max_chunk_age = "1h";
+        chunk_target_size = 999999;
+        chunk_retain_period = "30s";
+        max_transfer_retries = 0;
+      };
+
+      schema_config = {
+        configs = [
+          {
+            from = "2022-06-06";
+            store = "boltdb-shipper";
+            object_store = "filesystem";
+            schema = "v11";
+            index = {
+              prefix = "index_";
+              period = "24h";
+            };
+          }
+        ];
+      };
+
+      storage_config = {
+        boltdb_shipper = {
+          active_index_directory = "/srv/data/loki/boltdb-shipper/active";
+          cache_location = "/srv/data/loki/boltdb-shipper/cache";
+          cache_ttl = "24h";
+          shared_store = "filesystem";
+        };
+
+        filesystem = {
+          directory = "/srv/data/loki/chunks";
+        };
+      };
+
+      limits_config = {
+        reject_old_samples = true;
+        reject_old_samples_max_age = "168h";
+      };
+
+      chunk_store_config = {
+        max_look_back_period = "0s";
+      };
+
+      table_manager = {
+        retention_deletes_enabled = false;
+        retention_period = "0s";
+      };
+
+      compactor = {
+        working_directory = "/srv/data/loki";
+        shared_store = "filesystem";
+        compactor_ring = {
+          kvstore = {
+            store = "inmemory";
+          };
+        };
+      };
+    };
+  };
+
   services.unpoller = {
     enable = true;
     prometheus.http_listen = "127.0.0.1:9130";
@@ -370,14 +448,23 @@
           service = "grafana";
         };
 
-        services.grafana.loadBalancer.servers = [
-          { url = "http://localhost:${toString config.services.grafana.settings.server.http_port}"; }
-        ];
+        routers.loki = {
+          rule = "Host(`loki.svc.doofnet.uk`)";
+          service = "loki";
+        };
 
         routers.alertmanager = {
           rule = "Host(`alertmanager.svc.doofnet.uk`)";
           service = "alertmanager";
         };
+
+        services.grafana.loadBalancer.servers = [
+          { url = "http://localhost:${toString config.services.grafana.settings.server.http_port}"; }
+        ];
+
+        services.loki.loadBalancer.servers = [
+          { url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}"; }
+        ];
 
         services.alertmanager.loadBalancer.servers = [
           { url = "http://localhost:${toString config.services.prometheus.alertmanager.port}"; }
