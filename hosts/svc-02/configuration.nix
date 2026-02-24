@@ -314,6 +314,11 @@
           isDefault = true;
           editable = false;
         }
+        {
+          name = "loki";
+          type = "loki";
+          url = "https://loki.svc.doofnet.uk";
+        }
       ];
     };
   };
