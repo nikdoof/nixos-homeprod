@@ -278,6 +278,16 @@
         enable_gzip = true;
         domain = "grafana.svc.doofnet.uk";
       };
+      smtp = {
+        enabled = true;
+        from_address = "grafana@doofnet.uk";
+        host = "mx-01.doofnet.uk";
+        startTLS_policy = "OpportunisticStartTLS";
+      };
+      analytics = {
+        reporting_enabled = false;
+        feedback_links_enabled = false;
+      };
     };
 
     provision = {
