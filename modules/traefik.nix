@@ -92,7 +92,5 @@ in
   networking.firewall.allowedTCPPorts = [
     80
     443
-    8080
-    8443
   ];
 }
