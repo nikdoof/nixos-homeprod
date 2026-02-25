@@ -344,7 +344,7 @@ let
     };
 
     valkey = {
-      image = "valkey/valkey:9.0.2";
+      image = "valkey/valkey:9.0.3";
     };
 
     scanservjs = {
