@@ -10,8 +10,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../hardware/esxi-vm.nix
-    ../../modules/common.nix
-    ../../modules/server.nix
+    ../../modules/doofnet
   ];
 
   # Networking
@@ -47,6 +46,8 @@
       993
     ];
   };
+
+  doofnet.server = true;
 
   age.secrets = {
     digitaloceanApiToken = {

@@ -8,8 +8,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../hardware/prodesk-600-g3-dm.nix
-    ../../modules/common.nix
-    ../../modules/server.nix
+    ../../modules/doofnet
     ../../modules/traefik.nix
     ../../modules/podman.nix
     ./containers.nix
@@ -42,6 +41,7 @@
     };
   };
 
+  doofnet.server = true;
   doofnet.nfs.media = true;
 
   services.prometheus = {

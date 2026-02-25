@@ -11,8 +11,7 @@
     ./hardware-configuration.nix
     ../../hardware/prodesk-600-g3-dm.nix
     ../../hardware/coral-tpu-pcie.nix
-    ../../modules/common.nix
-    ../../modules/server.nix
+    ../../modules/doofnet
     ../../modules/podman.nix
     ../../modules/traefik.nix
     ../../modules/postgresql.nix
@@ -40,6 +39,7 @@
     };
   };
 
+  doofnet.server = true;
   doofnet.nfs = {
     media = true;
     paperless = true;

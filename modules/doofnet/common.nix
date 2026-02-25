@@ -4,11 +4,6 @@
 }:
 
 {
-  imports = [
-    ./nfs
-    ./users.nix
-  ];
-
   nix = {
     settings = {
       experimental-features = [
@@ -30,7 +25,7 @@
   };
 
   users.motdFile = builtins.path {
-    path = ../files/motd;
+    path = ./files/motd;
     name = "motd";
   };
 

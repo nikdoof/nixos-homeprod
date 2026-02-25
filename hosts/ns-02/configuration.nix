@@ -7,8 +7,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../hardware/esxi-vm.nix
-    ../../modules/common.nix
-    ../../modules/server.nix
+    ../../modules/doofnet
     ../../modules/bind
   ];
 
@@ -35,6 +34,8 @@
       IPv6AcceptRA = true;
     };
   };
+
+  doofnet.server = true;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?

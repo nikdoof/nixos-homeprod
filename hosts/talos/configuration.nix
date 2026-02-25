@@ -13,7 +13,7 @@
     inputs.nixos-hardware.nixosModules.common-pc-laptop-ssd
     ./hardware-configuration.nix
     ../../hardware/p8-laptop.nix
-    ../../modules/common.nix
+    ../../modules/doofnet
   ];
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
