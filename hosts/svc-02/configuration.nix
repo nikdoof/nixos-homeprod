@@ -394,8 +394,15 @@
           directory = "/srv/data/loki/chunks";
         };
       };
-    };
 
+      pattern_ingester = {
+        enabled = true;
+      };
+      limits_config = {
+        allow_structured_metadata = true;
+        volume_enabled = true;
+      };
+    };
   };
 
   services.unpoller = {
