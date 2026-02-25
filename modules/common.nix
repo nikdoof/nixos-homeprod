@@ -5,6 +5,7 @@
 
 {
   imports = [
+    ./nfs
     ./users.nix
   ];
 

@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   ...
 }:
 
@@ -13,7 +12,6 @@
     ../../modules/server.nix
     ../../modules/traefik.nix
     ../../modules/podman.nix
-    ../../modules/nfs/media.nix
     ./containers.nix
   ];
 
@@ -43,6 +41,8 @@
       IPv6AcceptRA = true;
     };
   };
+
+  doofnet.nfs.media = true;
 
   services.prometheus = {
     enable = true;

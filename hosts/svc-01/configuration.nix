@@ -16,8 +16,6 @@
     ../../modules/podman.nix
     ../../modules/traefik.nix
     ../../modules/postgresql.nix
-    ../../modules/nfs/media.nix
-    ../../modules/nfs/paperless.nix
     ./containers.nix
     ./timers.nix
   ];
@@ -40,6 +38,11 @@
       DHCP = "ipv4";
       IPv6AcceptRA = true;
     };
+  };
+
+  doofnet.nfs = {
+    media = true;
+    paperless = true;
   };
 
   # Printing
