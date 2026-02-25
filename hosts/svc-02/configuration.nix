@@ -270,6 +270,7 @@
       marcusolsson-json-datasource
       grafana-lokiexplore-app
       grafana-exploretraces-app
+      grafana-grafana-metricsdrilldown-app
     ];
 
     settings = {
