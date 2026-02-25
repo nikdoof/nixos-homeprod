@@ -264,15 +264,6 @@
   services.grafana = {
     enable = true;
 
-    declarativePlugins = with pkgs.grafanaPlugins; [
-      #marcusolsson-treemap-panel
-      grafana-clock-panel
-      marcusolsson-json-datasource
-      grafana-lokiexplore-app
-      grafana-exploretraces-app
-      grafana-metricsdrilldown-app
-    ];
-
     settings = {
       server = {
         http_addr = "127.0.0.1";
