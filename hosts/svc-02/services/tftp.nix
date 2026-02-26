@@ -1,15 +1,13 @@
 { lib, pkgs, ... }:
 {
 
-  systemd.services.rs-tftpd = {
-    description = "tftp server";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
+  services.xinetd.enable = true;
 
-    serviceConfig = {
-      ExecStart = "${pkgs.rs-tftpd}/bin/tftpd -r -d /srv/data/tftp";
-      DynamicUser = true;
-    };
+  services.xinetd.services = lib.singleton {
+    name = "tftp";
+    protocol = "udp";
+    server = "${pkgs.tftp-hpa}/sbin/in.tftpd";
+    serverArgs = "/srv/data/tftp";
   };
 
   networking.firewall.allowedUDPPorts = [ 69 ];
