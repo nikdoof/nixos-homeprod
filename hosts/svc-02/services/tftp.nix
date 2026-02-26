@@ -1,13 +1,9 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 {
 
-  services.xinetd.enable = true;
-
-  services.xinetd.services = lib.singleton {
-    name = "tftp";
-    protocol = "udp";
-    server = "${pkgs.tftp-hpa}/sbin/in.tftpd";
-    serverArgs = "-6 /srv/data/tftp";
+  services.atftpd = {
+    enable = true;
+    root = "/srv/data/tftp";
   };
 
   networking.firewall.allowedUDPPorts = [ 69 ];
