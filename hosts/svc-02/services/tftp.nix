@@ -3,6 +3,7 @@
   services.atftpd = {
     enable = true;
     root = "/srv/data/tftp";
+    extraOptions = [ "--verbose=6" ];
   };
 
   networking.firewall.allowedUDPPorts = [ 69 ];
