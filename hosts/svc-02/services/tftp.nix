@@ -7,7 +7,7 @@
     name = "tftp";
     protocol = "udp";
     server = "${pkgs.tftp-hpa}/sbin/in.tftpd";
-    serverArgs = "-4 /srv/data/tftp";
+    serverArgs = "-6 /srv/data/tftp";
   };
 
   networking.firewall.allowedUDPPorts = [ 69 ];
