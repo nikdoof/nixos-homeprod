@@ -2,7 +2,7 @@
 {
   services.tftpd = {
     enable = true;
-    root = "/srv/data/tftp";
+    path = "/srv/data/tftp";
   };
 
   networking.firewall.allowedUDPPorts = [ 69 ];
