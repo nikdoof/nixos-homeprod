@@ -36,7 +36,6 @@
 
   # Enable scram auth from Podman subnet
   services.postgresql.authentication = pkgs.lib.mkAfter ''
-    host all all 10.0.0.0/8 scram-sha-256
-    host all all 2001:8b0:bd9:101::/64 scram-sha-256
+    host all all 10.88.0.0/16 scram-sha-256
   '';
 }
