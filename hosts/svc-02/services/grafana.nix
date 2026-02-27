@@ -1,4 +1,18 @@
-{ config, ... }:
+{ config, pkgs, ... }:
+let
+  dashboards = pkgs.stdenv.mkDerivation {
+    name = "grafana-dashboards";
+    src = ./files/dashboards;
+    phases = [
+      "unpackPhase"
+      "installPhase"
+    ];
+    installPhase = ''
+      mkdir -p $out
+      cp -r $src/* $out
+    '';
+  };
+in
 {
   services.grafana = {
     enable = true;
@@ -33,7 +47,7 @@
           name = "Dashboards";
           disableDeletion = true;
           options = {
-            path = "/etc/grafana/dashboards";
+            path = dashboards;
             foldersFromFilesStructure = true;
           };
         }
@@ -55,28 +69,6 @@
         }
       ];
     };
-  };
-
-  # Provision Grafana dashboards via /etc
-  environment.etc = {
-    "grafana/dashboards/bind.json".source = ./files/dashboards/bind.json;
-    "grafana/dashboards/downloads.json".source = ./files/dashboards/downloads.json;
-    "grafana/dashboards/house-dashboard.json".source = ./files/dashboards/house-dashboard.json;
-    "grafana/dashboards/infra-dashboard.json".source = ./files/dashboards/infra-dashboard.json;
-    "grafana/dashboards/jrouter.json".source = ./files/dashboards/jrouter.json;
-    "grafana/dashboards/pfsense.json".source = ./files/dashboards/pfsense.json;
-    "grafana/dashboards/postgresql-database.json".source = ./files/dashboards/postgresql-database.json;
-    "grafana/dashboards/truenas-cgroups.json".source = ./files/dashboards/truenas-cgroups.json;
-    "grafana/dashboards/truenas-disk-insight.json".source =
-      ./files/dashboards/truenas-disk-insight.json;
-    "grafana/dashboards/truenas-overview.json".source = ./files/dashboards/truenas-overview.json;
-    "grafana/dashboards/truenas-temperatures.json".source =
-      ./files/dashboards/truenas-temperatures.json;
-    "grafana/dashboards/unifi_ap.json".source = ./files/dashboards/unifi_ap.json;
-    "grafana/dashboards/unifi_clients.json".source = ./files/dashboards/unifi_clients.json;
-    "grafana/dashboards/unifi_sites.json".source = ./files/dashboards/unifi_sites.json;
-    "grafana/dashboards/unifi_usw.json".source = ./files/dashboards/unifi_usw.json;
-    "grafana/dashboards/globaltalk.json".source = ./files/dashboards/globaltalk.json;
   };
 
   services.traefik = {
