@@ -54,6 +54,8 @@
     };
   };
 
+  microvm.host.enable = true;
+
   doofnet.server = true;
   doofnet.network.vlans = true;
 
