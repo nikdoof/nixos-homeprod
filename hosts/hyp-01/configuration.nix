@@ -5,6 +5,8 @@
     ./hardware-configuration.nix
     ../../hardware/prodesk-600-g3-dm.nix
     ../../modules/doofnet
+    ./services
+    ./vms
   ];
 
   # Networking

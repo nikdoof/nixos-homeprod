@@ -20,27 +20,24 @@
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
-      mkSystem =
-        name:
-        nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          modules = [
-            "${self}/hosts/${name}/configuration.nix"
-            inputs.agenix.nixosModules.default
-          ];
-        };
+
+      mkSystem = import ./lib/mksystem.nix {
+        inherit nixpkgs inputs;
+      };
     in
     {
       nixosConfigurations = {
         svc-01 = mkSystem "svc-01";
         svc-02 = mkSystem "svc-02";
         mx-01 = mkSystem "mx-01";
-        hyp-01 = mkSystem "hyp-01";
+        hyp-01 = mkSystem "hyp-01" {
+          extra_modules = [ inputs.microvm.nixosModules.host ];
+        };
 
         # Nameservers
-        ns-01 = nixpkgs.lib.nixosSystem {
+        ns-01 = mkSystem "ns-01" {
           system = "aarch64-linux";
-          modules = [
+          extra_modules = [
             {
               nix.settings = {
                 substituters = [
@@ -52,8 +49,6 @@
               };
             }
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-            ./hosts/ns-01/configuration.nix
-            inputs.agenix.nixosModules.default
           ];
         };
         ns-02 = mkSystem "ns-02";
