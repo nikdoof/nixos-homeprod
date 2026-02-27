@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -11,6 +12,12 @@
       port = 5432;
       ssl = true;
     };
+
+    # Allow local auth via scram
+    authentication = pkgs.lib.mkAfter ''
+      host sameuser all 127.0.0.1/32 scram-sha-256
+      host sameuser all ::1/128 scram-sha-256
+    '';
   };
 
   services.prometheus.exporters.postgres = {
