@@ -4,7 +4,7 @@ with lib;
   options.doofnet.network.vlans = mkEnableOption "Create Doofnet VLAN netdevs in systemd-networkd";
 
   config = mkIf config.doofnet.network.vlans {
-    systemd.netdevs = {
+    systemd.network.netdevs = {
       "vlan-private" = {
         netdevConfig = {
           Name = "vlan-private";
