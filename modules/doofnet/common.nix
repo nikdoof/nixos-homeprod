@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -95,6 +96,11 @@
     openssh = {
       enable = true;
       openFirewall = true;
+      settings = {
+        PasswordAuthentication = false;
+        KbdInteractiveAuthentication = false;
+        PermitRootLogin = lib.mkForce "no";
+      };
     };
     fstrim.enable = true;
   };
