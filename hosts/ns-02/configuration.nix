@@ -1,15 +1,17 @@
 {
+  inputs,
   ...
 }:
 
 {
   imports = [
     # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-    ../../hardware/esxi-vm.nix
     ../../modules/doofnet
     ../../modules/bind
+    inputs.microvm.nixosModules.microvm
   ];
+
+  microvm.hypervisor = "firecracker";
 
   # Networking
   networking.useDHCP = false;
@@ -23,9 +25,9 @@
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "ens32";
     address = [
-      "10.101.1.2/24"
-      "2001:8b0:bd9:101::2/64"
-      "fddd:d00f:dab0:101::2/64"
+      "10.101.4.2/24"
+      "2001:8b0:bd9:101:4:2/64"
+      "fddd:d00f:dab0:101:4:2/64"
     ];
     routes = [
       { Gateway = "10.101.1.1"; }

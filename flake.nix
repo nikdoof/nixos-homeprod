@@ -26,9 +26,9 @@
     in
     {
       nixosConfigurations = {
-        svc-01 = mkSystem "svc-01";
-        svc-02 = mkSystem "svc-02";
-        mx-01 = mkSystem "mx-01";
+        svc-01 = mkSystem "svc-01" { };
+        svc-02 = mkSystem "svc-02" { };
+        mx-01 = mkSystem "mx-01" { };
         hyp-01 = mkSystem "hyp-01" {
           extraModules = [ inputs.microvm.nixosModules.host ];
         };
@@ -50,10 +50,10 @@
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           ];
         };
-        ns-02 = mkSystem "ns-02";
+        ns-02 = mkSystem "ns-02" { };
 
         # Mini P8 Laptop
-        talos = mkSystem "talos";
+        talos = mkSystem "talos" { };
       };
 
       devShells = forAllSystems (system: {
