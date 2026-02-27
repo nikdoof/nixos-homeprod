@@ -7,8 +7,7 @@
 
 {
   age.secrets = {
-    swarmMirrorConfig.file = ../../secrets/swarmMirrorConfig.age;
-    gitSecrets.file = ../../secrets/gitSecrets.age;
+    swarmMirrorConfig.file = ../../../secrets/swarmMirrorConfig.age;
   };
 
   systemd.timers."swarm-mirror" = {
@@ -28,24 +27,4 @@
       Type = "oneshot";
     };
   };
-
-  # Gitea Mirror
-  systemd.timers."gitea-mirror" = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnBootSec = "5m";
-      OnUnitActiveSec = "30m";
-      Unit = "gitea-mirror.service";
-    };
-  };
-
-  systemd.services."gitea-mirror" = {
-    script = ''
-      ${pkgs.podman}/bin/podman run --env-file ${config.age.secrets.gitSecrets.path} --rm jaedle/mirror-to-gitea:latest
-    '';
-    serviceConfig = {
-      Type = "oneshot";
-    };
-  };
-
 }
