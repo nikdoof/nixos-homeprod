@@ -1,0 +1,72 @@
+#!ipxe
+
+# Some menu defaults
+set menu-timeout 5000
+set submenu-timeout ${menu-timeout}
+set menu-default exit
+
+# Figure out if client is 64-bit capable
+cpuid --ext 29 && set arch x64 || set arch x86
+cpuid --ext 29 && set archl amd64 || set archl i386
+
+:start
+menu iPXE boot menu
+item --gap --                   ---------------------------- Installers ----------------------------------
+item            debstable_install       Install Debian Stable
+item            debtesting_install      Install Debian Testing
+item            debsid_install          Install Debian Sid
+item            nixos                   Install NixOS
+item --gap --                   ------------------------- Advanced options -------------------------------
+item            netbootxyz              Netboot.xyz
+item            shell                   Drop to iPXE shell
+item            reboot                  Reboot
+item
+item --key x    exit                    Exit iPXE and continue BIOS boot
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
+set menu-timeout 0
+goto ${selected}
+
+:cancel
+echo You cancelled the menu, dropping you to a shell
+
+:shell
+echo Type 'exit' to get the back to the menu
+shell
+set menu-timeout 0
+set submenu-timeout 0
+goto start
+
+:reboot
+reboot
+
+:exit
+exit
+
+###
+### Custom menu entries
+###
+
+:debstable_install
+kernel ${debian-mirror}/dists/stable/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux initrd=initrd.gz || goto failed
+initrd ${debian-mirror}/dists/stable/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz || goto failed
+boot || goto failed
+pause 10
+
+:debtesting_install
+kernel ${debian-mirror}/dists/testing/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux initrd=initrd.gz || goto failed
+initrd ${debian-mirror}/dists/testing/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz || goto failed
+boot
+
+:debsid_install
+kernel ${debian-mirror}/dists/sid/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux initrd=initrd.gz || goto failed
+initrd ${debian-mirror}/dists/sid/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz || goto failed
+boot
+
+:nixos
+chain --autofree https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/netboot-x86_64-linux.ipxe
+
+:netbootxyz
+chain --autofree https://boot.netboot.xyz/ipxe/netboot.xyz.efi
+
+:failed
+sleep 10

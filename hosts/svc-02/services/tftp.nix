@@ -1,15 +1,29 @@
-{ lib, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
+let
+  tftp_data = pkgs.stdenv.mkDerivation {
+    name = "tftp_data";
+    src = ./files/tftp;
+    phases = [
+      "unpackPhase"
+      "installPhase"
+    ];
+    installPhase = ''
+      mkdir -p $out
+      cp -r $src/* $out
+    '';
+  };
+in
 {
 
   services.atftpd = {
     enable = true;
-    root = "/srv/data/tftp";
+    root = "${tftp_data}";
   };
 
   networking.firewall.allowedUDPPorts = [ 69 ];
-
-  system.activationScripts.rs-tftpd = lib.stringAfter [ "var" ] ''
-    if ! [ -f /srv/data/tftp ]; then mkdir -p "/srv/data/tftp"; fi
-    chmod u+rwX,g+rX,o+rX "/srv/data/tftp"
-  '';
 }
