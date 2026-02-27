@@ -13,7 +13,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       ...
     }@inputs:
@@ -31,13 +30,13 @@
         svc-02 = mkSystem "svc-02";
         mx-01 = mkSystem "mx-01";
         hyp-01 = mkSystem "hyp-01" {
-          extra_modules = [ inputs.microvm.nixosModules.host ];
+          extraModules = [ inputs.microvm.nixosModules.host ];
         };
 
         # Nameservers
         ns-01 = mkSystem "ns-01" {
           system = "aarch64-linux";
-          extra_modules = [
+          extraModules = [
             {
               nix.settings = {
                 substituters = [
