@@ -5,10 +5,12 @@ let
   svc-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILPHbFY5oPMjAinz46BD8qHTuMgjymS3Vo+57h+iKKWu";
   svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
   mx-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFxXrWjQIpC5UeJI8f5uZK5rV1vP1bmJTt87W38ucDPb";
+  hyp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKTI5LxG1wD5ee7rhYq9Kv9ArjkgooCODqqCFWh0hvNl";
   systems = [
     svc-01
     svc-02
     mx-01
+    hyp-01
   ];
 in
 {
