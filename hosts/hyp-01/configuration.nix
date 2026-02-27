@@ -46,7 +46,8 @@
     "10-lan" = {
       matchConfig.Name = "br0";
       networkConfig = {
-        DHCP = "ipv4";
+        Address = [ "10.101.3.22/16" ];
+        Gateway = "10.101.1.1";
         IPv6AcceptRA = true;
       };
       linkConfig.RequiredForOnline = "routable";
