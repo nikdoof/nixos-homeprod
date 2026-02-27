@@ -21,13 +21,35 @@
   networking.domain = "int.doofnet.uk";
   networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
+
+  # Create the bridge dev
+  systemd.network.netdevs."br0" = {
+    netdevConfig = {
+      Name = "br0";
+      Kind = "bridge";
+    };
+  };
+
   systemd.network.networks = {
+    # Bridge the ethernet and all vm TAPs
+    "10-bridge" = {
+      matchConfig.Name = [
+        "eno1"
+        "vm-*"
+      ];
+      networkConfig = {
+        Bridge = "br0";
+      };
+    };
+
+    # Create the lan interface on the bridge
     "10-lan" = {
-      matchConfig.Name = "eno1";
+      matchConfig.Name = "br0";
       networkConfig = {
         DHCP = "ipv4";
         IPv6AcceptRA = true;
       };
+      linkConfig.RequiredForOnline = "routable";
     };
   };
 
