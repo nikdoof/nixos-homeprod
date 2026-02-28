@@ -61,7 +61,12 @@
   };
 
   microvm.host.enable = true;
-  microvm.stateDir = "/srv/data/microvm";
+
+  # Bind Prometheus home folder to the NVMe.
+  fileSystems."/var/lib/microvm" = {
+    device = "/srv/data/microvm";
+    options = [ "bind" ];
+  };
 
   doofnet.server = true;
   doofnet.network.vlans = true;
