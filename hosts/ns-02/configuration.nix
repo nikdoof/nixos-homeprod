@@ -11,7 +11,16 @@
     inputs.microvm.nixosModules.microvm
   ];
 
-  microvm.hypervisor = "firecracker";
+  microvm = {
+    hypervisor = "firecracker";
+    interfaces = [
+      {
+        type = "tap";
+        id = "vm-ns-02";
+        mac = "02:00:00:00:00:01";
+      }
+    ];
+  };
 
   # Networking
   networking.useDHCP = false;
@@ -23,7 +32,7 @@
   networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
-    matchConfig.Name = "ens32";
+    matchConfig.Type = "ether";
     address = [
       "10.101.4.2/24"
       "2001:8b0:bd9:101:4:2/64"
