@@ -19,7 +19,7 @@
     interfaces = [
       {
         type = "tap";
-        vhost = true;
+        tap.vhost = true;
         id = "vm-ns-02";
         mac = "02:00:00:00:00:01";
       }
