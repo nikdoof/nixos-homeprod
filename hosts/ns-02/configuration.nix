@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   ...
 }:
 
@@ -12,7 +13,7 @@
   ];
 
   microvm = {
-    hypervisor = "firecracker";
+    hypervisor = "qemu";
     interfaces = [
       {
         type = "tap";
@@ -32,7 +33,7 @@
   networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
-    matchConfig.Type = "ether";
+    matchConfig.MACAddress = (builtins.head config.microvm.interfaces).mac;
     address = [
       "10.101.4.2/24"
       "2001:8b0:bd9:101:4:2/64"
