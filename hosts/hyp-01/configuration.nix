@@ -55,6 +55,7 @@
   };
 
   microvm.host.enable = true;
+  microvm.stateDir = "/srv/data/microvm";
 
   doofnet.server = true;
   doofnet.network.vlans = true;

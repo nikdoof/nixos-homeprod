@@ -14,11 +14,21 @@
 
   microvm = {
     hypervisor = "qemu";
+    vcpu = 2;
+    mem = 1024;
     interfaces = [
       {
         type = "tap";
         id = "vm-ns-02";
         mac = "02:00:00:00:00:01";
+      }
+    ];
+    shares = [
+      {
+        source = "/nix/store";
+        mountPoint = "/nix/.ro-store";
+        tag = "ro-store";
+        proto = "virtiofs";
       }
     ];
   };
