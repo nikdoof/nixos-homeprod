@@ -29,8 +29,8 @@ in
       {
         type = "tap";
         tap.vhost = true;
-        id = "vm-ns-02";
-        mac = mac;
+        id = "vm-${config.networking.hostName}";
+        inherit mac;
       }
     ];
     shares = [

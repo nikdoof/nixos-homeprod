@@ -9,6 +9,12 @@
     ./vms.nix
   ];
 
+  boot.kernel.sysctl = {
+    # forward network packets that are not destined for the interface on which they were received
+    "net.ipv4.conf.all.forwarding" = true;
+    "net.ipv6.conf.all.forwarding" = true;
+  };
+
   # Networking
   networking.useDHCP = false;
   networking.hostName = "hyp-01";
