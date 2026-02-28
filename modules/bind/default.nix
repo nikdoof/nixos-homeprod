@@ -59,5 +59,8 @@ in
     };
   };
 
-  services.prometheus.exporters.bind.enable = true;
+  services.prometheus.exporters.bind = {
+    enable = true;
+    openFirewall = true;
+  };
 }
