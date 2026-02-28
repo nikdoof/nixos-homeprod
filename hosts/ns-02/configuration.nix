@@ -30,7 +30,7 @@ in
         type = "tap";
         tap.vhost = true;
         id = "vm-ns-02";
-        inherit mac;
+        mac = mac;
       }
     ];
     shares = [
