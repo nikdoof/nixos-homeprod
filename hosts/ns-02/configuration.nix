@@ -3,7 +3,16 @@
   config,
   ...
 }:
-
+let
+  mkMac =
+    seed:
+    let
+      hash = builtins.hashString "md5" seed;
+      c = off: builtins.substring off 2 hash;
+    in
+    "${builtins.substring 0 1 hash}2:${c 2}:${c 4}:${c 6}:${c 8}:${c 10}";
+  mac = mkMac config.networking.fqdn;
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -21,7 +30,7 @@
         type = "tap";
         tap.vhost = true;
         id = "vm-ns-02";
-        mac = "02:00:00:00:00:01";
+        inherit mac;
       }
     ];
     shares = [
