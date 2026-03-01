@@ -11,7 +11,7 @@
     SOA = {
       nameServer = (builtins.head dns_masters);
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2019030800;
+      serial = 2025030101;
     };
     NS = dns_masters;
 

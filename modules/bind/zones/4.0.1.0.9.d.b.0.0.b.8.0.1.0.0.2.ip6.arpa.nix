@@ -11,7 +11,7 @@ with dns.lib.combinators;
     SOA = {
       nameServer = (builtins.head dns_masters);
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2024010100;
+      serial = 2025030101;
     };
     NS = dns_masters ++ [
       "ns1.he.net."
