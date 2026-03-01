@@ -191,6 +191,9 @@ in
       );
 
       extraConfig = ''
+        // RPZ
+        response-policy { zone "rpz"; };
+
         // Stats channel for prometheus-bind-exporter
         statistics-channels {
           inet 127.0.0.1 port 8053 allow { 127.0.0.1; };
