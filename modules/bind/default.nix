@@ -49,12 +49,6 @@ in
           inet 127.0.0.1 port 8053 allow { 127.0.0.1; };
         };
 
-        // HE.net DNS Servers
-        acl "he-dns" {
-            216.218.133.2;
-            2001:470:600::2;
-        };
-
         // DHCP update key
         include "${config.age.secrets.digitaloceanApiToken.path}";
         acl "doofnet-dhcp-updates" {
@@ -66,7 +60,12 @@ in
         let
           allZones = import ./zones { dns = inputs.dns; };
           dns_masters = [ "10.101.1.2" ];
-          dnsUtils = inputs.dns.util.${pkgs.system};
+          dns_slaves = [ "10.101.1.3" ];
+          # HE.net DNS server IPs (for zones that need transfers to Hurricane Electric)
+          he_dns_ips = [
+            "216.218.133.2"
+            "2001:470:600::2"
+          ];
 
           # Ensure all zones have required attributes for the BIND module
           normalizeZone =
@@ -80,20 +79,25 @@ in
                 # Add extraConfig if not present
                 extraConfig = if zone ? extraConfig then zone.extraConfig else "";
               };
-              # If extraConfig contains allow-transfer, we need to merge slaves into it
+              # Check if extraConfig contains allow-transfer or allow-update
               hasAllowTransfer = builtins.match ".*allow-transfer.*" baseZone.extraConfig != null;
-              # Check if extraConfig contains allow-update
               hasAllowUpdate = builtins.match ".*allow-update.*" baseZone.extraConfig != null;
-              mergedExtraConfig =
-                if hasAllowTransfer && (builtins.length baseZone.slaves) > 0 then
-                  # Replace "allow-transfer {" with "allow-transfer { <slaves>;"
+              hasHeDns = builtins.match ".*he-dns.*" baseZone.extraConfig != null;
+
+              # Remove allow-transfer from extraConfig since we'll handle via slaves list
+              cleanedExtraConfig =
+                if hasAllowTransfer then
+                  # Remove allow-transfer lines from extraConfig
                   let
-                    slavesIPs = builtins.concatStringsSep "; " (baseZone.slaves ++ [ "" ]);
+                    lines = lib.splitString "\n" baseZone.extraConfig;
+                    filtered = builtins.filter (line: builtins.match ".*allow-transfer.*" line == null) lines;
                   in
-                  builtins.replaceStrings [ "allow-transfer {" ] [ "allow-transfer { ${slavesIPs}" ]
-                    baseZone.extraConfig
+                  lib.concatStringsSep "\n" filtered
                 else
                   baseZone.extraConfig;
+
+              # For zones with he-dns, add HE.net IPs to slaves list
+              expandedSlaves = if hasHeDns then baseZone.slaves ++ he_dns_ips else baseZone.slaves;
               # Convert file string to path using writeZone if it's a string
               # For master zones with allow-update, use writable directory
               zoneFile =
@@ -110,9 +114,9 @@ in
             baseZone
             // {
               file = zoneFile;
-              extraConfig = mergedExtraConfig;
-              # Clear slaves list if allow-transfer is in extraConfig to avoid duplicate directive
-              slaves = if hasAllowTransfer then [ ] else baseZone.slaves;
+              extraConfig = cleanedExtraConfig;
+              # Use expanded slaves list (includes HE.net IPs if needed)
+              slaves = expandedSlaves;
             };
 
           # Build a list of zones needing dynamic updates with their store files
