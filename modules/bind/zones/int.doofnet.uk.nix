@@ -33,9 +33,9 @@ with dns.lib.combinators;
       nas-03 = host "10.101.3.16" "fddd:d00f:dab0:101::16";
 
       # Service Hosts
-      svc-01 = hosts "10.101.3.20" "fddd:d00f:dab0:101::20";
-      svc-02 = hosts "10.101.3.21" "fddd:d00f:dab0:101::21";
-      hyp-01 = hosts "10.101.3.22" "fddd:d00f:dab0:101::22";
+      svc-01 = host "10.101.3.20" "fddd:d00f:dab0:101::20";
+      svc-02 = host "10.101.3.21" "fddd:d00f:dab0:101::21";
+      hyp-01 = host "10.101.3.22" "fddd:d00f:dab0:101::22";
 
       # Kubernetes Masters
       prod-master-03 = host "10.101.10.13" "fddd:d00f:dab0:101::10:13";
