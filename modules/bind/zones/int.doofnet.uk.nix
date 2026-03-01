@@ -22,11 +22,10 @@ with dns.lib.combinators;
       gw = host "10.101.1.1" "2001:8b0:bd9:101::1";
 
       # Nameservers
-      ns1 = host "10.101.1.2" "2001:8b0:bd9:101::2";
-      ns2 = host "10.101.1.3" "2001:8b0:bd9:101::3";
+      ns-01 = host "10.101.1.2" "2001:8b0:bd9:101::2";
+      ns-02 = host "10.101.1.3" "2001:8b0:bd9:101::3";
 
       # Infrastructure
-      nexus = host "10.101.3.10" "fddd:d00f:dab0:101::10";
       nas-afp = host "10.101.3.11" "fddd:d00f:dab0:101::11";
       jrouter = host "10.101.3.12" "fddd:d00f:dab0:101::12";
       esx-01 = host "10.101.3.15" "fddd:d00f:dab0:101::15";

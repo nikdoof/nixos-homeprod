@@ -21,11 +21,10 @@ with dns.lib.combinators;
     subdomains."1.1".PTR = [ "gw.int.doofnet.uk." ];
 
     # Nameservers
-    subdomains."2.1".PTR = [ "ns1.int.doofnet.uk." ];
-    subdomains."3.1".PTR = [ "ns2.int.doofnet.uk." ];
+    subdomains."2.1".PTR = [ "ns-01.int.doofnet.uk." ];
+    subdomains."3.1".PTR = [ "ns-02.int.doofnet.uk." ];
 
     # Infrastructure
-    subdomains."10.3".PTR = [ "nexus.int.doofnet.uk." ];
     subdomains."11.3".PTR = [ "nas-afp.int.doofnet.uk." ];
     subdomains."12.3".PTR = [ "jrouter.int.doofnet.uk." ];
     subdomains."15.3".PTR = [ "esx-01.int.doofnet.uk." ];
