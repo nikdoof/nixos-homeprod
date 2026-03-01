@@ -53,6 +53,8 @@ in
       zones =
         let
           allZones = import ./zones { dns = inputs.dns; };
+          dns_masters = [ "10.101.1.2" ];
+
           # Ensure all zones have required attributes for the BIND module
           normalizeZone =
             name: zone:
@@ -71,8 +73,12 @@ in
             (normalizeZone name zone)
             // {
               master = false;
+              # Slave zones fetch from these masters
+              masters = dns_masters;
               # Slave zones don't need the file content, BIND will fetch it
               file = "/var/lib/bind/zones/${name}.zone";
+              # Remove extraConfig which may contain allow-update (not valid for slaves)
+              extraConfig = "";
             }
           ) allZones
         else

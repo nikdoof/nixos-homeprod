@@ -5,8 +5,7 @@
   ...
 }:
 {
-  master = false;
-  masters = dns_masters;
+  master = true;
   slaves = dns_slaves;
   file = dns.lib.toString "rpz" {
     SOA = {
