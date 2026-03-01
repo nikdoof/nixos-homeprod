@@ -59,8 +59,10 @@ in
       zones =
         let
           allZones = import ./zones { dns = inputs.dns; };
-          dns_masters = [ "10.101.1.2" ];
-          dns_slaves = [ "10.101.1.3" ];
+          dns_masters = [ "ns-01.int.doofnet.uk" ];
+          dns_masters_ips = [ "10.101.1.2" ];
+          dns_slaves = [ "ns-02.int.doofnet.uk" ];
+          dns_slaves_ips = [ "10.101.1.3" ];
           # HE.net DNS server IPs (for zones that need transfers to Hurricane Electric)
           he_dns_ips = [
             "216.218.133.2"
