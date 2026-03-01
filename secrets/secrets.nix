@@ -6,15 +6,20 @@ let
   svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
   mx-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFxXrWjQIpC5UeJI8f5uZK5rV1vP1bmJTt87W38ucDPb";
   hyp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKTI5LxG1wD5ee7rhYq9Kv9ArjkgooCODqqCFWh0hvNl";
+  ns-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOtgWM9xblR4YOR71KmUy3BkkKzd1p89gabsHjADXWr5";
   ns-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+RugXVoPkhVGjW1UzClCSAHlWscbAXxcFvsxqTNM1f";
   systems = [
     svc-01
     svc-02
     mx-01
     hyp-01
+    ns-01
     ns-02
   ];
-  nameservers = [ ns-02 ];
+  nameservers = [
+    ns-01
+    ns-02
+  ];
 in
 {
   "digitalOceanApiToken.age".publicKeys = users ++ systems;
