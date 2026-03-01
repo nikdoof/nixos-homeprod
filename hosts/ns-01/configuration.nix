@@ -18,7 +18,7 @@ in
   imports = [
     # Include the results of the hardware scan.
     ../../modules/doofnet
-    ../../modules/bind/master.nix
+    ../../modules/bind/primary.nix
     inputs.microvm.nixosModules.microvm
   ];
 
