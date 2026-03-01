@@ -28,7 +28,7 @@ in
     age.secrets = {
       digitaloceanApiToken = {
         file = ../../secrets/doofnetDnsUpdateKey.age;
-        owner = "bind";
+        owner = "named";
       };
     };
 
