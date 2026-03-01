@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   inputs,
   ...
 }:
@@ -65,6 +66,7 @@ in
         let
           allZones = import ./zones { dns = inputs.dns; };
           dns_masters = [ "10.101.1.2" ];
+          dnsUtils = inputs.dns.util.${pkgs.system};
 
           # Ensure all zones have required attributes for the BIND module
           normalizeZone =
@@ -80,6 +82,8 @@ in
               };
               # If extraConfig contains allow-transfer, we need to merge slaves into it
               hasAllowTransfer = builtins.match ".*allow-transfer.*" baseZone.extraConfig != null;
+              # Check if extraConfig contains allow-update
+              hasAllowUpdate = builtins.match ".*allow-update.*" baseZone.extraConfig != null;
               mergedExtraConfig =
                 if hasAllowTransfer && (builtins.length baseZone.slaves) > 0 then
                   # Replace "allow-transfer {" with "allow-transfer { <slaves>;"
@@ -90,13 +94,44 @@ in
                     baseZone.extraConfig
                 else
                   baseZone.extraConfig;
+              # Convert file string to path using writeZone if it's a string
+              # For master zones with allow-update, use writable directory
+              zoneFile =
+                if builtins.isString baseZone.file then
+                  # Write zone to /nix/store first
+                  let
+                    storeFile = pkgs.writeText "${name}.zone" baseZone.file;
+                  in
+                  # For master zones with allow-update, use writable location
+                  if baseZone.master && hasAllowUpdate then "/var/lib/bind/zones/${name}.zone" else storeFile
+                else
+                  baseZone.file;
             in
             baseZone
             // {
+              file = zoneFile;
               extraConfig = mergedExtraConfig;
               # Clear slaves list if allow-transfer is in extraConfig to avoid duplicate directive
               slaves = if hasAllowTransfer then [ ] else baseZone.slaves;
             };
+
+          # Build a list of zones needing dynamic updates with their store files
+          dynamicZones = lib.mapAttrs (
+            name: zone:
+            let
+              normalized = normalizeZone name zone;
+              hasAllowUpdate = builtins.match ".*allow-update.*" (zone.extraConfig or "") != null;
+            in
+            if zone.master && hasAllowUpdate && builtins.isString zone.file then
+              {
+                storePath = pkgs.writeText "${name}.zone" zone.file;
+                writable = "/var/lib/bind/zones/${name}.zone";
+              }
+            else
+              null
+          ) allZones;
+
+          dynamicZonesFiltered = lib.filterAttrs (n: v: v != null) dynamicZones;
         in
         if bindCfg.mode == "slave" then
           # For slave mode, convert all zones to slave zones
@@ -123,9 +158,33 @@ in
       openFirewall = true;
     };
 
-    # Create zone directory for slave zones
-    systemd.tmpfiles.rules = lib.mkIf (bindCfg.mode == "slave") [
+    # Create zone directory for slave zones and dynamic master zones
+    systemd.tmpfiles.rules = [
       "d /var/lib/bind/zones 0755 named named -"
     ];
+
+    # For primary server, copy zones with allow-update to writable location
+    systemd.services.bind.preStart =
+      let
+        allZones = import ./zones { dns = inputs.dns; };
+        dynamicZones = lib.mapAttrs (
+          name: zone:
+          let
+            hasAllowUpdate = builtins.match ".*allow-update.*" (zone.extraConfig or "") != null;
+          in
+          if zone.master && hasAllowUpdate && builtins.isString zone.file then
+            {
+              storePath = pkgs.writeText "${name}.zone" zone.file;
+              writable = "/var/lib/bind/zones/${name}.zone";
+            }
+          else
+            null
+        ) allZones;
+        dynamicZonesFiltered = lib.filterAttrs (n: v: v != null) dynamicZones;
+        copyCommands = lib.mapAttrsToList (
+          name: info: "cp -f ${info.storePath} ${info.writable} && chown named:named ${info.writable}"
+        ) dynamicZonesFiltered;
+      in
+      lib.mkIf (bindCfg.mode == "primary") (lib.concatStringsSep "\n" copyCommands);
   };
 }
