@@ -25,10 +25,5 @@ with dns.lib.combinators;
     PTR = [ "gw.int.doofnet.uk." ];
   };
   extraConfig = ''
-    allow-transfer {
-      10.101.1.3;
-      2001:8b0:bd9:101::3;
-      he-dns;
-    };
   '';
 }

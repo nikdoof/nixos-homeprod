@@ -28,10 +28,5 @@ with dns.lib.combinators;
     subdomains."13".PTR = [ "hs.doofnet.uk." ];
   };
   extraConfig = ''
-    allow-transfer {
-      10.101.1.3;
-      2001:8b0:bd9:101::3;
-      he-dns;
-    };
   '';
 }

@@ -22,6 +22,12 @@ let
     "2001:8b0:bd9:101::3"
   ];
 
+  # Hurricane Electric nameservers for zone transfers
+  heNetServers = [
+    "216.218.133.2"
+    "2001:470:600::2"
+  ];
+
   # Primary server IPs for zone transfers
   primaryServers = [
     "10.101.1.2"
@@ -50,31 +56,27 @@ let
     in
     builtins.match ".*allow-update.*" extraConfig != null;
 
-  # Check if a zone has allow-transfer in extraConfig
-  hasAllowTransfer =
+  # Check if a zone needs HE.net transfers (based on having HE.net NS records)
+  needsHeNetTransfer =
     zone:
     let
-      extraConfig = zone.value.extraConfig or "";
+      ns = zone.value.zoneData.NS or [ ];
     in
-    builtins.match ".*allow-transfer.*" extraConfig != null;
+    builtins.any (nameserver: builtins.match ".*he\\.net\\..*" nameserver != null) ns;
 
   # Generate zone configuration for primary mode
-  primaryZoneConfig =
-    zone:
-    let
-      baseConfig = {
-        master = true;
-        # Use persistent directory for zones with dynamic updates, /nix/store for static zones
-        file =
-          if hasDynamicUpdates zone then
-            "${zoneDir}/${zone.name}.zone"
-          else
-            writeZoneTemplate zone.name zone.value.zoneData;
-        extraConfig = zone.value.extraConfig or "";
-      };
-    in
-    # Only set slaves if allow-transfer is not already in extraConfig
-    if hasAllowTransfer zone then baseConfig else baseConfig // { slaves = secondaryServers; };
+  primaryZoneConfig = zone: {
+    master = true;
+    # Use persistent directory for zones with dynamic updates, /nix/store for static zones
+    file =
+      if hasDynamicUpdates zone then
+        "${zoneDir}/${zone.name}.zone"
+      else
+        writeZoneTemplate zone.name zone.value.zoneData;
+    # Include HE.net servers in slaves list if zone has HE.net nameservers
+    slaves = if needsHeNetTransfer zone then secondaryServers ++ heNetServers else secondaryServers;
+    extraConfig = zone.value.extraConfig or "";
+  };
 
   # Generate zone configuration for secondary mode
   secondaryZoneConfig = zone: {

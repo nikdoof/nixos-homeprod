@@ -38,11 +38,6 @@ with dns.lib.combinators;
     subdomains."3.1.0.0.0.1.0.0.0.0.0.0.0.0.0.0".PTR = [ "prod-master-03.int.doofnet.uk." ];
   };
   extraConfig = ''
-    allow-transfer {
-      10.101.1.3;
-      2001:8b0:bd9:101::3;
-      he-dns;
-    };
     allow-update { doofnet-dhcp-updates; };
   '';
 }
