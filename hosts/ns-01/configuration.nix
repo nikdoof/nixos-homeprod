@@ -1,4 +1,5 @@
 {
+  lib,
   ...
 }:
 {
@@ -32,6 +33,9 @@
       IPv6AcceptRA = true;
       DHCP = "no";
     };
+  };
+  networking.wireless = {
+    enable = lib.mkForce false;
   };
 
   doofnet.server = true;
