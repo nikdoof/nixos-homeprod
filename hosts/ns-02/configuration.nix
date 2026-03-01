@@ -56,9 +56,9 @@ in
     matchConfig.Type = "ether";
     networkConfig = {
       Address = [
-        "10.101.4.2/16"
-        "2001:8b0:bd9:101::4:2/64"
-        "fddd:d00f:dab0:101::4:2/64"
+        "10.101.1.2/16"
+        "2001:8b0:bd9:101::2/64"
+        "fddd:d00f:dab0:101::2/64"
       ];
       Gateway = "10.101.1.1";
       IPv6AcceptRA = true;
