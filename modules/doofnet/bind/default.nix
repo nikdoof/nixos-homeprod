@@ -133,7 +133,7 @@ in
     networking.firewall.allowedUDPPorts = [ 53 ];
 
     # DHCP Update Key
-    age.secrets.digitaloceanApiToken = {
+    age.secrets.doofnetDnsUpdateKey = {
       file = ../../../secrets/doofnetDnsUpdateKey.age;
       owner = "named";
     };
@@ -236,7 +236,7 @@ in
         };
 
         // DHCP update key
-        include "${config.age.secrets.digitaloceanApiToken.path}";
+        include "${config.age.secrets.doofnetDnsUpdateKey.path}";
         acl "doofnet-dhcp-updates" {
             key doofnet-dhcp-updates;
         };
