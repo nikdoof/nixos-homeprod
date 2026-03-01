@@ -1,19 +1,18 @@
 {
   dns,
-  dns_masters,
-  dns_slaves,
   ...
 }:
 with dns.lib.combinators;
 {
-  master = true;
-  file = dns.lib.toString "1.0.1.0.9.d.b.0.0.b.8.0.1.0.0.2.ip6.arpa" {
+  zoneData = {
     SOA = {
-      nameServer = (builtins.head dns_masters);
+      nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2025030101;
     };
-    NS = dns_masters ++ [
+    NS = [
+      "ns-01.int.doofnet.uk."
+      "ns-02.int.doofnet.uk."
       "ns1.he.net."
       "ns2.he.net."
       "ns3.he.net."
@@ -38,7 +37,6 @@ with dns.lib.combinators;
     # Kubernetes Masters
     subdomains."3.1.0.0.0.1.0.0.0.0.0.0.0.0.0.0".PTR = [ "prod-master-03.int.doofnet.uk." ];
   };
-  slaves = dns_slaves;
   extraConfig = ''
     allow-transfer { he-dns; };
     allow-update { doofnet-dhcp-updates; };

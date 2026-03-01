@@ -1,8 +1,5 @@
 { dns }:
 let
-  dns_masters = [ "10.101.1.2" ];
-  dns_slaves = [ "10.101.1.3" ];
-
   # Get all .nix files in the current directory except default.nix
   zoneFiles = builtins.filter (
     name: name != "default.nix" && (builtins.match ".*\\.nix" name) != null
@@ -17,7 +14,7 @@ let
     let
       zoneName = filenameToZoneName file;
       zoneConfig = import (./. + "/${file}") {
-        inherit dns dns_masters dns_slaves;
+        inherit dns;
       };
     in
     {

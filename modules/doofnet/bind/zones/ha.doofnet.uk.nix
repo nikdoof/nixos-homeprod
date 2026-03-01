@@ -1,19 +1,19 @@
 {
   dns,
-  dns_masters,
-  dns_slaves,
   ...
 }:
 with dns.lib.combinators;
 {
-  master = true;
-  file = dns.lib.toString "ha.doofnet.uk" {
+  zoneData = {
     SOA = {
-      nameServer = (builtins.head dns_masters);
+      nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2025030101;
     };
-    NS = dns_masters;
+    NS = [
+      "ns-01.int.doofnet.uk."
+      "ns-02.int.doofnet.uk."
+    ];
 
     TTL = 3600;
 
@@ -22,7 +22,6 @@ with dns.lib.combinators;
       gw = host "10.105.1.1" "2001:8b0:bd9:105::1";
     };
   };
-  slaves = dns_slaves;
   extraConfig = ''
     allow-update { doofnet-dhcp-updates; };
   '';

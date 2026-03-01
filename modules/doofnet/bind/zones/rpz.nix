@@ -1,20 +1,18 @@
 {
   dns,
-  dns_masters,
-  dns_slaves,
   ...
 }:
 {
-  master = true;
-  slaves = dns_slaves;
-  file = dns.lib.toString "rpz" {
+  zoneData = {
     SOA = {
-      nameServer = (builtins.head dns_masters);
+      nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2025030101;
     };
-    NS = dns_masters;
-
+    NS = [
+      "ns-01.int.doofnet.uk."
+      "ns-02.int.doofnet.uk."
+    ];
     # RPZ (Response Policy Zone) format:
     # Define domains you want to override as subdomains with A/AAAA records
     # The domain names in RPZ should be the FQDN you want to override
@@ -27,6 +25,7 @@
       # Override svc-prod-ingress-external.doofnet.uk to resolve to 10.101.3.20
       "svc-prod-ingress-external.doofnet.uk".A = [ "10.101.3.20" ];
 
+      "tester.mfg.cobaltmicro.com".A = [ "10.101.3.104" ];
       # You can also use CNAME to special RPZ actions:
       # - "." means NXDOMAIN (block the domain)
       # - "*." means NODATA (domain exists but no records)

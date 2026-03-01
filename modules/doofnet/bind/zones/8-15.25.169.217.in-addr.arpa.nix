@@ -1,19 +1,18 @@
 {
   dns,
-  dns_masters,
-  dns_slaves,
   ...
 }:
 with dns.lib.combinators;
 {
-  master = true;
-  file = dns.lib.toString "8-15.25.169.217.in-addr.arpa" {
+  zoneData = {
     SOA = {
-      nameServer = (builtins.head dns_masters);
+      nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2025030101;
     };
-    NS = dns_masters ++ [
+    NS = [
+      "ns-01.int.doofnet.uk."
+      "ns-02.int.doofnet.uk."
       "ns1.he.net."
       "ns2.he.net."
       "ns3.he.net."
@@ -28,7 +27,6 @@ with dns.lib.combinators;
     subdomains."11".PTR = [ "mx-01.doofnet.uk." ];
     subdomains."13".PTR = [ "hs.doofnet.uk." ];
   };
-  slaves = dns_slaves;
   extraConfig = ''
     allow-transfer { he-dns; };
   '';

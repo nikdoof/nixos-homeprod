@@ -18,7 +18,6 @@ in
   imports = [
     # Include the results of the hardware scan.
     ../../modules/doofnet
-    ../../modules/bind/primary.nix
     inputs.microvm.nixosModules.microvm
   ];
 
@@ -76,6 +75,11 @@ in
   };
 
   doofnet.server = true;
+
+  doofnet.bind = {
+    enable = true;
+    mode = "primary";
+  };
 
   # Persist host key to persistant fs
   fileSystems."/persist".neededForBoot = lib.mkForce true;

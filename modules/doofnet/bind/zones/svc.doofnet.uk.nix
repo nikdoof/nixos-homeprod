@@ -1,21 +1,21 @@
 {
   dns,
-  dns_masters,
-  dns_slaves,
   ...
 }:
 with dns.lib.combinators;
 {
-  master = true;
-  file = dns.lib.toString "svc.doofnet.uk" {
+  zoneData = {
     SOA = {
-      nameServer = (builtins.head dns_masters);
+      nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2025030101;
     };
-    NS = dns_masters;
+    NS = [
+      "ns-01.int.doofnet.uk."
+      "ns-02.int.doofnet.uk."
+    ];
 
-    TTL = 3600;
+    TTL = 300;
 
     subdomains = {
       # Wildcard for container services
@@ -26,5 +26,4 @@ with dns.lib.combinators;
       unifi.A = [ "10.101.3.21" ];
     };
   };
-  slaves = dns_slaves;
 }

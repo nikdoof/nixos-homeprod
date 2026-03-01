@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./bind
     ./common.nix
     ./cross_compile.nix
     ./nfs
