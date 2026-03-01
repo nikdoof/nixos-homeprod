@@ -25,6 +25,13 @@ in
     networking.firewall.allowedTCPPorts = [ 53 ];
     networking.firewall.allowedUDPPorts = [ 53 ];
 
+    age.secrets = {
+      digitaloceanApiToken = {
+        file = ../../secrets/doofnetDnsUpdateKey.age;
+        owner = "bind";
+      };
+    };
+
     services.bind = {
       enable = true;
 
@@ -47,8 +54,11 @@ in
             2001:470:600::2;
         };
 
-        // DHCP update key placeholder
-        // acl "doofnet-dhcp-updates" { ... };
+        // DHCP update key
+        include "${config.age.secrets.digitaloceanApiToken.path}";
+        acl "doofnet-dhcp-updates" {
+            key doofnet-dhcp-updates;
+        };
       '';
 
       zones =

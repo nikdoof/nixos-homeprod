@@ -1,6 +1,7 @@
 {
   inputs,
   config,
+  lib,
   ...
 }:
 let
@@ -40,6 +41,12 @@ in
         tag = "ro-store";
         proto = "virtiofs";
       }
+      {
+        tag = "persist";
+        source = "/srv/data/persist/microvms/${config.networking.hostName}";
+        mountPoint = "/persist";
+        proto = "virtiofs";
+      }
     ];
   };
 
@@ -65,6 +72,20 @@ in
       DHCP = "no";
     };
   };
+
+  # Persist host key to persistant fs
+  fileSystems."/persist".neededForBoot = lib.mkForce true;
+  services.openssh.hostKeys = [
+    {
+      path = "/persist/ssh_host_ed25519_key";
+      type = "ed25519";
+    }
+    {
+      path = "/persist/ssh_host_rsa_key";
+      type = "rsa";
+      bits = 4096;
+    }
+  ];
 
   doofnet.server = true;
 

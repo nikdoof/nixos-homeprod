@@ -12,6 +12,7 @@ let
     mx-01
     hyp-01
   ];
+  nameservers = [ ];
 in
 {
   "digitalOceanApiToken.age".publicKeys = users ++ systems;
@@ -35,4 +36,6 @@ in
   "hcloudExporterEnvironment.age".publicKeys = users ++ [ svc-02 ];
 
   "mx01DovecotPasswd.age".publicKeys = users ++ [ mx-01 ];
+
+  "doofnetDnsUpdateKey.age".publicKeys = users ++ nameservers;
 }
