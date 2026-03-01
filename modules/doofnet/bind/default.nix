@@ -193,7 +193,7 @@ in
       extraOptions = ''
         // RPZ
         response-policy { zone "rpz"; };
-      ''
+      '';
 
       extraConfig = ''
         // Stats channel for prometheus-bind-exporter
