@@ -28,6 +28,7 @@ in
     services.bind = {
       enable = true;
 
+      forwarders = [ ];
       cacheNetworks = [
         "10.0.0.0/8"
         "2001:8b0:bd9::/48"
