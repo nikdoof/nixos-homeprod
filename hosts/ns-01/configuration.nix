@@ -1,5 +1,4 @@
 {
-  inputs,
   ...
 }:
 {
@@ -8,7 +7,6 @@
     ./hardware-configuration.nix
     ../../hardware/raspberry-pi-3.nix
     ../../modules/doofnet
-    inputs.microvm.nixosModules.microvm
   ];
 
   # Networking
