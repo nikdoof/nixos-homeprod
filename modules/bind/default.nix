@@ -159,9 +159,23 @@ in
     };
 
     # Create zone directory for slave zones and dynamic master zones
-    systemd.tmpfiles.rules = [
-      "d /var/lib/bind/zones 0755 named named -"
-    ];
+    systemd.tmpfiles.rules =
+      let
+        allZones = import ./zones { dns = inputs.dns; };
+        dynamicZones = lib.mapAttrs (
+          name: zone:
+          let
+            hasAllowUpdate = builtins.match ".*allow-update.*" (zone.extraConfig or "") != null;
+          in
+          if zone.master && hasAllowUpdate && builtins.isString zone.file then name else null
+        ) allZones;
+        dynamicZoneNames = lib.filter (n: n != null) (lib.attrValues dynamicZones);
+        # Create tmpfiles rules for each dynamic zone file
+        zoneFileRules = map (
+          name: "f /var/lib/bind/zones/${name}.zone 0644 named named -"
+        ) dynamicZoneNames;
+      in
+      [ "d /var/lib/bind/zones 0755 named named -" ] ++ zoneFileRules;
 
     # For primary server, copy zones with allow-update to writable location
     systemd.services.bind.preStart =
@@ -182,7 +196,7 @@ in
         ) allZones;
         dynamicZonesFiltered = lib.filterAttrs (n: v: v != null) dynamicZones;
         copyCommands = lib.mapAttrsToList (
-          name: info: "cp -f ${info.storePath} ${info.writable} && chown named:named ${info.writable}"
+          name: info: "cp -f ${info.storePath} ${info.writable}"
         ) dynamicZonesFiltered;
       in
       lib.mkIf (bindCfg.mode == "primary") (lib.concatStringsSep "\n" copyCommands);
