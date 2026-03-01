@@ -50,18 +50,31 @@ let
     in
     builtins.match ".*allow-update.*" extraConfig != null;
 
+  # Check if a zone has allow-transfer in extraConfig
+  hasAllowTransfer =
+    zone:
+    let
+      extraConfig = zone.value.extraConfig or "";
+    in
+    builtins.match ".*allow-transfer.*" extraConfig != null;
+
   # Generate zone configuration for primary mode
-  primaryZoneConfig = zone: {
-    master = true;
-    # Use persistent directory for zones with dynamic updates, /nix/store for static zones
-    file =
-      if hasDynamicUpdates zone then
-        "${zoneDir}/${zone.name}.zone"
-      else
-        writeZoneTemplate zone.name zone.value.zoneData;
-    slaves = secondaryServers;
-    extraConfig = zone.value.extraConfig or "";
-  };
+  primaryZoneConfig =
+    zone:
+    let
+      baseConfig = {
+        master = true;
+        # Use persistent directory for zones with dynamic updates, /nix/store for static zones
+        file =
+          if hasDynamicUpdates zone then
+            "${zoneDir}/${zone.name}.zone"
+          else
+            writeZoneTemplate zone.name zone.value.zoneData;
+        extraConfig = zone.value.extraConfig or "";
+      };
+    in
+    # Only set slaves if allow-transfer is not already in extraConfig
+    if hasAllowTransfer zone then baseConfig else baseConfig // { slaves = secondaryServers; };
 
   # Generate zone configuration for secondary mode
   secondaryZoneConfig = zone: {
