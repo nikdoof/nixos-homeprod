@@ -67,7 +67,7 @@ let
   secondaryZoneConfig = zone: {
     master = false;
     masters = primaryServers;
-    file = "secondary/${zone.name}";
+    file = "zones/${zone.name}";
   };
 
   # List of zones that need dynamic updates
@@ -139,7 +139,7 @@ in
     };
 
     # Create persistent zone directory for dynamic zones
-    systemd.tmpfiles.settings."bind-zones" = lib.mkIf (cfg.mode == "primary") (
+    systemd.tmpfiles.settings."bind-zones" (
       {
         ${zoneDir} = {
           d = {
