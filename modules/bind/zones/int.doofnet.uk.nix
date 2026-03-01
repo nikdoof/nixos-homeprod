@@ -46,6 +46,6 @@ with dns.lib.combinators;
   };
   slaves = dns_slaves;
   extraConfig = ''
-    allow-update { key doofnet-dhcp-updates; };
+    allow-update { doofnet-dhcp-updates; };
   '';
 }

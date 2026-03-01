@@ -30,7 +30,7 @@ with dns.lib.combinators;
   };
   slaves = dns_slaves;
   extraConfig = ''
-    allow-transfer { key he-dns; };
-    allow-update { key doofnet-dhcp-updates; };
+    allow-transfer { he-dns; };
+    allow-update { doofnet-dhcp-updates; };
   '';
 }

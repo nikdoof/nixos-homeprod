@@ -30,6 +30,6 @@ with dns.lib.combinators;
   };
   slaves = dns_slaves;
   extraConfig = ''
-    allow-transfer { key he-dns; };
+    allow-transfer { he-dns; };
   '';
 }
