@@ -9,124 +9,112 @@ let
   cfg = config.doofnet.bind;
 
   # Import all zones from the zones directory
-  # Each zone file returns { zoneData = <zone definition>; extraConfig = "..."; }
   zones = import ./zones { dns = inputs.dns; };
 
-  # Extract zone name from attribute name
-  # (filename without .nix extension becomes the zone name)
+  # Convert zones attrset to list for easier processing
   zoneList = lib.mapAttrsToList (name: value: { inherit name value; }) zones;
 
-  # Secondary server IPs for zone transfers
+  # Server configuration
   secondaryServers = [
     "10.101.1.3"
     "2001:8b0:bd9:101::3"
   ];
 
-  # Hurricane Electric nameservers for zone transfers
-  heNetServers = [
-    "216.218.133.2"
-    "2001:470:600::2"
-  ];
-
-  # Primary server IPs for zone transfers
   primaryServers = [
     "10.101.1.2"
     "2001:8b0:bd9:101::2"
   ];
 
-  # Persistent directory for zone files (allows dynamic updates)
+  heNetServers = [
+    "216.218.133.2"
+    "2001:470:600::2"
+  ];
+
+  # Directory for mutable zone files
   zoneDir = "/var/lib/bind/zones";
 
-  # Write zone data to a file in /nix/store (for templating)
-  writeZoneTemplate =
-    name: zoneData:
+  # Helper functions
+  hasDynamicUpdates = zone: builtins.match ".*allow-update.*" (zone.value.extraConfig or "") != null;
+  hasHeNetNameservers =
+    zone:
+    builtins.any (ns: builtins.match ".*he\\.net\\..*" ns != null) (zone.value.zoneData.NS or [ ]);
+  getZoneSerial = zone: zone.value.zoneData.SOA.serial or 0;
+
+  writeZoneFile =
+    zone:
     pkgs.writeTextFile {
-      name = "${name}.zone";
-      text = inputs.dns.lib.toString name zoneData;
+      name = "${zone.name}.zone";
+      text = inputs.dns.lib.toString zone.name zone.value.zoneData;
     };
 
-  # Extract serial from zone data
-  getZoneSerial = zoneData: zoneData.SOA.serial or 0;
-
-  # Check if a zone has dynamic updates enabled
-  hasDynamicUpdates =
-    zone:
-    let
-      extraConfig = zone.value.extraConfig or "";
-    in
-    builtins.match ".*allow-update.*" extraConfig != null;
-
-  # Check if a zone needs HE.net transfers (based on having HE.net NS records)
-  needsHeNetTransfer =
-    zone:
-    let
-      ns = zone.value.zoneData.NS or [ ];
-    in
-    builtins.any (nameserver: builtins.match ".*he\\.net\\..*" nameserver != null) ns;
-
-  # Generate zone configuration for primary mode
-  primaryZoneConfig = zone: {
+  # Zone configuration builders
+  mkPrimaryZone = zone: {
     master = true;
-    # Use persistent directory for zones with dynamic updates, /nix/store for static zones
-    file =
-      if hasDynamicUpdates zone then
-        "${zoneDir}/${zone.name}.zone"
-      else
-        writeZoneTemplate zone.name zone.value.zoneData;
-    # Include HE.net servers in slaves list if zone has HE.net nameservers
-    slaves = if needsHeNetTransfer zone then secondaryServers ++ heNetServers else secondaryServers;
+    file = if hasDynamicUpdates zone then "${zoneDir}/${zone.name}.zone" else writeZoneFile zone;
+    slaves = secondaryServers ++ lib.optionals (hasHeNetNameservers zone) heNetServers;
     extraConfig = zone.value.extraConfig or "";
   };
 
-  # Generate zone configuration for secondary mode
-  secondaryZoneConfig = zone: {
+  mkSecondaryZone = zone: {
     master = false;
     masters = primaryServers;
     file = "zones/${zone.name}";
   };
 
-  # List of zones that need dynamic updates
+  # Filtered zone lists
   dynamicZones = builtins.filter hasDynamicUpdates zoneList;
 
-  # Generate tmpfiles rules to manage zone files
-  # We write a ".nix-serial" file to track the source serial number
-  # If the Nix serial changes, we update the zone file
-  dynamicZoneTmpfiles = lib.listToAttrs (
-    lib.concatMap (
-      zone:
-      let
-        zoneTemplate = writeZoneTemplate zone.name zone.value.zoneData;
-        zoneSerial = getZoneSerial zone.value.zoneData;
-        serialFile = "${zoneDir}/${zone.name}.nix-serial";
-      in
-      [
-        # Store the Nix config serial number
-        {
-          name = serialFile;
-          value = {
-            "f+" = {
-              user = "named";
-              group = "named";
-              mode = "0640";
-              argument = toString zoneSerial;
-            };
-          };
-        }
-        # Copy zone file only if it doesn't exist (initial creation)
-        {
-          name = "${zoneDir}/${zone.name}.zone";
-          value = {
-            "C+" = {
-              user = "named";
-              group = "named";
-              mode = "0640";
-              argument = toString zoneTemplate;
-            };
-          };
-        }
-      ]
-    ) dynamicZones
-  );
+  # Tmpfiles configuration for dynamic zones
+  mkDynamicZoneFiles =
+    zone:
+    let
+      zoneFile = writeZoneFile zone;
+      serial = getZoneSerial zone;
+    in
+    {
+      "${zoneDir}/${zone.name}.nix-serial" = {
+        "f+" = {
+          user = "named";
+          group = "named";
+          mode = "0640";
+          argument = toString serial;
+        };
+      };
+      "${zoneDir}/${zone.name}.zone" = {
+        "C+" = {
+          user = "named";
+          group = "named";
+          mode = "0640";
+          argument = toString zoneFile;
+        };
+      };
+    };
+
+  # Update script for dynamic zones
+  mkZoneUpdateScript =
+    zone:
+    let
+      zoneFile = writeZoneFile zone;
+      zoneFilePath = builtins.unsafeDiscardStringContext (toString zoneFile);
+      serial = getZoneSerial zone;
+      zonePath = "${zoneDir}/${zone.name}.zone";
+      serialPath = "${zoneDir}/${zone.name}.nix-serial";
+    in
+    ''
+      if [ -f "${zonePath}" ] && [ -f "${serialPath}" ]; then
+        STORED_SERIAL=$(cat "${serialPath}" 2>/dev/null || echo "0")
+        NIX_SERIAL="${toString serial}"
+
+        if [ "$STORED_SERIAL" != "$NIX_SERIAL" ]; then
+          echo "Zone ${zone.name}: Updating (serial $STORED_SERIAL -> $NIX_SERIAL)"
+          cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
+          cp -f "${zoneFilePath}" "${zonePath}"
+          echo "$NIX_SERIAL" > "${serialPath}"
+          rm -f "${zonePath}.jnl"
+          echo "Zone ${zone.name}: Update complete"
+        fi
+      fi
+    '';
 
 in
 {
@@ -139,33 +127,38 @@ in
         "secondary"
       ];
       default = "primary";
-      description = "Whether this server acts as a primary or secondary DNS server";
+      description = "Server mode: primary (master) or secondary (slave)";
     };
   };
 
   config = lib.mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = [ 53 ];
-    networking.firewall.allowedUDPPorts = [ 53 ];
+    # Firewall
+    networking.firewall = {
+      allowedTCPPorts = [ 53 ];
+      allowedUDPPorts = [ 53 ];
+    };
 
-    # DHCP Update Key
+    # Secrets
     age.secrets.doofnetDnsUpdateKey = {
       file = ../../../secrets/doofnetDnsUpdateKey.age;
       owner = "named";
     };
 
-    # Create persistent zone directory for dynamic zones
-    systemd.tmpfiles.settings."bind-zones" = {
-      ${zoneDir} = {
-        d = {
-          user = "named";
-          group = "named";
-          mode = "0750";
+    # Zone directory and files
+    systemd.tmpfiles.settings."bind-zones" =
+      let
+        baseDir = {
+          ${zoneDir}.d = {
+            user = "named";
+            group = "named";
+            mode = "0750";
+          };
         };
-      };
-    };
+        dynamicFiles = lib.foldl' (acc: zone: acc // mkDynamicZoneFiles zone) { } dynamicZones;
+      in
+      if cfg.mode == "primary" then baseDir // dynamicFiles else baseDir;
 
-    # Script to update zone files when Nix config changes
-    # This runs before BIND starts and compares the stored serial with the current Nix serial
+    # Zone update service (primary only)
     systemd.services.bind-update-zones = lib.mkIf (cfg.mode == "primary" && dynamicZones != [ ]) {
       description = "Update BIND zone files when Nix configuration changes";
       wantedBy = [ "bind.service" ];
@@ -175,66 +168,25 @@ in
         User = "named";
         Group = "named";
       };
-      script = ''
-        ${lib.concatMapStringsSep "\n" (
-          zone:
-          let
-            zoneTemplate = writeZoneTemplate zone.name zone.value.zoneData;
-            zoneTemplatePath = builtins.unsafeDiscardStringContext (toString zoneTemplate);
-            zoneSerial = getZoneSerial zone.value.zoneData;
-            zonePath = "${zoneDir}/${zone.name}.zone";
-            serialPath = "${zoneDir}/${zone.name}.nix-serial";
-          in
-          ''
-            # Check if zone file exists and if serial has changed
-            if [ -f "${zonePath}" ] && [ -f "${serialPath}" ]; then
-              STORED_SERIAL=$(cat "${serialPath}" 2>/dev/null || echo "0")
-              NIX_SERIAL="${toString zoneSerial}"
-
-              if [ "$STORED_SERIAL" != "$NIX_SERIAL" ]; then
-                echo "Zone ${zone.name}: Nix config changed (serial $STORED_SERIAL -> $NIX_SERIAL), updating zone file"
-
-                # Backup the current zone file (with dynamic updates)
-                cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
-
-                # Copy the new template from Nix
-                cp -f "${zoneTemplatePath}" "${zonePath}"
-
-                # Update the stored serial
-                echo "$NIX_SERIAL" > "${serialPath}"
-
-                # Remove journal file to force clean start with new zone
-                rm -f "${zonePath}.jnl"
-
-                echo "Zone ${zone.name}: Updated successfully, old version backed up"
-              fi
-            fi
-          ''
-        ) dynamicZones}
-      '';
+      script = lib.concatMapStringsSep "\n" mkZoneUpdateScript dynamicZones;
     };
 
+    # BIND configuration
     services.bind = {
       enable = true;
-
-      # Use /var/lib/bind as working directory for persistence
       directory = "/var/lib/bind";
-
-      # Don't forward queries
       forwarders = [ ];
 
-      # Networks to cache queries for
       cacheNetworks = [
         "10.0.0.0/8"
         "2001:8b0:bd9::/48"
         "fddd:d00f:dab0::/48"
       ];
 
-      # Configure zones based on mode
       zones = lib.listToAttrs (
         map (zone: {
           name = zone.name;
-          value = if cfg.mode == "primary" then primaryZoneConfig zone else secondaryZoneConfig zone;
+          value = if cfg.mode == "primary" then mkPrimaryZone zone else mkSecondaryZone zone;
         }) zoneList
       );
 
@@ -246,18 +198,19 @@ in
 
         // HE.net DNS transfer
         acl "he-dns" {
-            216.218.133.2;
-            2001:470:600::2;
+          216.218.133.2;
+          2001:470:600::2;
         };
 
         // DHCP update key
         include "${config.age.secrets.doofnetDnsUpdateKey.path}";
         acl "doofnet-dhcp-updates" {
-            key doofnet-dhcp-updates;
+          key doofnet-dhcp-updates;
         };
       '';
     };
 
+    # Monitoring
     services.prometheus.exporters.bind = {
       enable = true;
       openFirewall = true;
