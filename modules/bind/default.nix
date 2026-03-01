@@ -58,12 +58,33 @@ in
           # Ensure all zones have required attributes for the BIND module
           normalizeZone =
             name: zone:
-            zone
+            let
+              baseZone = zone // {
+                # Add masters = [] if not present (required by NixOS bind module)
+                masters = if zone ? masters then zone.masters else [ ];
+                # Add slaves if not present (required by NixOS bind module)
+                slaves = if zone ? slaves then zone.slaves else [ ];
+                # Add extraConfig if not present
+                extraConfig = if zone ? extraConfig then zone.extraConfig else "";
+              };
+              # If extraConfig contains allow-transfer, we need to merge slaves into it
+              hasAllowTransfer = builtins.match ".*allow-transfer.*" baseZone.extraConfig != null;
+              mergedExtraConfig =
+                if hasAllowTransfer && (builtins.length baseZone.slaves) > 0 then
+                  # Replace "allow-transfer {" with "allow-transfer { <slaves>;"
+                  let
+                    slavesIPs = builtins.concatStringsSep "; " (baseZone.slaves ++ [ "" ]);
+                  in
+                  builtins.replaceStrings [ "allow-transfer {" ] [ "allow-transfer { ${slavesIPs}" ]
+                    baseZone.extraConfig
+                else
+                  baseZone.extraConfig;
+            in
+            baseZone
             // {
-              # Add masters = [] if not present (required by NixOS bind module)
-              masters = if zone ? masters then zone.masters else [ ];
-              # Add slaves if not present (required by NixOS bind module)
-              slaves = if zone ? slaves then zone.slaves else [ ];
+              extraConfig = mergedExtraConfig;
+              # Clear slaves list if allow-transfer is in extraConfig to avoid duplicate directive
+              slaves = if hasAllowTransfer then [ ] else baseZone.slaves;
             };
         in
         if bindCfg.mode == "slave" then
