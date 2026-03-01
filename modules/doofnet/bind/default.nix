@@ -139,18 +139,15 @@ in
     };
 
     # Create persistent zone directory for dynamic zones
-    systemd.tmpfiles.settings."bind-zones" (
-      {
-        ${zoneDir} = {
-          d = {
-            user = "named";
-            group = "named";
-            mode = "0750";
-          };
+    systemd.tmpfiles.settings."bind-zones" = {
+      ${zoneDir} = {
+        d = {
+          user = "named";
+          group = "named";
+          mode = "0750";
         };
-      }
-      // dynamicZoneTmpfiles
-    );
+      };
+    };
 
     # Script to update zone files when Nix config changes
     # This runs before BIND starts and compares the stored serial with the current Nix serial
