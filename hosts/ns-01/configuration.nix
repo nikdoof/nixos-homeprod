@@ -7,7 +7,7 @@
     ./hardware-configuration.nix
     ../../hardware/raspberry-pi-3.nix
     ../../modules/doofnet
-    ../../modules/bind
+    ../../modules/bind/primary.nix
   ];
 
   # Networking

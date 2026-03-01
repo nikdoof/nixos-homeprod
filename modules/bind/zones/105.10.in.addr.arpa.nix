@@ -1,0 +1,27 @@
+{
+  dns,
+  dns_masters,
+  dns_slaves,
+  ...
+}:
+with dns.lib.combinators;
+{
+  master = true;
+  file = dns.lib.toString "105.10.in-addr.arpa" {
+    SOA = {
+      nameServer = (builtins.head dns_masters);
+      adminEmail = "hostmaster@doofnet.uk";
+      serial = 2024010100;
+    };
+    NS = dns_masters;
+
+    TTL = 3600;
+
+    # Gateway
+    subdomains."1.1".PTR = [ "gw.ha.doofnet.uk." ];
+  };
+  slaves = dns_slaves;
+  extraConfig = ''
+    allow-update { key doofnet-dhcp-updates; };
+  '';
+}
