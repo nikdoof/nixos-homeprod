@@ -196,6 +196,7 @@ in
         RestrictAddressFamilies = [
           "AF_INET"
           "AF_PACKET"
+          "AF_NETLINK"
         ];
         RestrictNamespaces = true;
         RestrictRealtime = true;
