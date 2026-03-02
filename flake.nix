@@ -31,7 +31,10 @@
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
 
       mkSystem = import ./lib/mksystem.nix {
-        inherit nixpkgs inputs;
+        inherit nixpkgs inputs mkMAC;
+      };
+      mkMAC = import ./lib/mkmac.nix {
+        inherit inputs;
       };
     in
     {
@@ -39,6 +42,7 @@
         svc-01 = mkSystem "svc-01" { };
         svc-02 = mkSystem "svc-02" { };
         mx-01 = mkSystem "mx-01" { };
+        hs-01 = mkSystem "hs-01" { };
         hyp-01 = mkSystem "hyp-01" {
           extraModules = [ inputs.microvm.nixosModules.host ];
         };

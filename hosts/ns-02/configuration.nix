@@ -2,17 +2,14 @@
   inputs,
   config,
   lib,
+  mkMAC,
   ...
 }:
 let
-  mkMac =
-    seed:
-    let
-      hash = builtins.hashString "md5" seed;
-      c = off: builtins.substring off 2 hash;
-    in
-    "${builtins.substring 0 1 hash}2:${c 2}:${c 4}:${c 6}:${c 8}:${c 10}";
-  mac = mkMac config.networking.fqdn;
+  hostName = "ns-02";
+  domainName = "int.doofnet.uk";
+  vlan = "101";
+  mac = mkMAC hostName;
 in
 {
   imports = [
@@ -29,7 +26,7 @@ in
       {
         type = "tap";
         tap.vhost = true;
-        id = "vm-${config.networking.hostName}";
+        id = "vm-${vlan}-${hostName}";
         inherit mac;
       }
     ];
@@ -51,14 +48,14 @@ in
 
   # Networking
   networking.useDHCP = false;
-  networking.hostName = "ns-02";
+  networking.hostName = hostName;
   networking.nameservers = [
     "127.0.0.1"
     "10.101.1.2"
     "10.101.1.3"
   ];
-  networking.domain = "int.doofnet.uk";
-  networking.search = [ "int.doofnet.uk" ];
+  networking.domain = domainName;
+  networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
