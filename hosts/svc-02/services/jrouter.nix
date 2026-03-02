@@ -1,7 +1,10 @@
 { ... }:
 {
 
-  imports = [ ../../modules/jrouter.nix ];
+  imports = [
+    ../../../modules/jrouter.nix
+    ../../../packages
+  ];
 
   services.jrouter = {
     enable = true;
