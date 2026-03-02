@@ -24,9 +24,6 @@ in
 
     staticConfigOptions = {
       api = true;
-      log = {
-        level = "DEBUG";
-      };
 
       entryPoints = {
         web = {
@@ -46,7 +43,7 @@ in
       };
 
       log = {
-        level = "INFO";
+        level = "DEBUG";
         filePath = "${config.services.traefik.dataDir}/traefik.log";
         format = "json";
       };
