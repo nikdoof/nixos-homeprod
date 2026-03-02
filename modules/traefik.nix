@@ -24,6 +24,9 @@ in
 
     staticConfigOptions = {
       api = true;
+      log = {
+        level = "DEBUG";
+      };
 
       entryPoints = {
         web = {
