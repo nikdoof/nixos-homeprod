@@ -6,6 +6,8 @@
     ../../../packages
   ];
 
+  networking.firewall.allowedUDPPorts = [ 387 ];
+
   services.jrouter = {
     enable = true;
 
