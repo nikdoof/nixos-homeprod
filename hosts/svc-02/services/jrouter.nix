@@ -6,10 +6,9 @@
     ../../../packages
   ];
 
-  networking.firewall.allowedUDPPorts = [ 387 ];
-
   services.jrouter = {
     enable = true;
+    openFirewall = true;
 
     settings = {
       local_ip = "81.187.48.147";

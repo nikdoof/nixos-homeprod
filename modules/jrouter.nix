@@ -70,6 +70,12 @@ in
 
     package = lib.mkPackageOption pkgs "jrouter" { };
 
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Open the listening port of the jrouter endpoint.";
+    };
+
     settings = {
       listen_port = lib.mkOption {
         type = lib.types.port;
@@ -151,6 +157,10 @@ in
   config = lib.mkIf cfg.enable {
     # Make the jrouter binary available on the system path.
     environment.systemPackages = [ cfg.package ];
+
+    networking.firewall = lib.mkIf cfg.openFirewall {
+      allowedUDPPorts = [ cfg.settings.listen_port ];
+    };
 
     systemd.services.jrouter = {
       description = "AURP to AppleTalk router";
