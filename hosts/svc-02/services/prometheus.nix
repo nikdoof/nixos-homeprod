@@ -27,7 +27,6 @@
               "svc-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "svc-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "nas-afp.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "jrouter.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
 
               "web-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "mx-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
@@ -41,7 +40,6 @@
         static_configs = [
           {
             targets = [
-              "jrouter.int.doofnet.uk:9459"
               "127.0.0.1:9459"
             ];
           }
