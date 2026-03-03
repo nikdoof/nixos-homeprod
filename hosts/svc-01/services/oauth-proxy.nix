@@ -14,7 +14,7 @@
       "traefik.http.routers.oauth2-proxy.middlewares" = "auth-headers@file";
       "traefik.http.services.oauth2-proxy.loadbalancer.server.port" = "4180";
     };
-    image = "quay.io/oauth2-proxy/oauth2-proxy:v7.14.2";
+    image = "quay.io/oauth2-proxy/oauth2-proxy:v7.14.3";
     environmentFiles = [ config.age.secrets.oauth2ClientSecret.path ];
     cmd = [
       "--provider=oidc"
