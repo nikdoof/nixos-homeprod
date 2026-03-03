@@ -30,7 +30,6 @@ with dns.lib.combinators;
 
     # Infrastructure
     subdomains."1.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0".PTR = [ "nas-afp.int.doofnet.uk." ];
-    subdomains."2.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0".PTR = [ "jrouter.int.doofnet.uk." ];
     subdomains."5.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0".PTR = [ "esx-01.int.doofnet.uk." ];
     subdomains."6.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0".PTR = [ "nas-03.int.doofnet.uk." ];
 
