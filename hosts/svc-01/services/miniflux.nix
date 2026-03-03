@@ -24,7 +24,6 @@
       OAUTH2_REDIRECT_URL = "https://rss.doofnet.uk/oauth2/oidc/callback";
       OAUTH2_USER_CREATION = "1";
       RUN_MIGRATIONS = "1";
-      TRUSTED_REVERSE_PROXY_NETWORKS = "10.88.0.1/32";
       TZ = "UTC";
     };
     environmentFiles = [ config.age.secrets.minifluxEnvironment.path ];
