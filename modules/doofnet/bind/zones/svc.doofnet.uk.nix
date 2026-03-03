@@ -8,7 +8,7 @@ with dns.lib.combinators;
     SOA = {
       nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2025030101;
+      serial = 2025030301;
     };
     NS = [
       "ns-01.int.doofnet.uk."
@@ -24,6 +24,7 @@ with dns.lib.combinators;
       # Specific services
       grafana.A = [ "10.101.3.21" ];
       unifi.A = [ "10.101.3.21" ];
+      loki.A = [ "10.101.3.21" ];
     };
   };
 }
