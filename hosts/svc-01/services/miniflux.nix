@@ -15,16 +15,17 @@
     };
     image = "miniflux/miniflux:2.2.17";
     environment = {
-      TZ = "UTC";
       BASE_URL = "https://rss.doofnet.uk/";
-      RUN_MIGRATIONS = "1";
-      METRICS_COLLECTOR = "1";
+      DISABLE_LOCAL_AUTH = "1";
       METRICS_ALLOWED_NETWORKS = "10.0.0.0/8";
+      METRICS_COLLECTOR = "1";
+      OAUTH2_OIDC_DISCOVERY_ENDPOINT = "https://id.doofnet.uk";
       OAUTH2_PROVIDER = "oidc";
       OAUTH2_REDIRECT_URL = "https://rss.doofnet.uk/oauth2/oidc/callback";
-      OAUTH2_OIDC_DISCOVERY_ENDPOINT = "https://id.doofnet.uk";
       OAUTH2_USER_CREATION = "1";
-      DISABLE_LOCAL_AUTH = "1";
+      RUN_MIGRATIONS = "1";
+      TRUSTED_REVERSE_PROXY_NETWORKS = "10.88.0.1/32";
+      TZ = "UTC";
     };
     environmentFiles = [ config.age.secrets.minifluxEnvironment.path ];
   };
