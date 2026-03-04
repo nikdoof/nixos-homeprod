@@ -160,6 +160,7 @@ in
   age.secrets = {
     headscaleClientSecret = {
       file = ../../secrets/headscaleClientSecret.age;
+      owner = "headscale";
     };
   };
 
