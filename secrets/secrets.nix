@@ -45,4 +45,6 @@ in
   "mx01DovecotPasswd.age".publicKeys = users ++ [ mx-01 ];
 
   "doofnetDnsUpdateKey.age".publicKeys = users ++ systems;
+
+  "headscaleClientSecret.age".publicKeys = users;
 }
