@@ -90,6 +90,7 @@
     yq
     fzf
     starship
+    tcpdump
   ];
 
   services = {

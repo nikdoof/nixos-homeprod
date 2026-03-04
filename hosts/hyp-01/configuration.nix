@@ -52,6 +52,11 @@
           config.systemd.network.netdevs."10-vlan-private".netdevConfig.Name
           config.systemd.network.netdevs."10-vlan-hosted".netdevConfig.Name
         ];
+        LinkLocalAddressing = "no";
+        LLDP = "no";
+        EmitLLDP = "no";
+        IPv6AcceptRA = "no";
+        IPv6SendRA = "no";
       };
       bridgeVLANs = [
         { VLAN = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id; }
