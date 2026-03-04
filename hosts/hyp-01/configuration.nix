@@ -94,7 +94,10 @@
       networkConfig.Bridge = "br0";
 
       bridgeVLANs = [
-        { PVID = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id; }
+        {
+          EgressUntagged = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id;
+          PVID = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id;
+        }
       ];
     };
 
@@ -105,7 +108,10 @@
       networkConfig.Bridge = "br0";
 
       bridgeVLANs = [
-        { PVID = config.systemd.network.netdevs."10-vlan-hosted".vlanConfig.Id; }
+        {
+          EgressUntagged = config.systemd.network.netdevs."10-vlan-hosted".vlanConfig.Id;
+          PVID = config.systemd.network.netdevs."10-vlan-hosted".vlanConfig.Id;
+        }
       ];
     };
   };
