@@ -283,6 +283,26 @@ in
     };
   };
 
+  systemd.services.headscale = {
+    serviceConfig = {
+      AmbientCapabilities = [
+        "CAP_NET_BIND_SERVICE"
+      ];
+      CapabilityBoundingSet = [
+        "CAP_NET_BIND_SERVICE"
+      ];
+    };
+  };
+
+  networking.firewall = {
+    allowedTCPPorts = [
+      80
+      443
+      3478
+    ];
+    allowedUDPPorts = [ 3478 ];
+  };
+
   # Write out ACL config
   environment.etc."headscale/acl_policy.json".text = builtins.toJSON acl_config;
 
