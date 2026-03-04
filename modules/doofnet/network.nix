@@ -5,7 +5,7 @@ with lib;
 
   config = mkIf config.doofnet.network.vlans {
     systemd.network.netdevs = {
-      "vlan-private" = {
+      "10-vlan-private" = {
         netdevConfig = {
           Name = "vlan-private";
           Kind = "vlan";
@@ -15,7 +15,7 @@ with lib;
         };
       };
 
-      "vlan-lab" = {
+      "10-vlan-lab" = {
         netdevConfig = {
           Name = "vlan-private";
           Kind = "vlan";
@@ -25,9 +25,9 @@ with lib;
         };
       };
 
-      "vlan-hosted" = {
+      "10-vlan-hosted" = {
         netdevConfig = {
-          Name = "vlan-private";
+          Name = "vlan-hosted";
           Kind = "vlan";
         };
         vlanConfig = {
