@@ -17,7 +17,7 @@ with lib;
 
       "10-vlan-lab" = {
         netdevConfig = {
-          Name = "vlan-private";
+          Name = "vlan-lab";
           Kind = "vlan";
         };
         vlanConfig = {
