@@ -9,9 +9,10 @@
   virtualisation.oci-containers.containers.miniflux = {
     labels = {
       "traefik.enable" = "true";
+      "traefik.http.routers.miniflux.entrypoints" = "websecure,extwebsecure";
+      "traefik.http.routers.miniflux.priority" = "1000";
       "traefik.http.routers.miniflux.rule" = "Host(`rss.doofnet.uk`)";
       "traefik.http.services.miniflux.loadbalancer.server.port" = "8080";
-      "traefik.http.routers.miniflux.entrypoints" = "websecure,extwebsecure";
     };
     image = "miniflux/miniflux:2.2.17";
     environment = {
