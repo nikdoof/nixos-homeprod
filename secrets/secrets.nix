@@ -8,6 +8,7 @@ let
   hyp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKTI5LxG1wD5ee7rhYq9Kv9ArjkgooCODqqCFWh0hvNl";
   ns-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEP/iQjTNADjLloMaSag8AKcLNbNVznEf9l3IYP5a2Y0";
   ns-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+RugXVoPkhVGjW1UzClCSAHlWscbAXxcFvsxqTNM1f";
+  hs-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEqU636TZeQGoqkmGUQpkHvs6/AB4cjFgBcmNFJIGWMQ";
   systems = [
     svc-01
     svc-02
@@ -46,5 +47,5 @@ in
 
   "doofnetDnsUpdateKey.age".publicKeys = users ++ systems;
 
-  "headscaleClientSecret.age".publicKeys = users;
+  "headscaleClientSecret.age".publicKeys = users ++ [ hs-01 ];
 }
