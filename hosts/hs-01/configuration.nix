@@ -280,7 +280,7 @@ in
   };
 
   # Write out ACL config
-  environment.etc."headscale/acl_policy.json".source = builtins.toJSON acl_config;
+  environment.etc."headscale/acl_policy.json".text = builtins.toJSON acl_config;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?

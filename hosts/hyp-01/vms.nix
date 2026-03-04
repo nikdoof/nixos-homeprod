@@ -4,8 +4,8 @@
     flake = inputs.self;
     restartIfChanged = true;
   };
-  # microvm.vms.hs-01 = {
-  #   flake = inputs.self;
-  #   restartIfChanged = true;
-  # };
+  microvm.vms.hs-01 = {
+    flake = inputs.self;
+    restartIfChanged = true;
+  };
 }
