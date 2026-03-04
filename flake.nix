@@ -19,6 +19,10 @@
       url = "github:nix-community/dns.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    deadnix = {
+      url = "github:astro/deadnix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -77,6 +81,7 @@
           pkgs.mkShell {
             packages = [
               inputs.agenix.packages.${system}.agenix
+              inputs.deadnix.packages.${system}.deadnix
             ];
           };
       });
