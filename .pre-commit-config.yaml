@@ -12,4 +12,13 @@ repos:
     rev: v8.30.0
     hooks:
       - id: gitleaks
-q
+
+  - repo: local
+    hooks:
+      - id: "nix-flake-check"
+        name: "nix flake checker"
+        description: "Will run command nix flake check"
+        entry: "nix flake check --no-warn-dirty"
+        language: "unsupported"
+        pass_filenames: false
+        types: [nix]
