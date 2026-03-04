@@ -122,13 +122,16 @@ in
   ];
   networking.domain = domainName;
   networking.search = [ domainName ];
+  networking.hosts = {
+    "10.101.3.20" = [ "id.doofnet.uk" ];
+  };
   systemd.network.enable = true;
 
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
     networkConfig = {
       Address = [
-        "217.169.14.2/19"
+        "217.169.25.13/29"
         "2001:8b0:bd9:106::13/64"
       ];
       Gateway = "217.169.25.9";
