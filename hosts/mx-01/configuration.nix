@@ -57,8 +57,6 @@
   };
 
   security.acme = {
-    acceptTerms = true;
-    defaults.email = "certs@doofnet.uk";
     certs = {
       "${config.networking.hostName}.${config.networking.domain}" = {
         dnsProvider = "digitalocean";

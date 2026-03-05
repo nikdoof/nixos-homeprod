@@ -105,4 +105,9 @@
     };
     fstrim.enable = true;
   };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "certs@doofnet.uk";
+  };
 }
