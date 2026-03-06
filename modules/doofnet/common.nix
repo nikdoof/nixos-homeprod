@@ -83,6 +83,9 @@
     VISUAL = "nano";
   };
 
+  # Disable zsh NEWUSER by creating the zshrc file for users
+  system.userActivationScripts.zshrc = "touch .zshrc";
+
   environment.systemPackages = with pkgs; [
     gnupg
     eza
