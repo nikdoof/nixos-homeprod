@@ -3,6 +3,7 @@
   config,
   lib,
   mkMAC,
+  pkgs,
   ...
 }:
 let
@@ -200,6 +201,7 @@ in
     groups.deploy = { };
     users.deploy = {
       group = "deploy";
+      shell = pkgs.zsh;
       isSystemUser = true;
       home = "/persist/sites";
       openssh.authorizedKeys.keys = [
