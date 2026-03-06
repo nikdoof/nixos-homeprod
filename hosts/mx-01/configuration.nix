@@ -53,10 +53,7 @@ in
   networking.hostName = "mx-01";
   networking.nameservers = [
     "217.169.25.9"
-    "217.169.20.20"
-    "217.169.20.21"
-    "2001:8b0::2020"
-    "2001:8b0::2021"
+    "2001:8b0:bd9:106::1"
   ];
   networking.domain = domainName;
   networking.search = [ domainName ];
