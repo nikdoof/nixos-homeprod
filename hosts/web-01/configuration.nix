@@ -169,6 +169,13 @@ in
     };
   };
 
+  networking.firewall = {
+    allowedTCPPorts = [
+      80
+      443
+    ];
+  };
+
   # Persist host key to persistant fs
   fileSystems."/persist".neededForBoot = lib.mkForce true;
   services.openssh.hostKeys = [
