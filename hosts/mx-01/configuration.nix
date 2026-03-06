@@ -1,17 +1,52 @@
 {
+  inputs,
   config,
   lib,
+  mkMAC,
   pkgs,
   ...
 }:
-
+let
+  hostName = "mx-01";
+  domainName = "int.doofnet.uk";
+  vlan = "106";
+  mac = mkMAC hostName;
+in
 {
   imports = [
     # Include the results of the hardware scan.
-    ./hardware-configuration.nix
     ../../hardware/esxi-vm.nix
     ../../modules/doofnet
+    inputs.microvm.nixosModules.microvm
   ];
+
+  microvm = {
+    hypervisor = "qemu";
+    vcpu = 2;
+    mem = 1024;
+    interfaces = [
+      {
+        type = "tap";
+        tap.vhost = true;
+        id = "vm-${vlan}-${hostName}";
+        inherit mac;
+      }
+    ];
+    shares = [
+      {
+        source = "/nix/store";
+        mountPoint = "/nix/.ro-store";
+        tag = "ro-store";
+        proto = "virtiofs";
+      }
+      {
+        tag = "persist";
+        source = "/srv/data/persist/microvms/${config.networking.hostName}";
+        mountPoint = "/persist";
+        proto = "virtiofs";
+      }
+    ];
+  };
 
   # Networking
   networking.useDHCP = false;
@@ -20,8 +55,8 @@
     "217.169.25.9"
     "2001:8b0:bd9:106::1"
   ];
-  networking.domain = "doofnet.uk";
-  networking.search = [ "doofnet.uk" ];
+  networking.domain = domainName;
+  networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "ens32";
@@ -48,6 +83,26 @@
   };
 
   doofnet.server = true;
+
+  # Persist host key to persistant fs
+  fileSystems."/persist".neededForBoot = lib.mkForce true;
+  services.openssh.hostKeys = [
+    {
+      path = "/persist/ssh_host_ed25519_key";
+      type = "ed25519";
+    }
+    {
+      path = "/persist/ssh_host_rsa_key";
+      type = "rsa";
+      bits = 4096;
+    }
+  ];
+
+  # Persist the ACME folder
+  fileSystems."/var/lib/acme" = {
+    device = "/persist/acme";
+    options = [ "bind" ];
+  };
 
   age.secrets = {
     digitaloceanApiToken = {
@@ -195,7 +250,7 @@
   users.groups.vmail = { };
   users.users."vmail" = {
     createHome = true;
-    home = "/var/spool/mail/vmail";
+    home = "/persist/vmail";
     isSystemUser = true;
     group = "vmail";
   };
@@ -290,7 +345,7 @@
         # the full e-mail address inside passwd-file is the username (%u)
         # user@example.com
         # %d for domain_name %n for user_name
-        args = uid=vmail gid=vmail username_format=%u home=/var/spool/mail/vmail/%d/%n
+        args = uid=vmail gid=vmail username_format=%u home=/persist/vmail/%d/%n
       }
 
       # connection to postfix via lmtp

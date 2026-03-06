@@ -12,4 +12,8 @@
     flake = inputs.self;
     restartIfChanged = true;
   };
+  microvm.vms.mx-01 = {
+    flake = inputs.self;
+    restartIfChanged = true;
+  };
 }
