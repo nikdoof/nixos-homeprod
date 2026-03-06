@@ -190,12 +190,18 @@ in
     }
   ];
 
+  # Persist the ACME folder
+  fileSystems."/var/lib/acme" = {
+    device = "/persist/acme";
+    options = [ "bind" ];
+  };
+
   users = {
     groups.deploy = { };
     users.deploy = {
       group = "deploy";
       isSystemUser = true;
-      home = "/persist/nginx/www";
+      home = "/persist/sites";
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGPnOF7hixCwjxvN9dpmOIXIdJSSiMLNeur6u+iG3HWM github-deploy"
       ];
