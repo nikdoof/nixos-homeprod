@@ -8,7 +8,7 @@
 }:
 let
   hostName = "mx-01";
-  domainName = "int.doofnet.uk";
+  domainName = "doofnet.uk";
   vlan = "106";
   mac = mkMAC hostName;
 in
