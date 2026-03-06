@@ -115,6 +115,7 @@ in
   networking.useDHCP = false;
   networking.hostName = hostName;
   networking.nameservers = [
+    "217.169.25.9"
     "217.169.20.20"
     "217.169.20.21"
     "2001:8b0::2020"
