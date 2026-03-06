@@ -59,7 +59,7 @@ in
   networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
-    matchConfig.Name = "ens32";
+    matchConfig.Type = "ether";
     address = [
       "217.169.25.11/29"
       "2001:8b0:bd9:106::3/64"
