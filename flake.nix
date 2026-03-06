@@ -47,6 +47,7 @@
         svc-02 = mkSystem "svc-02" { };
         mx-01 = mkSystem "mx-01" { };
         hs-01 = mkSystem "hs-01" { };
+        web-01 = mkSystem "web-01" { };
         hyp-01 = mkSystem "hyp-01" {
           extraModules = [ inputs.microvm.nixosModules.host ];
         };

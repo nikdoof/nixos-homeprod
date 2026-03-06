@@ -8,4 +8,8 @@
     flake = inputs.self;
     restartIfChanged = true;
   };
+  microvm.vms.web-01 = {
+    flake = inputs.self;
+    restartIfChanged = true;
+  };
 }

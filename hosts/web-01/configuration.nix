@@ -14,28 +14,49 @@ let
   sites = [
     "${hostName}.${domainName}"
     "2315media.com"
-    "andrewwilliams.net"
-    "alanthetravellingalpaca.com"
-    "andrew.williams.id"
     "bluecalx.co.uk"
     "doofnet.uk"
     "hereforthis.uk"
     "incognitus.net"
     "intellectops.com"
-    "joslittlecorner.com"
-    "joslittlecorner.co.uk"
     "nikdoof.com"
-    "nikdoof.id"
     "oojamaflip.wtf"
     "parkpioneer.com"
     "parkpioneer.review.2315media.com"
-    "thatgirl.co.uk"
   ];
 
   redirects = [
     {
       name = "${hostName}.${domainName}";
       target = "doofnet.uk";
+    }
+    {
+      name = "thatgirl.co.uk";
+      target = "oojamaflip.wtf";
+    }
+    {
+      name = "alanthetravellingalpaca.com";
+      target = "oojamaflip.wtf";
+    }
+    {
+      name = "joslittlecorner.co.uk";
+      target = "oojamaflip.wtf";
+    }
+    {
+      name = "joslittlecorner.com";
+      target = "oojamaflip.wtf";
+    }
+    {
+      name = "nikdoof.id";
+      target = "nikdoof.com";
+    }
+    {
+      name = "andrewwilliams.net";
+      target = "nikdoof.com";
+    }
+    {
+      name = "andrew.williams.id";
+      target = "nikdoof.com";
     }
   ];
 
@@ -65,6 +86,7 @@ let
       (name: redirect: {
         name = name;
         value = {
+          enableACME = true;
           forceSSL = true;
           locations."/".extraConfig = ''
             return 301 https://${redirect.target}$request_uri;
@@ -75,11 +97,16 @@ let
         lib.listToAttrs (
           lib.map (redirect: {
             name = redirect.name;
-            value = redirect.target;
+            value = redirect;
           }) redirects
         )
       )
   );
+
+  # Take the root of each site and create a tmpfiles rule
+  nginx_site_folders = lib.concatMap (site: [
+    "d /persist/sites/${site} 0755 deploy deploy -"
+  ]) sites;
 in
 {
   imports = [
@@ -156,13 +183,28 @@ in
     }
   ];
 
+  users = {
+    groups.deploy = { };
+    users.deploy = {
+      group = "deploy";
+      isSystemUser = true;
+      home = "/persist/nginx/www";
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGPnOF7hixCwjxvN9dpmOIXIdJSSiMLNeur6u+iG3HWM github-deploy"
+      ];
+    };
+  };
+
   doofnet.server = true;
 
   services.nginx = {
     enable = true;
 
-    virtualHosts = nginx_sites ++ nginx_sites_redirects;
+    virtualHosts = nginx_sites // nginx_sites_redirects;
   };
+
+  # Create the deployment folders
+  systemd.tmpfiles.rules = nginx_site_folders;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
