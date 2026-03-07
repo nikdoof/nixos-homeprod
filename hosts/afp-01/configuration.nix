@@ -79,7 +79,10 @@ in
   services.avahi = {
     enable = true;
     openFirewall = true;
-    publish.enable = true;
+    publish = {
+      enable = true;
+      userServices = true;
+    };
   };
 
   services.netatalk = {
@@ -131,6 +134,9 @@ in
 
   systemd.services.atalkd = {
     description = "Netatalk AppleTalk daemon";
+    before = [
+      "netatalk.service"
+    ];
     after = [
       "network.target"
     ];
