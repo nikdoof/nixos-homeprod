@@ -7,6 +7,7 @@
     ../../modules/doofnet
     ./services
     ./microvms.nix
+    ./qemu_vms.nix
   ];
 
   boot.kernel.sysctl = {
