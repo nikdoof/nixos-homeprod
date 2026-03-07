@@ -5,6 +5,9 @@
   ...
 }:
 let
+  ovmf = pkgs.OVMF.fd;
+in
+let
   # VM definitions — add entries here to define more QEMU VMs.
   # Disk images live at /srv/data/vms/<name>/ on the host.
   # QEMU reads VMDK natively; to convert to qcow2 for better performance:
@@ -31,6 +34,7 @@ let
     name: vm:
     let
       tapIface = "vm-${vm.vlan}-${vm.tapId}";
+      varsFile = "/srv/data/vms/${name}/OVMF_VARS.fd";
     in
     {
       description = "QEMU VM: ${name}";
@@ -49,9 +53,11 @@ let
         Group = "qemu-vm";
 
         # Tap interface lifecycle — run as root via the + prefix
+        # Also seed a per-VM writable OVMF_VARS.fd on first boot
         ExecStartPre = [
           "+${pkgs.iproute2}/bin/ip tuntap add dev ${tapIface} mode tap"
           "+${pkgs.iproute2}/bin/ip link set ${tapIface} up"
+          "${pkgs.bash}/bin/bash -c 'test -f ${varsFile} || cp ${ovmf}/FV/OVMF_VARS.fd ${varsFile}'"
         ];
         ExecStopPost = [
           "+${pkgs.bash}/bin/bash -c '${pkgs.iproute2}/bin/ip link del ${tapIface} || true'"
@@ -69,6 +75,13 @@ let
           (toString vm.vcpus)
           "-m"
           (toString vm.memory)
+          # EFI firmware — read-only code image
+          "-drive"
+          "if=pflash,format=raw,readonly=on,file=${ovmf}/FV/OVMF_CODE.fd"
+          # EFI vars — writable per-VM copy seeded in ExecStartPre
+          "-drive"
+          "if=pflash,format=raw,file=${varsFile}"
+          # Disk
           "-drive"
           "file=${vm.disk},format=${vm.diskFormat},if=virtio,cache=writeback"
           "-netdev"
