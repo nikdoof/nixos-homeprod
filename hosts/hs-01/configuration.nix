@@ -248,7 +248,7 @@ in
       logtail = {
         enabled = false;
       };
-      metrics_listen_addr = "127.0.0.1:9090";
+      metrics_listen_addr = "0.0.0.0:9090";
       noise = {
         private_key_path = "/var/lib/headscale/noise_private.key";
       };
@@ -299,6 +299,12 @@ in
       3478
     ];
     allowedUDPPorts = [ 3478 ];
+    extraCommands = ''
+      # Allow Headscale metrics port from Prometheus system
+      iptables -A INPUT -p tcp --dport 9090 -s 10.101.0.0/16 -j ACCEPT -m comment --comment "Prometheus access to Headscale metrics"
+      ip6tables -A INPUT -p tcp --dport 9090 -s fddd:d00f:dab0:101::/64 -j ACCEPT -m comment --comment "Prometheus access to Headscale metrics"
+      ip6tables -A INPUT -p tcp --dport 9090 -s 2001:8b0:bd9:101::21/64 -j ACCEPT -m comment --comment "Prometheus access to Headscale metrics"
+    '';
   };
 
   # Write out ACL config

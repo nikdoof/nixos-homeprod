@@ -40,6 +40,16 @@ in
           asDefault = true;
           http.tls.certResolver = "letsencrypt";
         };
+
+        metrics = {
+          address = ":9871";
+        };
+      };
+
+      metrics = {
+        prometheus = {
+          entryPoint = "metrics";
+        };
       };
 
       log = {
@@ -89,8 +99,16 @@ in
   };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    80
-    443
-  ];
+  networking.firewall = {
+    allowedTCPPorts = [
+      80
+      443
+    ];
+    extraCommands = ''
+      # Allow Traefik metrics port from Prometheus system
+      iptables -A INPUT -p tcp --dport 9871 -s 10.101.0.0/16 -j ACCEPT -m comment --comment "Prometheus access to Traefik metrics"
+      ip6tables -A INPUT -p tcp --dport 9871 -s fddd:d00f:dab0:101::/64 -j ACCEPT -m comment --comment "Prometheus access to Traefik metrics"
+      ip6tables -A INPUT -p tcp --dport 9871 -s 2001:8b0:bd9:101::21/64 -j ACCEPT -m comment --comment "Prometheus access to Traefik metrics"
+    '';
+  };
 }

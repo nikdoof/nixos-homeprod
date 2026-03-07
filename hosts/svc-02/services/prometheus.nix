@@ -116,10 +116,39 @@
         ];
       }
       {
+        job_name = "loki";
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:3100" ];
+          }
+        ];
+      } # Loki
+      {
         job_name = "hcloud";
         static_configs = [
           {
             targets = [ "127.0.0.1:9501" ];
+          }
+        ];
+      }
+      {
+        job_name = "traefik";
+        static_configs = [
+          {
+            targets = [
+              "svc-01.int.doofnet.uk:9871"
+              "svc-02.int.doofnet.uk:9871"
+            ];
+          }
+        ];
+      }
+      {
+        job_name = "headscale";
+        static_configs = [
+          {
+            targets = [
+              "hs-01.doofnet.uk:9090"
+            ];
           }
         ];
       }

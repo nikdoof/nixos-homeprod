@@ -73,7 +73,6 @@ in
   };
 
   networking.firewall = {
-    enable = true;
     allowedTCPPorts = [
       25
       465
