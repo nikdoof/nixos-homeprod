@@ -137,11 +137,12 @@ in
     ];
   };
 
+  systemd.services.netatalk = {
+    after = [ "atalkd.service" ];
+  };
+
   systemd.services.atalkd = {
     description = "Netatalk AppleTalk daemon";
-    before = [
-      "netatalk.service"
-    ];
     after = [
       "network.target"
     ];
