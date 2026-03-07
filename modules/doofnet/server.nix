@@ -24,6 +24,15 @@ with lib;
       ];
     };
 
+    # Allow node_exporter metrics port from Prometheus system
+    networking.firewall = {
+      extraCommands = ''
+        iptables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.node.port} -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "node_exporter"
+        ip6tables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.node.port} -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "node_exporter"
+        ip6tables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.node.port} -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "node_exporter"
+      '';
+    };
+
     services.promtail = {
       enable = true;
       configuration = {
