@@ -6,35 +6,38 @@
 }:
 let
   ovmf = pkgs.OVMF.fd;
-in
-let
-  # VM definitions — add entries here to define more QEMU VMs.
-  # Disk images live at /srv/data/vms/<name>/ on the host.
-  # QEMU reads VMDK natively; to convert to qcow2 for better performance:
-  #   qemu-img convert -f vmdk -O qcow2 disk.vmdk disk.qcow2
+  dataDir = "/srv/data/vms";
+
+  # VM definitions.
+  # Required: vlan
+  # Optional: mac (derived from name), tapId (derived from name),
+  #           vcpus (2), memory (2048), diskFormat ("vmdk")
+  # Disk image is always at /srv/data/vms/<name>/disk.<diskFormat>
   vms = {
     homeassistant = {
-      # MAC address derived deterministically from the VM name
-      mac = mkMAC "homeassistant";
       vlan = "101";
-      # Short tap interface ID — must produce an ifname under 15 chars
-      # (Linux IFNAMSIZ limit). Format: vm-<vlan>-<tapId>
       tapId = "ha";
-      # vCPU count
-      vcpus = 2;
-      # RAM in MiB
-      memory = 2048;
-      # Absolute path to the disk image on the host
-      disk = "/srv/data/vms/homeassistant/disk.vmdk";
-      diskFormat = "vmdk";
     };
+  };
+
+  # Apply defaults and derive any unset fields from the VM name
+  normaliseVm = name: vm: {
+    mac = vm.mac or (mkMAC name);
+    vlan = vm.vlan;
+    tapId = vm.tapId or (builtins.substring 0 8 name);
+    vcpus = vm.vcpus or 2;
+    memory = vm.memory or 2048;
+    diskFormat = vm.diskFormat or "vmdk";
   };
 
   mkQemuService =
     name: vm:
     let
-      tapIface = "vm-${vm.vlan}-${vm.tapId}";
-      varsFile = "/srv/data/vms/${name}/OVMF_VARS.fd";
+      normVm = normaliseVm name vm;
+      tapIface = "vm-${normVm.vlan}-${normVm.tapId}";
+      vmDir = "${dataDir}/${name}";
+      varsFile = "${vmDir}/OVMF_VARS.fd";
+      diskFile = "${vmDir}/disk.${normVm.diskFormat}";
     in
     {
       description = "QEMU VM: ${name}";
@@ -52,11 +55,11 @@ let
         User = "qemu-vm";
         Group = "qemu-vm";
 
-        # Tap interface lifecycle — run as root via the + prefix
-        # Also seed a per-VM writable OVMF_VARS.fd on first boot
         ExecStartPre = [
+          # Tap interface setup — runs as root
           "+${pkgs.iproute2}/bin/ip tuntap add dev ${tapIface} mode tap"
           "+${pkgs.iproute2}/bin/ip link set ${tapIface} up"
+          # Seed a writable EFI vars store on first boot
           "${pkgs.bash}/bin/bash -c 'test -f ${varsFile} || cp ${ovmf}/FV/OVMF_VARS.fd ${varsFile}'"
         ];
         ExecStopPost = [
@@ -72,22 +75,23 @@ let
           "-cpu"
           "host"
           "-smp"
-          (toString vm.vcpus)
+          (toString normVm.vcpus)
           "-m"
-          (toString vm.memory)
-          # EFI firmware — read-only code image
+          (toString normVm.memory)
+          # EFI firmware: read-only code + writable per-VM vars
           "-drive"
           "if=pflash,format=raw,readonly=on,file=${ovmf}/FV/OVMF_CODE.fd"
-          # EFI vars — writable per-VM copy seeded in ExecStartPre
           "-drive"
           "if=pflash,format=raw,file=${varsFile}"
-          # Disk
+          # Primary disk
           "-drive"
-          "file=${vm.disk},format=${vm.diskFormat},if=virtio,cache=writeback"
+          "file=${diskFile},format=${normVm.diskFormat},if=virtio,cache=writeback"
+          # Network
           "-netdev"
           "tap,id=net0,ifname=${tapIface},script=no,downscript=no,vhost=on"
           "-device"
-          "virtio-net-pci,netdev=net0,mac=${vm.mac}"
+          "virtio-net-pci,netdev=net0,mac=${normVm.mac}"
+          # Serial console → journald via stdio
           "-chardev"
           "stdio,id=con,mux=on,signal=off"
           "-serial"
@@ -98,12 +102,11 @@ let
           "-nodefaults"
         ];
 
-        # Security hardening
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
-        ReadWritePaths = [ "/srv/data/vms/${name}" ];
+        ReadWritePaths = [ vmDir ];
         DeviceAllow = [
           "/dev/kvm rw"
           "/dev/net/tun rw"
@@ -113,7 +116,6 @@ let
     };
 in
 {
-  # Unprivileged user that owns the QEMU processes
   users.users.qemu-vm = {
     isSystemUser = true;
     group = "qemu-vm";
@@ -122,12 +124,10 @@ in
   };
   users.groups.qemu-vm = { };
 
-  # Ensure VM disk directories exist on the persistent volume
   systemd.tmpfiles.rules = lib.concatMap (name: [
-    "d /srv/data/vms/${name} 0750 qemu-vm qemu-vm -"
+    "d ${dataDir}/${name} 0750 qemu-vm qemu-vm -"
   ]) (builtins.attrNames vms);
 
-  # One systemd service per VM
   systemd.services = lib.mapAttrs' (
     name: vm: lib.nameValuePair "qemu-vm-${name}" (mkQemuService name vm)
   ) vms;
