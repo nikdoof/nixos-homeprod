@@ -62,6 +62,26 @@ in
 
   doofnet.server = true;
 
+  # Persist host key to persistant fs
+  fileSystems."/persist".neededForBoot = lib.mkForce true;
+  services.openssh.hostKeys = [
+    {
+      path = "/persist/ssh_host_ed25519_key";
+      type = "ed25519";
+    }
+    {
+      path = "/persist/ssh_host_rsa_key";
+      type = "rsa";
+      bits = 4096;
+    }
+  ];
+
+  services.avahi = {
+    enable = true;
+    openFirewall = true;
+    publish.enable = true;
+  };
+
   services.netatalk = {
     enable = true;
 
@@ -111,7 +131,6 @@ in
 
   systemd.services.atalkd = {
     description = "Netatalk AppleTalk daemon";
-    unitConfig.Documentation = "man:netatalk(8) man:afpd(8) man:cnid_metad(8) man:cnid_dbd(8)";
     after = [
       "network.target"
     ];
