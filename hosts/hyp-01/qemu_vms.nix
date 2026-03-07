@@ -94,6 +94,7 @@ let
         DeviceAllow = [
           "/dev/kvm rw"
           "/dev/net/tun rw"
+          "/dev/vhost-net rw"
         ];
       };
     };
