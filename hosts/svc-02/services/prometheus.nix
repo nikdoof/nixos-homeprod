@@ -21,16 +21,17 @@
         static_configs = [
           {
             targets = [
+              "afp-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "gw.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "nas-afp.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "ns-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "ns-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "svc-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "svc-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "nas-afp.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
 
-              "web-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "mx-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "hs.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "mx-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "web-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
             ];
           }
         ];
@@ -103,7 +104,7 @@
         job_name = "prometheus";
         static_configs = [
           {
-            targets = [ "127.0.0.1:9090" ];
+            targets = [ "127.0.0.1:${toString config.services.prometheus.port}" ];
           }
         ];
       }
@@ -111,7 +112,7 @@
         job_name = "grafana";
         static_configs = [
           {
-            targets = [ "127.0.0.1:3000" ];
+            targets = [ "127.0.0.1:${toString config.services.grafana.settings.server.http_port}" ];
           }
         ];
       }
@@ -155,10 +156,21 @@
     ];
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [
-      9090 # Prometheus
-    ];
+  services.traefik = {
+    dynamicConfigOptions = {
+      http = {
+        routers.prometheus = {
+          rule = "Host(`prometheus.svc.doofnet.uk`)";
+          service = "prometheus";
+        };
+
+        services.prometheus.loadBalancer.servers = [
+          {
+            url = "http://localhost:${toString config.services.prometheus.port}";
+          }
+        ];
+      };
+    };
   };
 
   # Bind Prometheus home folder to the NVMe.
