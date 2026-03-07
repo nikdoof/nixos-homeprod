@@ -23,6 +23,10 @@
       url = "github:astro/deadnix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    globaltalk = {
+      url = "github:nikdoof/globaltalk-scraper";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -43,15 +47,13 @@
     in
     {
       nixosConfigurations = {
-        afp-01 = mkSystem "afp-01" { };
+        afp-01 = mkSystem "afp-01" { extraModules = [ inputs.globaltalk.nixosModules.default ]; };
         svc-01 = mkSystem "svc-01" { };
         svc-02 = mkSystem "svc-02" { };
         mx-01 = mkSystem "mx-01" { };
         hs-01 = mkSystem "hs-01" { };
         web-01 = mkSystem "web-01" { };
-        hyp-01 = mkSystem "hyp-01" {
-          extraModules = [ inputs.microvm.nixosModules.host ];
-        };
+        hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
 
         # Nameservers
         ns-01 = mkSystem "ns-01" {

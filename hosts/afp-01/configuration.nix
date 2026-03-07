@@ -133,6 +133,12 @@ in
     };
   };
 
+  services.globaltalk.scrape = {
+    enable = true;
+    outputFile = "/persist/netatalk/shares/data/globaltalk.json";
+  };
+  services.globaltalk.metrics.enable = true;
+
   networking.firewall = {
     allowedTCPPorts = [
       548 # AFP

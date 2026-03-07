@@ -22,7 +22,12 @@ with lib;
         "processes"
         "systemd"
       ];
+      extraFlags = [
+        "--collector.textfile.directory=var/lib/prometheus/node-exporter/"
+      ];
     };
+
+    systemd.tmpfiles.rules = [ "d var/lib/prometheus/node-exporter/ 0755 root root" ];
 
     # Allow node_exporter metrics port from Prometheus system
     networking.firewall = {
