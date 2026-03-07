@@ -147,7 +147,7 @@
         static_configs = [
           {
             targets = [
-              "hs-01.doofnet.uk:9090"
+              "hs.doofnet.uk:9090"
             ];
           }
         ];
