@@ -8,7 +8,7 @@ buildGoModule rec {
   pname = "jrouter";
   version = "0.0.21";
 
-  src = builtins.fetchTarball {
+  src = fetchTarball {
     url = "https://gitea.drjosh.dev/josh/jrouter/archive/v${version}.tar.gz";
     sha256 = "11z89l5h9qi3rk6fhfww6w8ahmga2x7d9kn9rwcr5v4g6sbc4g6i";
   };
@@ -25,4 +25,3 @@ buildGoModule rec {
     platforms = platforms.unix;
   };
 }
- 

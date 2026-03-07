@@ -84,6 +84,7 @@
             packages = [
               inputs.agenix.packages.${system}.agenix
               inputs.deadnix.packages.${system}.deadnix
+              pkgs.statix
             ];
           };
       });
