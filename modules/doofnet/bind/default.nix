@@ -223,10 +223,10 @@ in
 
     networking.firewall = {
       extraCommands = ''
-        # Allow Bind Exporter metrics port from Prometheus system
-        iptables -A INPUT -p tcp --dport ${toString config.services.prometheus.exporters.bind.port} -s 10.101.0.0/16 -j ACCEPT -m comment --comment "Prometheus access to Bind Exporter metrics"
-        ip6tables -A INPUT -p tcp --dport ${toString config.services.prometheus.exporters.bind.port} -s fddd:d00f:dab0:101::/64 -j ACCEPT -m comment --comment "Prometheus access to Bind Exporter metrics"
-        ip6tables -A INPUT -p tcp --dport ${toString config.services.prometheus.exporters.bind.port} -s 2001:8b0:bd9:101::21/64 -j ACCEPT -m comment --comment "Prometheus access to Bind Exporter metrics"
+        # Allow bind-exporter metrics port from Prometheus system
+        iptables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.bind.port} -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "bind-exporter"
+        ip6tables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.bind.port} -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "bind-exporter"
+        ip6tables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.bind.port} -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "bind-exporter"
       '';
     };
   };

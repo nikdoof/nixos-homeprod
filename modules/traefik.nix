@@ -106,9 +106,9 @@ in
     ];
     extraCommands = ''
       # Allow Traefik metrics port from Prometheus system
-      iptables -A INPUT -p tcp --dport 9871 -s 10.101.0.0/16 -j ACCEPT -m comment --comment "Prometheus access to Traefik metrics"
-      ip6tables -A INPUT -p tcp --dport 9871 -s fddd:d00f:dab0:101::/64 -j ACCEPT -m comment --comment "Prometheus access to Traefik metrics"
-      ip6tables -A INPUT -p tcp --dport 9871 -s 2001:8b0:bd9:101::21/64 -j ACCEPT -m comment --comment "Prometheus access to Traefik metrics"
+      iptables -A nixos-fw -p tcp -m tcp --dport 9871 -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "traefik"
+      ip6tables -A nixos-fw -p tcp -m tcp --dport 9871 -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "traefik"
+      ip6tables -A nixos-fw -p tcp -m tcp --dport 9871 -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "traefik"
     '';
   };
 }

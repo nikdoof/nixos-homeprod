@@ -33,9 +33,9 @@
     ];
     extraCommands = ''
       # Allow PostgreSQL metrics port from Prometheus system
-      iptables -A INPUT -p tcp --dport 9187 -s 10.101.0.0/16 -j ACCEPT -m comment --comment "Prometheus access to PostgreSQL metrics"
-      ip6tables -A INPUT -p tcp --dport 9187 -s fddd:d00f:dab0:101::/64 -j ACCEPT -m comment --comment "Prometheus access to PostgreSQL metrics"
-      ip6tables -A INPUT -p tcp --dport 9187 -s 2001:8b0:bd9:101::21/64 -j ACCEPT -m comment --comment "Prometheus access to PostgreSQL metrics"
+      iptables -A nixos-fw -p tcp -m tcp --dport 9187 -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "PostgreSQL"
+      ip6tables -A nixos-fw -p tcp -m tcp --dport 9187 -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "PostgreSQL"
+      ip6tables -A nixos-fw -p tcp -m tcp --dport 9187 -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "PostgreSQL"
     '';
   };
 }
