@@ -102,4 +102,35 @@ in
       };
     };
   };
+
+  networking.firewall = {
+    allowedTCPPorts = [
+      548 # AFP
+    ];
+  };
+
+  systemd.services.atalkd = {
+    description = "Netatalk AppleTalk daemon";
+    unitConfig.Documentation = "man:netatalk(8) man:afpd(8) man:cnid_metad(8) man:cnid_dbd(8)";
+    after = [
+      "network.target"
+    ];
+    wantedBy = [ "multi-user.target" ];
+
+    path = [ pkgs.netatalk ];
+
+    serviceConfig = {
+      Type = "forking";
+      GuessMainPID = "no";
+      PIDFile = "/run/lock/atalkd";
+      ExecStart = "${pkgs.netatalk}/sbin/atalkd";
+      ExecReload = "${pkgs.coreutils}/bin/kill -HUP  $MAINPID";
+      ExecStop = "${pkgs.coreutils}/bin/kill -TERM $MAINPID";
+      Restart = "always";
+      RestartSec = 1;
+    };
+  };
+
+  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
+  system.stateVersion = "25.11"; # Did you read the comment?
 }
