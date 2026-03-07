@@ -43,6 +43,7 @@
     in
     {
       nixosConfigurations = {
+        afp-01 = mkSystem "afp-01" { };
         svc-01 = mkSystem "svc-01" { };
         svc-02 = mkSystem "svc-02" { };
         mx-01 = mkSystem "mx-01" { };
