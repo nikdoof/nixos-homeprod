@@ -14,6 +14,9 @@ let
       # MAC address derived deterministically from the VM name
       mac = mkMAC "homeassistant";
       vlan = "101";
+      # Short tap interface ID — must produce an ifname under 15 chars
+      # (Linux IFNAMSIZ limit). Format: vm-<vlan>-<tapId>
+      tapId = "ha";
       # vCPU count
       vcpus = 2;
       # RAM in MiB
@@ -27,7 +30,7 @@ let
   mkQemuService =
     name: vm:
     let
-      tapIface = "vm-${vm.vlan}-${name}";
+      tapIface = "vm-${vm.vlan}-${vm.tapId}";
     in
     {
       description = "QEMU VM: ${name}";
@@ -51,7 +54,7 @@ let
           "+${pkgs.iproute2}/bin/ip link set ${tapIface} up"
         ];
         ExecStopPost = [
-          "+${pkgs.iproute2}/bin/ip link del ${tapIface} || true"
+          "+${pkgs.bash}/bin/bash -c '${pkgs.iproute2}/bin/ip link del ${tapIface} || true'"
         ];
 
         ExecStart = lib.escapeShellArgs [
