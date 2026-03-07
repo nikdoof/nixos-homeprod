@@ -94,6 +94,8 @@ in
         "uam list" = "uams_guest.so uams_dhx_pam.so uams_dhx2_pam.so uams_pam.so";
         "afpstats" = "yes";
         "vol dbpath" = "/persist/netatalk/cnid";
+        "mimic model" = "RackMac";
+        "map acls" = "mode";
       };
 
       archive = {
@@ -107,6 +109,7 @@ in
       dropbox = {
         "volume name" = "Dropbox";
         path = "/persist/netatalk/shares/dropbox";
+        rwlist = "nobody nikdoof";
         ea = "sys";
       };
 
@@ -115,6 +118,7 @@ in
         path = "/persist/netatalk/shares/transfer";
         ea = "sys";
         "valid users" = "nikdoof";
+        rwlist = "nikdoof";
       };
 
       data = {
@@ -122,6 +126,7 @@ in
         path = "/persist/netatalk/shares/data";
         ea = "sys";
         rolist = "nobody";
+        rwlist = "nikdoof";
       };
     };
   };
