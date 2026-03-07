@@ -19,10 +19,6 @@ let
     svc-02
     web-01
   ];
-  nameservers = [
-    ns-01
-    ns-02
-  ];
 in
 {
   "digitalOceanApiToken.age".publicKeys = users ++ systems;

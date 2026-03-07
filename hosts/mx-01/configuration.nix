@@ -237,6 +237,7 @@ in
 
   services.opendkim = {
     enable = true;
+    keyPath = "/persist/opendkim/keys";
     selector = builtins.hashString "sha1" "${config.services.postfix.settings.main.myhostname}";
     domains = config.networking.domain;
     inherit (config.services.postfix) user group;
