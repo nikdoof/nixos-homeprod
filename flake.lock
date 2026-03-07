@@ -128,11 +128,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772914903,
-        "narHash": "sha256-k7kxcOs1vfJVpRkPUhBJkYcw5Rb5x1PQVd1EdbUUj4o=",
+        "lastModified": 1772915216,
+        "narHash": "sha256-dNhlhRnYB4mtHaNARMROcGI4O01hcuK8HkOGPrMN7io=",
         "owner": "nikdoof",
         "repo": "globaltalk-scraper",
-        "rev": "fe78b7d5344589e4ca63aa68b70e14f3b9ef1f4a",
+        "rev": "29d4aef3ac65445be4d5216d413c7ad91e0b5ce0",
         "type": "github"
       },
       "original": {
