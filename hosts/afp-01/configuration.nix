@@ -46,6 +46,8 @@ in
     ];
   };
 
+  boot.kernelModules = [ "appletalk" ];
+
   # Networking
   networking.useDHCP = false;
   networking.hostName = "afp-01";
