@@ -64,6 +64,7 @@ in
     networkConfig = {
       DHCP = "yes";
       IPv6AcceptRA = true;
+      MulticastDNS = true;
     };
   };
 
@@ -86,8 +87,6 @@ in
   services.avahi = {
     enable = true;
     openFirewall = true;
-    nssmdns4 = true;
-    nssmdns6 = true;
     publish = {
       enable = true;
       userServices = true;
@@ -201,6 +200,11 @@ in
       RestartSec = 1;
     };
   };
+
+  # Create the spool folder for netatalk/papd
+  systemd.tmpfiles.rules = [
+    "d /var/spool/netatalk 0755 root root - -"
+  ];
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
