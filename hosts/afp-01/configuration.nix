@@ -167,7 +167,7 @@ in
     (_: super: {
       netatalk = super.netatalk.overrideAttrs (oldAttrs: {
         mesonFlags = oldAttrs.mesonFlags ++ [
-          "-Dwith-spooldir=/var/spool/netatalk"
+          "-Dwith-spooldir=var/spool/netatalk"
         ];
       });
     })
