@@ -34,7 +34,6 @@ in
     {
       allowedTCPPorts = [
         5432
-        9187
       ];
     }
     (firewall.allowFromPrometheus 9187 "postgres-exporter")
