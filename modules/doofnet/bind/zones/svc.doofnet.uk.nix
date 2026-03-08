@@ -25,6 +25,7 @@ with dns.lib.combinators;
       grafana.A = [ "10.101.3.21" ];
       unifi.A = [ "10.101.3.21" ];
       loki.A = [ "10.101.3.21" ];
+      prometheus.A = [ "10.101.3.21" ];
     };
   };
 }

@@ -36,10 +36,13 @@ with dns.lib.combinators;
       svc-02 = host "10.101.3.21" "fddd:d00f:dab0:101::21";
       hyp-01 = host "10.101.3.22" "fddd:d00f:dab0:101::22";
 
+      # VMs
+      afp-01 = host "10.101.3.30" "fddd:d00f:dab0:101::3:30";
+
       # Kubernetes Masters
       prod-master-03 = host "10.101.10.13" "fddd:d00f:dab0:101::10:13";
 
-      # MetalLB endpoints
+      # Service endpoints
       unifi.CNAME = [ "svc-01.int.doofnet.uk." ];
     };
   };

@@ -34,6 +34,9 @@ with dns.lib.combinators;
     subdomains."21.3".PTR = [ "svc-01.int.doofnet.uk." ];
     subdomains."22.3".PTR = [ "hyp-01.int.doofnet.uk." ];
 
+    # VMs
+    subdomains."30.3".PTR = [ "afp-01.int.doofnet.uk." ];
+
     # Kubernetes Masters
     subdomains."13.10".PTR = [ "prod-master-03.int.doofnet.uk." ];
   };
