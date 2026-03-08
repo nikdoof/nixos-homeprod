@@ -16,6 +16,7 @@
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "ahci"
+    "nvme"
     "usbhid"
     "sd_mod"
   ];
@@ -35,6 +36,11 @@
       "fmask=0022"
       "dmask=0022"
     ];
+  };
+
+  fileSystems."/srv/data" = {
+    device = "/dev/disk/by-label/data";
+    fsType = "xfs";
   };
 
   swapDevices = [

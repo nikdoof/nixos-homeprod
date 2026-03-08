@@ -85,13 +85,14 @@
   system.userActivationScripts.zshrc = "touch .zshrc";
 
   environment.systemPackages = with pkgs; [
-    gnupg
     eza
-    jq
-    yq
     fzf
+    gnupg
+    jq
+    lsof
     starship
     tcpdump
+    yq
   ];
 
   services = {
