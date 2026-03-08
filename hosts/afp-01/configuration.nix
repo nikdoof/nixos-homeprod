@@ -14,7 +14,7 @@ let
 
   papdConfig = pkgs.writeText "papd.conf" ''
     HP LaserJet 200 M251n:\
-       :pr=HP_LaserJet_200_color_M251n_5F9EF6:
+       :pr=HP_LaserJet_200_color_M251n_5F9EF6:op=root:
   '';
 in
 {
@@ -86,7 +86,8 @@ in
   services.avahi = {
     enable = true;
     openFirewall = true;
-    nssmdns = true;
+    nssmdns4 = true;
+    nssmdns6 = true;
     publish = {
       enable = true;
       userServices = true;
