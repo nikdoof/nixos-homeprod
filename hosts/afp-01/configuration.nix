@@ -13,8 +13,8 @@ let
   mac = mkMAC hostName;
 
   papdConfig = pkgs.writeText "papd.conf" ''
-    HP LaserJet 200:\
-       :pr=HP_LaserJet_200_color_M251n_5F9EF6:
+    HP LaserJet 200 M251n:\
+       :pr=HP_Laserjet_M251n:
   '';
 in
 {
@@ -178,6 +178,20 @@ in
 
   services.printing = {
     enable = true;
+  };
+
+  #
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "HP_Laserjet_M251n";
+        description = "HP LaserJet 200 color M251n";
+        location = "Games Room";
+        deviceUri = "dnssd://HP%20LaserJet%20200%20color%20M251n%20(5F9EF6)._ipp._tcp.local/?uuid=434e4331-4230-3434-3830-c8cbb85f9ef6";
+        model = "HP LaserJet Series PCL 4/5";
+      }
+    ];
+    ensureDefaultPrinter = "HP_Laserjet_M251n";
   };
 
   systemd.services.papd = {
