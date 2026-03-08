@@ -168,7 +168,7 @@ in
       netatalk = super.netatalk.overrideAttrs (oldAttrs: {
         version = "4.4.1";
         mesonFlags = oldAttrs.mesonFlags ++ [
-          "-Dwith-spooldir=/var/spool/netatalk"
+          "-Dwith-spooldir=var/spool/netatalk"
         ];
         src = pkgs.fetchurl {
           url = "mirror://sourceforge/netatalk/netatalk/netatalk-4.4.1.tar.xz";
@@ -226,16 +226,8 @@ in
       ExecStop = "${pkgs.coreutils}/bin/kill -TERM $MAINPID";
       Restart = "always";
       RestartSec = 1;
-
-      PrivateMounts = "yes";
-      BindPaths = "/persist/netatalk/papd:/var/spool/netatalk";
     };
   };
-
-  # Create the spool folder for netatalk/papd
-  systemd.tmpfiles.rules = [
-    "d /persist/netatalk/papd 0777 root root - -"
-  ];
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
