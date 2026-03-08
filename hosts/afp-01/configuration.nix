@@ -11,6 +11,11 @@ let
   domainName = "int.doofnet.uk";
   vlan = "101";
   mac = mkMAC hostName;
+
+  papdConfig = pkgs.writeText "papd.conf" ''
+    HP LaserJet 200:\
+       :pr=HP_LaserJet_200_color_M251n_5F9EF6:
+  '';
 in
 {
   imports = [
@@ -163,6 +168,31 @@ in
       GuessMainPID = "no";
       PIDFile = "/run/lock/atalkd";
       ExecStart = "${pkgs.netatalk}/sbin/atalkd";
+      ExecReload = "${pkgs.coreutils}/bin/kill -HUP  $MAINPID";
+      ExecStop = "${pkgs.coreutils}/bin/kill -TERM $MAINPID";
+      Restart = "always";
+      RestartSec = 1;
+    };
+  };
+
+  services.printing = {
+    enable = true;
+  };
+
+  systemd.services.papd = {
+    description = "Netatalk printing daemon";
+    after = [
+      "network.target"
+    ];
+    wantedBy = [ "multi-user.target" ];
+
+    path = [ pkgs.netatalk ];
+
+    serviceConfig = {
+      Type = "forking";
+      GuessMainPID = "no";
+      PIDFile = "/run/lock/papd";
+      ExecStart = "${pkgs.netatalk}/sbin/papd -f ${papdConfig}";
       ExecReload = "${pkgs.coreutils}/bin/kill -HUP  $MAINPID";
       ExecStop = "${pkgs.coreutils}/bin/kill -TERM $MAINPID";
       Restart = "always";
