@@ -4,11 +4,13 @@
   pkgs,
   ...
 }:
-with lib;
+let
+  firewall = import ../../lib/firewall.nix { inherit lib; };
+in
 {
-  options.doofnet.server = mkEnableOption "Server Mode";
+  options.doofnet.server = lib.mkEnableOption "Server Mode";
 
-  config = mkIf config.doofnet.server {
+  config = lib.mkIf config.doofnet.server {
     age.secrets = {
       borgmaticEncryptionKey.file = ../../secrets/borgmaticEncryptionKey.age;
       borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
@@ -30,13 +32,7 @@ with lib;
     systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0755 root root" ];
 
     # Allow node_exporter metrics port from Prometheus system
-    networking.firewall = {
-      extraCommands = ''
-        iptables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.node.port} -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "node_exporter"
-        ip6tables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.node.port} -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "node_exporter"
-        ip6tables -A nixos-fw -p tcp -m tcp --dport ${toString config.services.prometheus.exporters.node.port} -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "node_exporter"
-      '';
-    };
+    networking.firewall = firewall.allowFromPrometheus config.services.prometheus.exporters.node.port "node_exporter";
 
     services.promtail = {
       enable = true;

@@ -1,7 +1,11 @@
 {
+  lib,
   pkgs,
   ...
 }:
+let
+  firewall = import ../lib/firewall.nix { inherit lib; };
+in
 
 {
   services.postgresql = {
@@ -26,16 +30,13 @@
     port = 9187;
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [
-      5432
-      9187
-    ];
-    extraCommands = ''
-      # Allow PostgreSQL metrics port from Prometheus system
-      iptables -A nixos-fw -p tcp -m tcp --dport 9187 -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "PostgreSQL"
-      ip6tables -A nixos-fw -p tcp -m tcp --dport 9187 -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "PostgreSQL"
-      ip6tables -A nixos-fw -p tcp -m tcp --dport 9187 -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "PostgreSQL"
-    '';
-  };
+  networking.firewall = lib.mkMerge [
+    {
+      allowedTCPPorts = [
+        5432
+        9187
+      ];
+    }
+    (firewall.allowFromPrometheus 9187 "postgres-exporter")
+  ];
 }
