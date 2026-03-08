@@ -19,6 +19,6 @@ repos:
         name: "nix flake checker"
         description: "Will run command nix flake check"
         entry: "nix flake check --no-warn-dirty"
-        language: "unsupported"
+        language: "system"
         pass_filenames: false
         types: [nix]
