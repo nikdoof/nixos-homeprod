@@ -46,8 +46,4 @@ in
   "doofnetDnsUpdateKey.age".publicKeys = users ++ systems;
 
   "headscaleClientSecret.age".publicKeys = users ++ [ hs-01 ];
-
-  # User password hash — readable by all systems so the user module can
-  # reference it regardless of which host it is deployed to.
-  "nikdoofHashedPassword.age".publicKeys = users ++ systems;
 }
