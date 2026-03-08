@@ -166,9 +166,14 @@ in
   nixpkgs.overlays = [
     (_: super: {
       netatalk = super.netatalk.overrideAttrs (oldAttrs: {
+        version = "4.4.1";
         mesonFlags = oldAttrs.mesonFlags ++ [
-          "-Dwith-spooldir=var/spool/netatalk"
+          "-Dwith-spooldir=/var/spool/netatalk"
         ];
+        src = pkgs.fetchurl {
+          url = "mirror://sourceforge/netatalk/netatalk/netatalk-4.4.1.tar.xz";
+          hash = "sha256-j8qwvzs5zYqU/j7nqCZMYABRWjrzd9o0FmlmCasTMW0=";
+        };
       });
     })
   ];
