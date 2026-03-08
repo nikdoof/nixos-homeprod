@@ -1,16 +1,16 @@
 {
   lib,
   buildGoModule,
+  fetchzip,
   libpcap,
-  ...
 }:
 buildGoModule rec {
   pname = "jrouter";
   version = "0.0.21";
 
-  src = fetchTarball {
+  src = fetchzip {
     url = "https://gitea.drjosh.dev/josh/jrouter/archive/v${version}.tar.gz";
-    sha256 = "11z89l5h9qi3rk6fhfww6w8ahmga2x7d9kn9rwcr5v4g6sbc4g6i";
+    hash = "sha256-0TzCljaP7JIZz8nO1E4X6lWoEDecO+jMzCPiBAtN6Ic=";
   };
 
   buildInputs = [ libpcap ];
