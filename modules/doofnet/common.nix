@@ -36,8 +36,6 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_GB.UTF-8";
   console = {
-    #packages = [ pkgs.spleen pkgs.tamsyn ];
-    #font = "spleen-12x24";
     useXkbConfig = true; # use xkb.options in tty.
 
     # Nord theme colors for the console
