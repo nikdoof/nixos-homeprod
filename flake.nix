@@ -66,22 +66,7 @@
         hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
 
         # Nameservers
-        ns-01 = mkSystem "ns-01" {
-          system = "aarch64-linux";
-          extraModules = [
-            {
-              nix.settings = {
-                substituters = [
-                  "https://nix-community.cachix.org"
-                ];
-                trusted-public-keys = [
-                  "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-                ];
-              };
-            }
-            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-          ];
-        };
+        ns-01 = mkSystem "ns-01" { system = "aarch64-linux"; };
         ns-02 = mkSystem "ns-02" { };
 
         # Mini P8 Laptop

@@ -1,5 +1,6 @@
 {
   lib,
+  modulesPath,
   ...
 }:
 {
@@ -8,7 +9,20 @@
     ./hardware-configuration.nix
     ../../hardware/raspberry-pi-3.nix
     ../../modules/doofnet
+    # Required to produce an SD card image for the Pi.
+    # modulesPath is a built-in specialArg provided by nixpkgs.lib.nixosSystem
+    # pointing at the nixpkgs modules directory — no need to pass nixpkgs itself.
+    "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
   ];
+
+  # nix-community cache is needed to pull pre-built aarch64 binaries
+  # (e.g. dns.nix) when deploying to this host from an x86_64 builder.
+  nix.settings = {
+    substituters = [ "https://nix-community.cachix.org" ];
+    trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
 
   # Networking
   networking.useDHCP = false;
