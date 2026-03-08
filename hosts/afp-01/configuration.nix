@@ -184,6 +184,7 @@ in
     description = "Netatalk printing daemon";
     after = [
       "network.target"
+      "atalkd.service"
     ];
     wantedBy = [ "multi-user.target" ];
 
@@ -198,12 +199,15 @@ in
       ExecStop = "${pkgs.coreutils}/bin/kill -TERM $MAINPID";
       Restart = "always";
       RestartSec = 1;
+
+      PrivateMounts = "yes";
+      BindPaths = "/persist/netatalk/papd:/var/spool/netatalk";
     };
   };
 
   # Create the spool folder for netatalk/papd
   systemd.tmpfiles.rules = [
-    "d /var/spool/netatalk 0755 root root - -"
+    "d /persist/netatalk/papd 0777 root root - -"
   ];
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
