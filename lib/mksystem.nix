@@ -1,4 +1,5 @@
 {
+  self,
   nixpkgs,
   inputs,
   mkMAC,
@@ -12,7 +13,7 @@ nixpkgs.lib.nixosSystem {
   inherit system;
 
   specialArgs = {
-    inherit inputs mkMAC;
+    inherit self inputs mkMAC;
   };
 
   modules = [

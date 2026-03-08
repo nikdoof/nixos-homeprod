@@ -35,6 +35,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       ...
     }@inputs:
@@ -43,7 +44,12 @@
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
 
       mkSystem = import ./lib/mksystem.nix {
-        inherit nixpkgs inputs mkMAC;
+        inherit
+          self
+          nixpkgs
+          inputs
+          mkMAC
+          ;
       };
       mkMAC = import ./lib/mkmac.nix {
         inherit inputs;
