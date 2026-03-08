@@ -55,15 +55,26 @@ in
 
   # Networking
   networking.useDHCP = false;
-  networking.hostName = "afp-01";
+  networking.hostName = hostName;
+  networking.nameservers = [
+    "127.0.0.1"
+    "10.101.1.2"
+    "10.101.1.3"
+  ];
   networking.domain = domainName;
   networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
     networkConfig = {
-      DHCP = "yes";
+      Address = [
+        "10.101.3.30/16"
+        "2001:8b0:bd9:101::3:30/64"
+        "fddd:d00f:dab0:101::3:30/64"
+      ];
+      Gateway = "10.101.1.1";
       IPv6AcceptRA = true;
+      DHCP = "no";
       MulticastDNS = true;
     };
   };
@@ -150,6 +161,17 @@ in
       548 # AFP
     ];
   };
+
+  # Override netatalk's spool path
+  nixpkgs.overlays = [
+    (_: super: {
+      netatalk = super.netatalk.overrideAttrs (oldAttrs: {
+        mesonFlags = oldAttrs.mesonFlags ++ [
+          "-Dwith-spooldir=/var/spool/netatalk"
+        ];
+      });
+    })
+  ];
 
   systemd.services.netatalk = {
     after = [ "atalkd.service" ];
