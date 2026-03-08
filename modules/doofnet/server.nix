@@ -46,7 +46,7 @@ with lib;
           grpc_listen_port = 0;
         };
         positions = {
-          filename = "/tmp/positions.yaml";
+          filename = "/var/lib/promtail/positions.yaml";
         };
         clients = [
           {
