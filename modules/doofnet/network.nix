@@ -14,6 +14,16 @@
         };
       };
 
+      "10-vlan-public" = {
+        netdevConfig = {
+          Name = "vlan-public";
+          Kind = "vlan";
+        };
+        vlanConfig = {
+          Id = 102;
+        };
+      };
+
       "10-vlan-lab" = {
         netdevConfig = {
           Name = "vlan-lab";
@@ -21,6 +31,16 @@
         };
         vlanConfig = {
           Id = 104;
+        };
+      };
+
+      "10-vlan-ha" = {
+        netdevConfig = {
+          Name = "vlan-ha";
+          Kind = "vlan";
+        };
+        vlanConfig = {
+          Id = 105;
         };
       };
 
