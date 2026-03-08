@@ -2,10 +2,14 @@
   description = "nikdoof's home production NixOS configuration";
 
   inputs = {
-    # NixOS official package source, using the nixos-25.11 branch here
+    # Tracking nixos-25.11 (upcoming release branch) intentionally.
+    # Switch to nixos-24.11 for a stable channel.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixos-hardware = {
-      url = "github:NixOS/nixos-hardware/master";
+      # nixos-hardware does not have release branches; we pin to a specific
+      # commit via the lock file. Removing /master lets `nix flake update`
+      # track HEAD without silently floating on the branch ref.
+      url = "github:NixOS/nixos-hardware";
     };
     agenix = {
       url = "github:ryantm/agenix";
