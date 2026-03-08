@@ -165,11 +165,8 @@ in
   # Override netatalk's spool path
   nixpkgs.overlays = [
     (_: super: {
-      netatalk = super.netatalk.overrideAttrs (oldAttrs: {
+      netatalk = super.netatalk.overrideAttrs (_: {
         version = "4.4.1";
-        mesonFlags = oldAttrs.mesonFlags ++ [
-          "-Dwith-spooldir=var/spool/netatalk"
-        ];
         src = pkgs.fetchurl {
           url = "mirror://sourceforge/netatalk/netatalk/netatalk-4.4.1.tar.xz";
           hash = "sha256-j8qwvzs5zYqU/j7nqCZMYABRWjrzd9o0FmlmCasTMW0=";
@@ -228,6 +225,12 @@ in
       RestartSec = 1;
     };
   };
+
+  # Create the spool folder for netatalk/papd, and fixes NixOS oddities with papd
+  systemd.tmpfiles.rules = [
+    "d /var/spool/netatalk 0777 root root - -"
+    "L /var/spool/netatalk/var/spool/netatalk - - - - /var/spool/netatalk"
+  ];
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
