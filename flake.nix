@@ -76,6 +76,10 @@
             ${pkgs.statix}/bin/statix check --config ${./statix.toml} ${./.}
             touch $out
           '';
+          format = pkgs.runCommand "nixfmt-check" { } ''
+            ${pkgs.nixfmt-rfc-style}/bin/nixfmt --check $(find ${./.} -name '*.nix' -not -path '*/\.*')
+            touch $out
+          '';
         }
       );
 
@@ -105,6 +109,7 @@
             packages = [
               inputs.agenix.packages.${system}.agenix
               inputs.deadnix.packages.${system}.deadnix
+              pkgs.nixfmt-rfc-style
               pkgs.statix
             ];
           };

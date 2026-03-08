@@ -24,6 +24,5 @@ with dns.lib.combinators;
     # Root of zone
     PTR = [ "gw.int.doofnet.uk." ];
   };
-  extraConfig = ''
-  '';
+  extraConfig = "";
 }

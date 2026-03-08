@@ -27,6 +27,5 @@ with dns.lib.combinators;
     subdomains."11".PTR = [ "mx-01.doofnet.uk." ];
     subdomains."13".PTR = [ "hs.doofnet.uk." ];
   };
-  extraConfig = ''
-  '';
+  extraConfig = "";
 }
