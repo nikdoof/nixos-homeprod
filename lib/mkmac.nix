@@ -1,5 +1,4 @@
-{ ... }:
-hostName:
+_: hostName:
 let
   hashedHostOctet =
     pos:

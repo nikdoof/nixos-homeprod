@@ -48,14 +48,37 @@
           self
           nixpkgs
           inputs
-          mkMAC
           ;
-      };
-      mkMAC = import ./lib/mkmac.nix {
-        inherit inputs;
       };
     in
     {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          jrouter = pkgs.callPackage ./packages/jrouter.nix { };
+        }
+      );
+
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          deadnix = pkgs.runCommand "deadnix" { } ''
+            ${inputs.deadnix.packages.${system}.deadnix}/bin/deadnix --fail ${./.}
+            touch $out
+          '';
+          statix = pkgs.runCommand "statix" { } ''
+            ${pkgs.statix}/bin/statix check --config ${./statix.toml} ${./.}
+            touch $out
+          '';
+        }
+      );
+
       nixosConfigurations = {
         afp-01 = mkSystem "afp-01" { extraModules = [ inputs.globaltalk.nixosModules.default ]; };
         svc-01 = mkSystem "svc-01" { };

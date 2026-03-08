@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   virtualisation.oci-containers.containers.jellyfin = {
     labels = {
       "traefik.enable" = "true";

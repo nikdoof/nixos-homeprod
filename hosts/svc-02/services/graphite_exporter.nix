@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.prometheus.exporters = {
     graphite = {
       enable = true;

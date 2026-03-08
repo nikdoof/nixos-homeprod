@@ -2,8 +2,10 @@
   self,
   nixpkgs,
   inputs,
-  mkMAC,
 }:
+let
+  mkMAC = import ./mkmac.nix { };
+in
 name:
 {
   system ? "x86_64-linux",

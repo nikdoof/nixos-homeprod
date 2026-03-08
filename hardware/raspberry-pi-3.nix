@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # Pi3 boot configuration.
   boot.loader = {
     grub.enable = false;
@@ -29,6 +28,7 @@
       ExecStop = "hwclock -w";
       RemainAfterExit = "yes";
     };
+
     wantedBy = [ "basic.target" ];
   };
 }

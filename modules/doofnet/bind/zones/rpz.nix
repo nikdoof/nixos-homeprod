@@ -1,8 +1,4 @@
-{
-  dns,
-  ...
-}:
-{
+_: {
   zoneData = {
     SOA = {
       nameServer = "ns-01.int.doofnet.uk.";

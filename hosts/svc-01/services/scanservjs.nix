@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   virtualisation.oci-containers.containers.scanservjs = {
     labels = {
       "traefik.enable" = "true";

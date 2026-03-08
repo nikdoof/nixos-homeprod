@@ -22,23 +22,26 @@
   networking.hostName = "talos";
   networking.networkmanager.enable = true;
 
-  services.tailscale.enable = true;
-  services.fstrim.enable = true;
-
-  services.logind.settings.Login = {
-    HandleLidSwitchExternalPower = "ignore";
-    HandleLidSwitchDocked = "ignore";
+  services = {
+    tailscale.enable = true;
+    fstrim.enable = true;
+    logind.settings.Login = {
+      HandleLidSwitchExternalPower = "ignore";
+      HandleLidSwitchDocked = "ignore";
+    };
   };
 
   # Hyprland
-  programs.hyprland = {
-    enable = true;
-    withUWSM = true; # recommended for most users
-    xwayland.enable = true; # Xwayland can be disabled.
+  programs = {
+    hyprland = {
+      enable = true;
+      withUWSM = true; # recommended for most users
+      xwayland.enable = true; # Xwayland can be disabled.
+    };
+    hyprlock.enable = true;
+    waybar.enable = true;
+    yazi.enable = true;
   };
-  programs.hyprlock.enable = true;
-  programs.waybar.enable = true;
-  programs.yazi.enable = true;
 
   environment.systemPackages = with pkgs; [
     kitty

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   virtualisation.oci-containers.containers.copyparty = {
     labels = {
       "traefik.enable" = "true";

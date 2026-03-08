@@ -64,8 +64,8 @@ let
   # Build the nginx vHost config using common params
   nginx_sites = lib.listToAttrs (
     lib.mapAttrsToList
-      (name: site: {
-        name = name;
+      (name: _: {
+        inherit name;
         value = {
           enableACME = true;
           forceSSL = true;
@@ -75,7 +75,7 @@ let
       (
         lib.listToAttrs (
           lib.map (name: {
-            name = name;
+            inherit name;
             value = name;
           }) sites
         )
@@ -85,7 +85,7 @@ let
   nginx_sites_redirects = lib.listToAttrs (
     lib.mapAttrsToList
       (name: redirect: {
-        name = name;
+        inherit name;
         value = {
           enableACME = true;
           forceSSL = true;
@@ -97,7 +97,7 @@ let
       (
         lib.listToAttrs (
           lib.map (redirect: {
-            name = redirect.name;
+            inherit (redirect) name;
             value = redirect;
           }) redirects
         )

@@ -23,7 +23,7 @@ let
   # Apply defaults and derive any unset fields from the VM name
   normaliseVm = name: vm: {
     mac = vm.mac or (mkMAC name);
-    vlan = vm.vlan;
+    inherit (vm) vlan;
     tapId = vm.tapId or (builtins.substring 0 8 name);
     vcpus = vm.vcpus or 2;
     memory = vm.memory or 2048;

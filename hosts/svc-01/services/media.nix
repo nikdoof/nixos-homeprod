@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   virtualisation.oci-containers.containers = {
 
     # Prowlarr, Radarr, Sonarr

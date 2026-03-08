@@ -10,7 +10,7 @@ let
   firewall = import ../../../lib/firewall.nix { inherit lib; };
 
   # Import all zones from the zones directory
-  zones = import ./zones { dns = inputs.dns; };
+  zones = import ./zones { inherit (inputs) dns; };
 
   # Convert zones attrset to list for easier processing
   zoneList = lib.mapAttrsToList (name: value: { inherit name value; }) zones;
@@ -189,7 +189,7 @@ in
 
       zones = lib.listToAttrs (
         map (zone: {
-          name = zone.name;
+          inherit (zone) name;
           value = if cfg.mode == "primary" then mkPrimaryZone zone else mkSecondaryZone zone;
         }) zoneList
       );
