@@ -8,8 +8,7 @@ let
     ES_ENABLED = "false";
     IP_RETENTION_PERIOD = "31556952";
     LOCAL_DOMAIN = "incognitus.net";
-    REDIS_HOST = "10.88.0.1";
-    REDIS_PORT = "6379";
+    REDIS_URL = "redis://valkey:6379";
     S3_ENABLED = "false";
     SESSION_RETENTION_PERIOD = "31556952";
     SMTP_FROM_ADDRESS = "Incognitus Mastodon <notifications@mastodon.incognitus.net>";
@@ -41,6 +40,11 @@ in
         "traefik.http.routers.mastodon.entrypoints" = "websecure,extwebsecure";
       };
       image = "ghcr.io/mastodon/mastodon:v4.5.7";
+      cmd = [
+        "bash"
+        "-c"
+        "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails db:migrate; bundle exec rails s -p 3000"
+      ];
       environment = mastodon_config;
       environmentFiles = [
         config.age.secrets.mastodonEnvironment.path
@@ -57,6 +61,10 @@ in
         "traefik.http.routers.mastodon-streaming.entrypoints" = "websecure,extwebsecure";
       };
       image = "ghcr.io/mastodon/mastodon-streaming:v4.5.7";
+      cmd = [
+        "node"
+        "./streaming"
+      ];
       environment = mastodon_config;
       environmentFiles = [
         config.age.secrets.mastodonEnvironment.path
