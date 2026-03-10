@@ -7,6 +7,7 @@
     ./gotosocial.nix
     ./jellyfin.nix
     ./linkding.nix
+    ./mastodon.nix
     ./media.nix
     ./miniflux.nix
     ./oauth-proxy.nix

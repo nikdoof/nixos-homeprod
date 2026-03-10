@@ -62,16 +62,20 @@ in
         config.age.secrets.mastodonEnvironment.path
       ];
     };
-  };
 
-  mastodon-sidekiq = {
-    image = "ghcr.io/mastodon/mastodon:v4.5.7";
-    command = "bundle exec sidekiq";
-    environment = mastodon_config;
-    environmentFiles = [
-      config.age.secrets.mastodonEnvironment.path
-    ];
-    volumes = mastodon_volumes;
+    mastodon-sidekiq = {
+      image = "ghcr.io/mastodon/mastodon:v4.5.7";
+      cmd = [
+        "bundle"
+        "exec"
+        "sidekiq"
+      ];
+      environment = mastodon_config;
+      environmentFiles = [
+        config.age.secrets.mastodonEnvironment.path
+      ];
+      volumes = mastodon_volumes;
+    };
   };
 
   services.postgresql = {
