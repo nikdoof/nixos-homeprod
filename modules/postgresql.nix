@@ -19,6 +19,7 @@ in
 
     # Allow local auth via scram
     authentication = pkgs.lib.mkAfter ''
+      local all all trust
       host sameuser all 127.0.0.1/32 scram-sha-256
       host sameuser all ::1/128 scram-sha-256
     '';
