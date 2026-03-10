@@ -51,10 +51,10 @@ in
     mastodon-streaming = {
       labels = {
         "traefik.enable" = "true";
-        "traefik.http.routers.mastodon.rule" =
+        "traefik.http.routers.mastodon-streaming.rule" =
           "Host(`mastodon.incognitus.net`) && Path(`/api/v1/streaming/`)";
-        "traefik.http.services.mastodon.loadbalancer.server.port" = "4000";
-        "traefik.http.routers.mastodon.entrypoints" = "websecure,extwebsecure";
+        "traefik.http.services.mastodon-streaming.loadbalancer.server.port" = "4000";
+        "traefik.http.routers.mastodon-streaming.entrypoints" = "websecure,extwebsecure";
       };
       image = "ghcr.io/mastodon/mastodon-streaming:v4.5.7";
       environment = mastodon_config;

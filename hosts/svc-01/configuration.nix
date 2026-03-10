@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -40,6 +41,11 @@
     media = true;
     paperless = true;
   };
+
+  # Allow Private LAN access
+  services.postgresql.authentication = pkgs.lib.mkAfter ''
+    host all all 10.101.0.0/16 scram-sha-256
+  '';
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
