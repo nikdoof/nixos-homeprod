@@ -22,6 +22,11 @@ in
     hypervisor = "qemu";
     vcpu = 2;
     mem = 1024;
+
+    registerWithMachined = true;
+    vsock.ssh.enable = true;
+    vsock.cid = 12;
+
     interfaces = [
       {
         type = "tap";
