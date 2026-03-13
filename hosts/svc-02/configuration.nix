@@ -30,6 +30,11 @@
     };
   };
 
+  programs.zsh.shellAliases = {
+    # Shortcut to rebuild NS-01 from this host
+    nrs-ns01 = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01 --fast";
+  };
+
   doofnet.server = true;
   doofnet.cross_compile = true;
   doofnet.nfs.media = true;
