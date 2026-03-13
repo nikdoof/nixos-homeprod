@@ -32,7 +32,7 @@
 
   programs.zsh.shellAliases = {
     # Shortcut to rebuild NS-01 from this host
-    nrs-ns01 = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01 --fast";
+    nrs-ns01 = "sudo nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01 --no-reexec";
   };
 
   doofnet.server = true;
