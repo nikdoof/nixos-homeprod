@@ -12,5 +12,10 @@ with dns.lib.combinators;
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2026031301;
     };
+
+    NS = [
+      "ns-01.int.doofnet.uk."
+      "ns-02.int.doofnet.uk."
+    ];
   };
 }
