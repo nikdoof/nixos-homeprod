@@ -3,7 +3,7 @@ _: {
     SOA = {
       nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2025030101;
+      serial = 2026031301;
     };
     NS = [
       "ns-01.int.doofnet.uk."
@@ -15,9 +15,6 @@ _: {
     # For example: "example.com.rpz" would override queries for "example.com"
 
     subdomains = {
-      # Override k8s-prod-ingress-external.doofnet.uk to resolve to 10.101.10.6
-      "k8s-prod-ingress-external.doofnet.uk".A = [ "10.101.10.6" ];
-
       # Override svc-prod-ingress-external.doofnet.uk to resolve to 10.101.3.20
       "svc-prod-ingress-external.doofnet.uk".A = [ "10.101.3.20" ];
 

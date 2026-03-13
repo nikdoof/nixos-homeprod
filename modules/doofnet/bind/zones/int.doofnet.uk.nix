@@ -8,7 +8,7 @@ with dns.lib.combinators;
     SOA = {
       nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2025030101;
+      serial = 2026031301;
     };
     NS = [
       "ns-01.int.doofnet.uk."
@@ -26,9 +26,7 @@ with dns.lib.combinators;
       ns-02 = host "10.101.1.3" "2001:8b0:bd9:101::3";
 
       # Infrastructure
-      nas-afp = host "10.101.3.11" "fddd:d00f:dab0:101::11";
-      jrouter = host "10.101.3.12" "fddd:d00f:dab0:101::12";
-      esx-01 = host "10.101.3.15" "fddd:d00f:dab0:101::15";
+      nas-01 = host "10.101.3.16" "fddd:d00f:dab0:101::16";
       nas-03 = host "10.101.3.16" "fddd:d00f:dab0:101::16";
 
       # Service Hosts
@@ -38,9 +36,6 @@ with dns.lib.combinators;
 
       # VMs
       afp-01 = host "10.101.3.30" "fddd:d00f:dab0:101::3:30";
-
-      # Kubernetes Masters
-      prod-master-03 = host "10.101.10.13" "fddd:d00f:dab0:101::10:13";
 
       # Service endpoints
       unifi.CNAME = [ "svc-01.int.doofnet.uk." ];
