@@ -24,7 +24,7 @@ _: {
     };
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "/bin/sh -c \"/run/current-system/sw/bin/modprobe i2c_bcm2835 && /run/current-system/sw/bin/modprobe rtc_ds1307 && sleep 1 && echo ds1307 0x68 > /sys/class/i2c-dev/i2c-1/device/new_device && hwclock -s\"";
+      ExecStart = "/bin/sh -c \"/run/current-system/sw/bin/modprobe i2c_bcm2835 && /run/current-system/sw/bin/modprobe rtc_ds1307 && sleep 1 && echo ds1307 0x68 > /sys/class/i2c-dev/i2c-1/device/new_device && /run/current-system/sw/bin/hwclock -s\"";
       ExecStop = "/run/current-system/sw/bin/hwclock -w";
       RemainAfterExit = "yes";
     };
