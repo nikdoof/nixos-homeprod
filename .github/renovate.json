@@ -26,5 +26,8 @@
       ],
       "datasourceTemplate": "docker"
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }
