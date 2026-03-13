@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   ...
 }:
@@ -102,7 +101,7 @@
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
-        PermitRootLogin = lib.mkForce "no";
+        PermitRootLogin = "no";
       };
     };
     fstrim.enable = true;

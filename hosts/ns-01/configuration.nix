@@ -52,6 +52,9 @@
     enable = lib.mkForce false;
   };
 
+  # We need to do remote rebuilds, and its just easier to connect as root
+  services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
+
   doofnet.server = true;
 
   doofnet.bind = {
