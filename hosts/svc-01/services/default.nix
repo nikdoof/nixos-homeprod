@@ -3,6 +3,7 @@ _: {
     ./copyparty.nix
     ./gitea.nix
     ./glance.nix
+    ./globaltalk.nix
     ./gotosocial.nix
     ./jellyfin.nix
     ./linkding.nix

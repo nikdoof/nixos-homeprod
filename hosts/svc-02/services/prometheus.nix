@@ -175,7 +175,7 @@
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 9090 ];
+  networking.firewall.allowedTCPPorts = [ config.services.prometheus.port ];
 
   # Bind Prometheus home folder to the NVMe.
   fileSystems."/var/lib/prometheus2" = {
