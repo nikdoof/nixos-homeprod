@@ -23,6 +23,7 @@
             targets = [
               "afp-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "gw.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
+              "hyp-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "nas-afp.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "ns-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
               "ns-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
