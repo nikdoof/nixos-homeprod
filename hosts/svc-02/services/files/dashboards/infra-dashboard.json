@@ -72,7 +72,7 @@
         },
         "viewMode": "list"
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "title": "Alerts",
       "type": "alertlist"
     },
@@ -123,7 +123,7 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "datasource": {
@@ -221,7 +221,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "datasource": {
@@ -296,7 +296,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "datasource": {
@@ -363,7 +363,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "datasource": {
@@ -452,7 +452,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "editorMode": "code",
@@ -521,7 +521,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "editorMode": "code",
@@ -535,19 +535,6 @@
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 13
-      },
-      "id": 53,
-      "panels": [],
-      "title": "ESX",
-      "type": "row"
-    },
-    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -557,9 +544,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "fieldMinMax": false,
           "mappings": [],
-          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -569,12 +554,12 @@
                 "value": 0
               },
               {
-                "color": "dark-yellow",
-                "value": 80
+                "color": "#EAB839",
+                "value": 40
               },
               {
-                "color": "dark-red",
-                "value": 90
+                "color": "red",
+                "value": 70
               }
             ]
           },
@@ -584,11 +569,11 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 3,
-        "x": 0,
-        "y": 14
+        "w": 9,
+        "x": 3,
+        "y": 13
       },
-      "id": 55,
+      "id": 61,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -600,160 +585,28 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": true,
-        "textMode": "auto",
+        "showPercentChange": false,
+        "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "code",
-          "expr": "avg (vmware_host_cpu_usage / vmware_host_cpu_max * 100)",
-          "legendFormat": "{{ hostname }}",
+          "exemplar": false,
+          "expr": "100 * (1 - avg by (instance) (\n  rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"(svc|hyp)-.*\"}[5m])\n))",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{ instance }}",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "CPU Usage",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "dark-green",
-                "value": 0
-              },
-              {
-                "color": "dark-yellow",
-                "value": 80
-              },
-              {
-                "color": "dark-red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 3,
-        "y": 14
-      },
-      "id": 56,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": true,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.3",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "avg (vmware_host_memory_usage / vmware_host_memory_max)",
-          "legendFormat": "{{host_name}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Memory Usage",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "dark-green",
-                "value": 0
-              },
-              {
-                "color": "dark-yellow",
-                "value": 80
-              },
-              {
-                "color": "dark-red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 6,
-        "y": 14
-      },
-      "id": 54,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": true,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.3",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "avg by (ds_name) (100 - ((vmware_datastore_freespace_size / vmware_datastore_capacity_size) * 100))",
-          "legendFormat": "{{ds_name}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Datastore Usage",
       "type": "stat"
     },
     {
@@ -789,8 +642,8 @@
       "gridPos": {
         "h": 6,
         "w": 3,
-        "x": 9,
-        "y": 14
+        "x": 0,
+        "y": 13
       },
       "id": 59,
       "options": {
@@ -808,7 +661,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.3",
+      "pluginVersion": "12.3.4",
       "targets": [
         {
           "editorMode": "code",
@@ -819,66 +672,6 @@
         }
       ],
       "title": "Prometheus Retention",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "dark-green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 12,
-        "y": 14
-      },
-      "id": 60,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.3",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "prometheus_tsdb_storage_blocks_bytes/prometheus_tsdb_retention_limit_bytes",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Prometheus Storage Usage",
       "type": "stat"
     }
   ],
@@ -900,6 +693,6 @@
   "timezone": "utc",
   "title": "Infra / Overview",
   "uid": "uLwTLp27k",
-  "version": 2,
+  "version": 11,
   "weekStart": "monday"
 }
