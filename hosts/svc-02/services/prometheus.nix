@@ -2,6 +2,7 @@
 {
   services.prometheus = {
     enable = true;
+    listenAddress = "0.0.0.0";
 
     alertmanagers = [
       {
@@ -173,6 +174,8 @@
       };
     };
   };
+
+  networking.firewall.allowedTCPPorts = [ 9090 ];
 
   # Bind Prometheus home folder to the NVMe.
   fileSystems."/var/lib/prometheus2" = {
