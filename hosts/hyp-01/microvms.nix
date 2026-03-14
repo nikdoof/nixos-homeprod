@@ -26,6 +26,10 @@
       flake = inputs.self;
       restartIfChanged = true;
     };
+    grf-01 = {
+      flake = inputs.self;
+      restartIfChanged = true;
+    };
   };
 
   # Make the persistent folders for VMs

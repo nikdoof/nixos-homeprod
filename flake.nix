@@ -85,12 +85,13 @@
 
       nixosConfigurations = {
         afp-01 = mkSystem "afp-01" { extraModules = [ inputs.globaltalk.nixosModules.default ]; };
+        grf-01 = mkSystem "grf-01" { };
+        hs-01 = mkSystem "hs-01" { };
+        hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
+        mx-01 = mkSystem "mx-01" { };
         svc-01 = mkSystem "svc-01" { };
         svc-02 = mkSystem "svc-02" { };
-        mx-01 = mkSystem "mx-01" { };
-        hs-01 = mkSystem "hs-01" { };
         web-01 = mkSystem "web-01" { };
-        hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
 
         # Nameservers
         ns-01 = mkSystem "ns-01" { system = "aarch64-linux"; };

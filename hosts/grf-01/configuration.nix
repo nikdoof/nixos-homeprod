@@ -118,12 +118,13 @@ in
       };
       auth = {
         disable_login_form = true;
-        anonymous = {
-          enabled = true;
-          org_name = "Main Org.";
-          org_role = "Viewer";
-        };
       };
+      "auth.anonymous" = {
+        enabled = true;
+        org_name = "Main Org.";
+        org_role = "Viewer";
+      };
+
       alerting = {
         enabled = false;
       };
@@ -141,7 +142,7 @@ in
         feedback_links_enabled = false;
       };
       dashboards = {
-        default_home_dashboard_path = "${dashboards.path}/globaltalk.json";
+        default_home_dashboard_path = "${dashboards}/globaltalk.json";
       };
     };
 
