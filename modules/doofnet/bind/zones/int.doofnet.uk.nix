@@ -36,6 +36,7 @@ with dns.lib.combinators;
 
       # VMs
       afp-01 = host "10.101.3.30" "fddd:d00f:dab0:101::3:30";
+      grf-01 = host "10.101.3.31" "fddd:d00f:dab0:101::3:31";
 
       # Service endpoints
       unifi.CNAME = [ "svc-01.int.doofnet.uk." ];
