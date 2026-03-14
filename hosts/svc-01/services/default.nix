@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   imports = [
     ./copyparty.nix
     ./gitea.nix

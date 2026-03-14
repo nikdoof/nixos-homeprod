@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   imports = [
     ./alertmanager.nix
     ./grafana.nix

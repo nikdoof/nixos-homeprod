@@ -26,16 +26,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 9,
-  "links": [
-    {
-      "icon": "external link",
-      "tags": [],
-      "title": "Dashboard Source",
-      "tooltip": "",
-      "type": "link",
-      "url": "https://github.com/pecastro/grafana-dashboards/blob/master/prometheus/bind9-exporter-dns.json"
-    }
-  ],
+  "links": [],
   "panels": [
     {
       "collapsed": false,

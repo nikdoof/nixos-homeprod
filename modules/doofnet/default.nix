@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   imports = [
     ./bind
     ./common.nix
