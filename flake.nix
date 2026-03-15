@@ -23,10 +23,6 @@
       url = "github:nix-community/dns.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    deadnix = {
-      url = "github:astro/deadnix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     globaltalk = {
       url = "github:nikdoof/globaltalk-scraper";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -69,7 +65,7 @@
         in
         {
           deadnix = pkgs.runCommand "deadnix" { } ''
-            ${inputs.deadnix.packages.${system}.deadnix}/bin/deadnix --fail ${./.}
+            ${pkgs.deadnix}/bin/deadnix --fail ${./.}
             touch $out
           '';
           statix = pkgs.runCommand "statix" { } ''
@@ -109,7 +105,7 @@
           pkgs.mkShell {
             packages = [
               inputs.agenix.packages.${system}.agenix
-              inputs.deadnix.packages.${system}.deadnix
+              pkgs.deadnix
               pkgs.nixfmt-rfc-style
               pkgs.statix
             ];
