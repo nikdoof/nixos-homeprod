@@ -66,7 +66,7 @@ in
         "uam list" = "uams_guest.so uams_dhx_pam.so uams_dhx2_pam.so uams_pam.so";
         "afpstats" = "yes";
         "vol dbpath" = "/persist/netatalk/cnid";
-        "mimic model" = "RackMac";
+        "mimic model" = "PowerMac";
         "map acls" = "mode";
       };
 
