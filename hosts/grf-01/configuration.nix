@@ -2,7 +2,6 @@
   inputs,
   config,
   lib,
-  mkMAC,
   pkgs,
   ...
 }:
@@ -10,7 +9,7 @@ let
   hostName = "grf-01";
   domainName = "int.doofnet.uk";
   vlan = "101";
-  mac = mkMAC hostName;
+  mac = lib.mkMAC hostName;
 
   dashboards = pkgs.stdenv.mkDerivation {
     name = "grafana-dashboards";

@@ -2,14 +2,13 @@
   inputs,
   config,
   lib,
-  mkMAC,
   ...
 }:
 let
   hostName = "ns-02";
   domainName = "int.doofnet.uk";
   vlan = "101";
-  mac = mkMAC hostName;
+  mac = lib.mkMAC hostName;
 in
 {
   imports = [

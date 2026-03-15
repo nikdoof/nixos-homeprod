@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  mkMAC,
   ...
 }:
 let
@@ -22,7 +21,7 @@ let
 
   # Apply defaults and derive any unset fields from the VM name
   normaliseVm = name: vm: {
-    mac = vm.mac or (mkMAC name);
+    mac = vm.mac or (lib.mkMAC name);
     inherit (vm) vlan;
     tapId = vm.tapId or (builtins.substring 0 8 name);
     vcpus = vm.vcpus or 2;

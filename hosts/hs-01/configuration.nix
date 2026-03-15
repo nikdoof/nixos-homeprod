@@ -2,7 +2,6 @@
   inputs,
   config,
   lib,
-  mkMAC,
   ...
 }:
 let
@@ -10,7 +9,7 @@ let
   hostName = "hs-01";
   domainName = "doofnet.uk";
   vlan = "106";
-  mac = mkMAC hostName;
+  mac = lib.mkMAC hostName;
 
   acl_config = {
     acls = [

@@ -4,7 +4,7 @@
   inputs,
 }:
 let
-  mkMAC = import ./mkmac.nix { };
+  lib = nixpkgs.lib.extend (_: _: { mkMAC = import ./mkmac.nix { }; });
 in
 name:
 {
@@ -12,10 +12,10 @@ name:
   extraModules ? [ ],
 }:
 nixpkgs.lib.nixosSystem {
-  inherit system;
+  inherit system lib;
 
   specialArgs = {
-    inherit self inputs mkMAC;
+    inherit self inputs;
   };
 
   modules = [
