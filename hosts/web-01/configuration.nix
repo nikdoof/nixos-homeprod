@@ -1,6 +1,4 @@
 {
-  inputs,
-  config,
   lib,
   pkgs,
   ...
@@ -8,8 +6,6 @@
 let
   hostName = "web-01";
   domainName = "doofnet.uk";
-  vlan = "106";
-  mac = lib.mkMAC hostName;
 
   sites = [
     "${hostName}.${domainName}"
@@ -109,42 +105,10 @@ let
   ]) sites;
 in
 {
-  imports = [
-    # Include the results of the hardware scan.
-    inputs.microvm.nixosModules.microvm
-  ];
-
-  microvm = {
-    hypervisor = "qemu";
-    vcpu = 2;
-    mem = 1024;
-
-    registerWithMachined = true;
-    vsock.ssh.enable = true;
-    vsock.cid = 14;
-
-    interfaces = [
-      {
-        type = "tap";
-        tap.vhost = true;
-        id = "vm-${vlan}-${hostName}";
-        inherit mac;
-      }
-    ];
-    shares = [
-      {
-        source = "/nix/store";
-        mountPoint = "/nix/.ro-store";
-        tag = "ro-store";
-        proto = "virtiofs";
-      }
-      {
-        tag = "persist";
-        source = "/srv/data/persist/microvms/${config.networking.hostName}";
-        mountPoint = "/persist";
-        proto = "virtiofs";
-      }
-    ];
+  doofnet.microvm = {
+    enable = true;
+    cid = 14;
+    vlan = "106";
   };
 
   # Networking
@@ -177,20 +141,6 @@ in
       443
     ];
   };
-
-  # Persist host key to persistant fs
-  fileSystems."/persist".neededForBoot = lib.mkForce true;
-  services.openssh.hostKeys = [
-    {
-      path = "/persist/ssh_host_ed25519_key";
-      type = "ed25519";
-    }
-    {
-      path = "/persist/ssh_host_rsa_key";
-      type = "rsa";
-      bits = 4096;
-    }
-  ];
 
   # Persist the ACME folder
   fileSystems."/var/lib/acme" = {

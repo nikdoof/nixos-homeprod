@@ -1,15 +1,10 @@
 {
-  inputs,
-  config,
-  lib,
   pkgs,
   ...
 }:
 let
   hostName = "afp-01";
   domainName = "int.doofnet.uk";
-  vlan = "101";
-  mac = lib.mkMAC hostName;
 
   papdConfig = pkgs.writeText "papd.conf" ''
     HP LaserJet 200 M251n:\
@@ -17,41 +12,10 @@ let
   '';
 in
 {
-  imports = [
-    inputs.microvm.nixosModules.microvm
-  ];
-
-  microvm = {
-    hypervisor = "qemu";
-    vcpu = 2;
-    mem = 1024;
-
-    registerWithMachined = true;
-    vsock.ssh.enable = true;
-    vsock.cid = 11;
-
-    interfaces = [
-      {
-        type = "tap";
-        tap.vhost = true;
-        id = "vm-${vlan}-${hostName}";
-        inherit mac;
-      }
-    ];
-    shares = [
-      {
-        source = "/nix/store";
-        mountPoint = "/nix/.ro-store";
-        tag = "ro-store";
-        proto = "virtiofs";
-      }
-      {
-        tag = "persist";
-        source = "/srv/data/persist/microvms/${config.networking.hostName}";
-        mountPoint = "/persist";
-        proto = "virtiofs";
-      }
-    ];
+  doofnet.microvm = {
+    enable = true;
+    cid = 11;
+    vlan = "101";
   };
 
   boot.kernelModules = [ "appletalk" ];
@@ -83,20 +47,6 @@ in
   };
 
   doofnet.server = true;
-
-  # Persist host key to persistant fs
-  fileSystems."/persist".neededForBoot = lib.mkForce true;
-  services.openssh.hostKeys = [
-    {
-      path = "/persist/ssh_host_ed25519_key";
-      type = "ed25519";
-    }
-    {
-      path = "/persist/ssh_host_rsa_key";
-      type = "rsa";
-      bits = 4096;
-    }
-  ];
 
   services.avahi = {
     enable = true;

@@ -80,18 +80,50 @@
       );
 
       nixosConfigurations = {
-        afp-01 = mkSystem "afp-01" { extraModules = [ inputs.globaltalk.nixosModules.default ]; };
-        grf-01 = mkSystem "grf-01" { };
-        hs-01 = mkSystem "hs-01" { };
+        # Physical Hosts
         hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
-        mx-01 = mkSystem "mx-01" { };
+        ns-01 = mkSystem "ns-01" { system = "aarch64-linux"; };
         svc-01 = mkSystem "svc-01" { };
         svc-02 = mkSystem "svc-02" { };
-        web-01 = mkSystem "web-01" { };
 
-        # Nameservers
-        ns-01 = mkSystem "ns-01" { system = "aarch64-linux"; };
-        ns-02 = mkSystem "ns-02" { };
+        # VMs
+        afp-01 = mkSystem "afp-01" {
+          extraModules = [
+            inputs.globaltalk.nixosModules.default
+            inputs.microvm.nixosModules.microvm
+            ./modules/doofnet/microvm.nix
+          ];
+        };
+        grf-01 = mkSystem "grf-01" {
+          extraModules = [
+            inputs.microvm.nixosModules.microvm
+            ./modules/doofnet/microvm.nix
+          ];
+        };
+        hs-01 = mkSystem "hs-01" {
+          extraModules = [
+            inputs.microvm.nixosModules.microvm
+            ./modules/doofnet/microvm.nix
+          ];
+        };
+        mx-01 = mkSystem "mx-01" {
+          extraModules = [
+            inputs.microvm.nixosModules.microvm
+            ./modules/doofnet/microvm.nix
+          ];
+        };
+        web-01 = mkSystem "web-01" {
+          extraModules = [
+            inputs.microvm.nixosModules.microvm
+            ./modules/doofnet/microvm.nix
+          ];
+        };
+        ns-02 = mkSystem "ns-02" {
+          extraModules = [
+            inputs.microvm.nixosModules.microvm
+            ./modules/doofnet/microvm.nix
+          ];
+        };
 
         # Mini P8 Laptop
         talos = mkSystem "talos" { };
