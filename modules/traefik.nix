@@ -55,7 +55,7 @@ in
       };
 
       log = {
-        level = "DEBUG";
+        level = "INFO";
         filePath = "${config.services.traefik.dataDir}/traefik.log";
         format = "json";
       };
