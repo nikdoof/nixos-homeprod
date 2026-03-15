@@ -1,8 +1,39 @@
-{ config, ... }:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
+let
+  # For every nixosConfiguration that has doofnet.server enabled, read the
+  # hostname, domain, and node_exporter port from its evaluated config and
+  # build a "host.domain:port" scrape target string.
+  nodeExporterTargets =
+    let
+      allConfigs = lib.mapAttrsToList (name: nixos: {
+        inherit name;
+        cfg = nixos.config;
+      }) inputs.self.nixosConfigurations;
+
+      serverHosts = builtins.filter (h: h.cfg.doofnet.server) allConfigs;
+    in
+    map (
+      h:
+      "${h.cfg.networking.hostName}.${h.cfg.networking.domain}:${toString h.cfg.services.prometheus.exporters.node.port}"
+    ) serverHosts;
+
+  # Hosts running node_exporter that are not managed by this flake.
+  extraNodeTargets = [
+    "gw.int.doofnet.uk:9100"
+  ];
+in
 {
   services.prometheus = {
     enable = true;
     listenAddress = "0.0.0.0";
+
+    enableReload = true;
+    retentionTime = "365d";
 
     alertmanagers = [
       {
@@ -16,25 +47,13 @@
         ];
       }
     ];
+
     scrapeConfigs = [
       {
         job_name = "node_exporter";
         static_configs = [
           {
-            targets = [
-              "afp-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "gw.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "hyp-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "nas-afp.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "ns-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "ns-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "svc-01.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "svc-02.int.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-
-              "hs.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "mx-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-              "web-01.doofnet.uk:${toString config.services.prometheus.exporters.node.port}"
-            ];
+            targets = nodeExporterTargets ++ extraNodeTargets;
           }
         ];
       }
@@ -92,9 +111,7 @@
       }
       {
         job_name = "homeassistant";
-
         metrics_path = "/api/prometheus";
-
         scheme = "https";
         static_configs = [
           {
@@ -125,7 +142,7 @@
             targets = [ "127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}" ];
           }
         ];
-      } # Loki
+      }
       {
         job_name = "hcloud";
         static_configs = [
@@ -177,7 +194,7 @@
 
   networking.firewall.allowedTCPPorts = [ config.services.prometheus.port ];
 
-  # Bind Prometheus home folder to the NVMe.
+  # Bind Prometheus data directory to the NVMe.
   fileSystems."/var/lib/prometheus2" = {
     device = "/srv/data/prometheus/data";
     options = [ "bind" ];
