@@ -2,13 +2,8 @@
   description = "nikdoof's home production NixOS configuration";
 
   inputs = {
-    # Tracking nixos-25.11 (upcoming release branch) intentionally.
-    # Switch to nixos-24.11 for a stable channel.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixos-hardware = {
-      # nixos-hardware does not have release branches; we pin to a specific
-      # commit via the lock file. Removing /master lets `nix flake update`
-      # track HEAD without silently floating on the branch ref.
       url = "github:NixOS/nixos-hardware";
     };
     agenix = {
@@ -69,7 +64,7 @@
             touch $out
           '';
           statix = pkgs.runCommand "statix" { } ''
-            ${pkgs.statix}/bin/statix check --config ${./statix.toml} ${./.}
+            cd ${./.} && ${pkgs.statix}/bin/statix check --config ${./statix.toml} .
             touch $out
           '';
           format = pkgs.runCommand "nixfmt-check" { } ''

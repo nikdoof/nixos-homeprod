@@ -4,7 +4,39 @@
   config,
   ...
 }:
+let
+  # Collect the CID for each declared VM by reading the guest's evaluated config
+  # via inputs.self. This gives us host-side visibility across all guests so we
+  # can assert uniqueness at evaluation time (i.e. during nix flake check).
+  vmCIDs = lib.mapAttrsToList (
+    name: _:
+    let
+      cid = inputs.self.nixosConfigurations.${name}.config.doofnet.microvm.cid;
+    in
+    {
+      inherit name cid;
+    }
+  ) config.microvm.vms;
+
+  # Group VMs by CID value — any group with more than one entry is a duplicate.
+  cidGroups = lib.groupBy (vm: toString vm.cid) vmCIDs;
+  duplicates = lib.filterAttrs (_: vms: builtins.length vms > 1) cidGroups;
+
+  # Build a human-readable description of each conflicting CID.
+  duplicateMsg = lib.concatStringsSep ", " (
+    lib.mapAttrsToList (
+      cid: vms: "CID ${cid} used by ${lib.concatMapStringsSep " and " (vm: vm.name) vms}"
+    ) duplicates
+  );
+in
 {
+  assertions = [
+    {
+      assertion = duplicates == { };
+      message = "Duplicate microVM CIDs on hyp-01: ${duplicateMsg}";
+    }
+  ];
+
   microvm.vms = {
     afp-01 = {
       flake = inputs.self;
