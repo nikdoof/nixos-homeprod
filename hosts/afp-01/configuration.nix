@@ -24,7 +24,6 @@ in
   networking.useDHCP = false;
   networking.hostName = hostName;
   networking.nameservers = [
-    "127.0.0.1"
     "10.101.1.2"
     "10.101.1.3"
   ];
@@ -42,7 +41,6 @@ in
       Gateway = "10.101.1.1";
       IPv6AcceptRA = true;
       DHCP = "no";
-      MulticastDNS = true;
     };
   };
 
