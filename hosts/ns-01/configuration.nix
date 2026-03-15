@@ -8,7 +8,6 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../hardware/raspberry-pi-3.nix
-    ../../modules/doofnet
     # Required to produce an SD card image for the Pi.
     # modulesPath is a built-in specialArg provided by nixpkgs.lib.nixosSystem
     # pointing at the nixpkgs modules directory — no need to pass nixpkgs itself.

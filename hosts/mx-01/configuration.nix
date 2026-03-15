@@ -14,7 +14,6 @@ let
 in
 {
   imports = [
-    ../../modules/doofnet
     inputs.microvm.nixosModules.microvm
   ];
 

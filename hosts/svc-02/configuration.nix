@@ -3,7 +3,6 @@ _: {
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../hardware/prodesk-600-g3-dm.nix
-    ../../modules/doofnet
     ../../modules/traefik.nix
     ../../modules/podman.nix
     ./services

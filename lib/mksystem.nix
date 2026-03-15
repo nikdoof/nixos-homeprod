@@ -21,6 +21,7 @@ nixpkgs.lib.nixosSystem {
   modules = [
     ../hosts/${name}/configuration.nix
     inputs.agenix.nixosModules.default
+    ../modules/doofnet
   ]
   ++ extraModules;
 }

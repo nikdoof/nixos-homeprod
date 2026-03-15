@@ -4,8 +4,6 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../../hardware/prodesk-600-g3-dm.nix
-    ../../modules/doofnet
-    ./services
     ./microvms.nix
     ./qemu_vms.nix
   ];

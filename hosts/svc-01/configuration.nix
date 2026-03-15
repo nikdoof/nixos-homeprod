@@ -9,7 +9,6 @@
     ./hardware-configuration.nix
     ../../hardware/prodesk-600-g3-dm.nix
     ../../hardware/coral-tpu-pcie.nix
-    ../../modules/doofnet
     ../../modules/podman.nix
     ../../modules/traefik.nix
     ../../modules/postgresql.nix

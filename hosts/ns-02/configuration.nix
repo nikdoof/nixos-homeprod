@@ -14,7 +14,6 @@ in
 {
   imports = [
     # Include the results of the hardware scan.
-    ../../modules/doofnet
     inputs.microvm.nixosModules.microvm
   ];
 
