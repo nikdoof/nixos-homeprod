@@ -6,6 +6,7 @@
   ...
 }:
 let
+  firewall = import ../../lib/firewall.nix { inherit lib; };
   hostName = "hs-01";
   domainName = "doofnet.uk";
   vlan = "106";
@@ -296,20 +297,17 @@ in
     };
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [
-      80
-      443
-      3478
-    ];
-    allowedUDPPorts = [ 3478 ];
-    extraCommands = ''
-      # Allow Headscale metrics port from Prometheus system
-      iptables -A nixos-fw -p tcp -m tcp --dport 9090 -s 10.101.0.0/16 -j nixos-fw-accept -m comment --comment "headscale"
-      ip6tables -A nixos-fw -p tcp -m tcp --dport 9090 -s fddd:d00f:dab0:101::/64 -j nixos-fw-accept -m comment --comment "headscale"
-      ip6tables -A nixos-fw -p tcp -m tcp --dport 9090 -s 2001:8b0:bd9:101::21/64 -j nixos-fw-accept -m comment --comment "headscale"
-    '';
-  };
+  networking.firewall = lib.mkMerge [
+    {
+      allowedTCPPorts = [
+        80
+        443
+        3478
+      ];
+      allowedUDPPorts = [ 3478 ];
+    }
+    (firewall.allowFromPrometheus 9090 "headscale")
+  ];
 
   # Write out ACL config
   environment.etc."headscale/acl_policy.json".text = builtins.toJSON acl_config;
