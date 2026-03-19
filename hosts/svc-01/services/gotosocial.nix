@@ -46,6 +46,7 @@
         GTS_OIDC_ENABLED = "true";
         GTS_OIDC_IDP_NAME = "Doofnet";
         GTS_OIDC_ISSUER = "https://id.doofnet.uk";
+        GTS_OIDC_LINK_EXISTING = "true";
         GTS_SMTP_FROM = "no-reply@doofnet.uk";
         GTS_SMTP_HOST = "mx-01.doofnet.uk";
         GTS_SMTP_PORT = "25";
