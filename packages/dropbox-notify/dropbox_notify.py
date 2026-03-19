@@ -5,6 +5,7 @@ ActivityPub instance when new user files appear.
 """
 
 import argparse
+import collections
 import logging
 import os
 import sys
@@ -81,17 +82,30 @@ def post_status(
 
 
 def watch(
-    watch_dir: str, instance_url: str, token_path: str, dry_run: bool = False
+    watch_dir: str,
+    instance_url: str,
+    token_path: str,
+    dry_run: bool = False,
+    post_interval: int = 60,
 ) -> None:
     """Main watch loop – blocks forever."""
-    log.info("Watching %s for new files", watch_dir)
+    log.info("Watching %s for new files (post interval: %ds)", watch_dir, post_interval)
+
+    # Pre-populate with files that already exist so we don't re-announce them
+    # on startup or after a service restart.
+    seen_files: set[str] = {f for f in os.listdir(watch_dir) if is_user_file(f)}
+    log.debug("Pre-seeded %d existing files", len(seen_files))
+
+    queue: collections.deque[str] = collections.deque()
+    last_post_time = 0.0
 
     inotify = inotify_simple.INotify()
     inotify.add_watch(watch_dir, WATCH_FLAGS)
 
     while True:
-        # Block until at least one event arrives (no timeout = wait forever).
-        events = inotify.read()
+        # Use a 1-second timeout so we can drain the queue on schedule even
+        # when no new inotify events arrive.
+        events = inotify.read(timeout=1000)
         for event in events:
             filename = event.name
 
@@ -99,18 +113,27 @@ def watch(
                 log.debug("Ignoring non-user file: %s", filename)
                 continue
 
-            full_path = os.path.join(watch_dir, filename)
-            log.info("New user file detected: %s", full_path)
+            if filename in seen_files:
+                log.debug("Ignoring already-seen file: %s", filename)
+                continue
 
-            # Re-read the token on every event so it can be rotated without
-            # restarting the service.
+            seen_files.add(filename)
+            log.info("Queuing new file: %s", os.path.join(watch_dir, filename))
+            queue.append(filename)
+
+        # Post at most one queued item per interval.
+        now = time.monotonic()
+        if queue and now - last_post_time >= post_interval:
+            filename = queue.popleft()
+            if queue:
+                log.info("Posting %s (%d more queued)", filename, len(queue))
             try:
                 token = read_token(token_path)
             except (OSError, ValueError) as exc:
                 log.error("Could not read token: %s", exc)
-                continue
-
-            post_status(instance_url, token, filename, dry_run=dry_run)
+            else:
+                post_status(instance_url, token, filename, dry_run=dry_run)
+            last_post_time = now
 
 
 def main() -> None:
@@ -137,6 +160,13 @@ def main() -> None:
         action="store_true",
         default=False,
         help="Log what would be posted without actually calling the API.",
+    )
+    parser.add_argument(
+        "--post-interval",
+        type=int,
+        default=60,
+        metavar="SECONDS",
+        help="Minimum seconds between posts (default: 60).",
     )
     parser.add_argument(
         "--log-level",
@@ -166,6 +196,7 @@ def main() -> None:
                 instance_url=args.instance_url,
                 token_path=args.token_file,
                 dry_run=args.dry_run,
+                post_interval=args.post_interval,
             )
         except KeyboardInterrupt:
             log.info("Interrupted, exiting.")

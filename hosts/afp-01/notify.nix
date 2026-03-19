@@ -32,6 +32,18 @@ in
       example = "/run/agenix/dropboxNotifyToken";
     };
 
+    dryRun = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Log what would be posted without actually calling the API.";
+    };
+
+    postInterval = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 60;
+      description = "Minimum seconds between posts (queued files are drained one per interval).";
+    };
+
     logLevel = lib.mkOption {
       type = lib.types.enum [
         "DEBUG"
@@ -80,6 +92,8 @@ in
           "--watch-dir ${cfg.watchDir}"
           "--instance-url ${cfg.instanceUrl}"
           "--token-file ${cfg.tokenFile}"
+          (lib.optionalString cfg.dryRun "--dry-run")
+          "--post-interval ${toString cfg.postInterval}"
           "--log-level ${cfg.logLevel}"
         ];
 

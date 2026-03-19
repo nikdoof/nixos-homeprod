@@ -190,7 +190,8 @@ in
   ];
 
   services.dropbox-notify = {
-    enable = false;
+    enable = true;
+    dryRun = true;
     watchDir = "/persist/netatalk/shares/dropbox";
     instanceUrl = "https://social.doofnet.uk";
     tokenFile = dropboxNotifyToken.path;
