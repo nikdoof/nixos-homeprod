@@ -2,6 +2,7 @@ let
   nikdoof = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHWO2qwHaPaQs46na4Aa6gMkw5QqRHUMGQphtgAcDJOw";
   users = [ nikdoof ];
 
+  afp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDoO2RnmZOgSEIfziRh7FJsJPUZe5dLpFXysea5yvEnB";
   hs-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEqU636TZeQGoqkmGUQpkHvs6/AB4cjFgBcmNFJIGWMQ";
   hyp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKTI5LxG1wD5ee7rhYq9Kv9ArjkgooCODqqCFWh0hvNl";
   mx-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH2WGGEH1jk+Z0Q7zRMXF/ENZtEk8EtfWY3AYBinNtdr";
@@ -47,4 +48,6 @@ in
   "doofnetDnsUpdateKey.age".publicKeys = users ++ systems;
 
   "headscaleClientSecret.age".publicKeys = users ++ [ hs-01 ];
+
+  "dropboxNotifyToken.age".publicKeys = users ++ [ afp-01 ];
 }

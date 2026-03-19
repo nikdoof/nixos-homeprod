@@ -1,9 +1,11 @@
 {
   pkgs,
+  config,
   ...
 }:
 let
   hostName = "afp-01";
+  inherit (config.age.secrets) dropboxNotifyToken;
   domainName = "int.doofnet.uk";
 
   papdConfig = pkgs.writeText "papd.conf" ''
@@ -12,6 +14,8 @@ let
   '';
 in
 {
+  imports = [ ./notify.nix ];
+
   doofnet.microvm = {
     enable = true;
     cid = 11;
@@ -184,6 +188,13 @@ in
     "d /var/spool/netatalk 0777 root root - -"
     "L /var/spool/netatalk/var/spool/netatalk - - - - /var/spool/netatalk"
   ];
+
+  services.dropbox-notify = {
+    enable = true;
+    watchDir = "/persist/netatalk/shares/dropbox";
+    instanceUrl = "https://social.doofnet.uk";
+    tokenFile = dropboxNotifyToken.path;
+  };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
