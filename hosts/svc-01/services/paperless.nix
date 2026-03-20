@@ -69,7 +69,7 @@
     };
 
     gotenberg = {
-      image = "thecodingmachine/gotenberg:8.27.0";
+      image = "thecodingmachine/gotenberg:8.28.0";
       environment = {
         DISABLE_GOOGLE_CHROME = "1";
       };
