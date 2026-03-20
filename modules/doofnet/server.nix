@@ -71,6 +71,11 @@ in
       # extraFlags
     };
 
+    programs.ssh.knownHosts."hetzner-storagebox" = {
+      hostNames = [ "[u453638.your-storagebox.de]:23" ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
+    };
+
     services.borgmatic = {
       enable = true;
       configurations."hetzner" = {
