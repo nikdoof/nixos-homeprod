@@ -90,6 +90,7 @@ in
         remote_path = "borg";
         exclude_if_present = [ ".nobackup" ];
 
+        encryption_mode = "repokey-blake2";
         encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
         ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
 
