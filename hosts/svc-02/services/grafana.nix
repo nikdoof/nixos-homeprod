@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 let
+  secretPath = config.age.secrets.grafanaOidcClientSecret.path;
   dashboards = pkgs.stdenv.mkDerivation {
     name = "grafana-dashboards";
     src = ./files/dashboards;
@@ -14,6 +15,11 @@ let
   };
 in
 {
+  age.secrets.grafanaOidcClientSecret = {
+    file = ../../../secrets/grafanaOidcClientSecret.age;
+    owner = "grafana";
+  };
+
   services.grafana = {
     enable = true;
 
@@ -34,6 +40,26 @@ in
       analytics = {
         reporting_enabled = false;
         feedback_links_enabled = false;
+      };
+      auth = {
+        disable_login_form = false;
+        oauth_auto_login = false;
+      };
+      "auth.generic_oauth" = {
+        enabled = true;
+        name = "Pocket ID";
+        client_id = "590ca225bf4cd85c2d4c4f65a38067b096675715";
+        client_secret = "$__file{${secretPath}}";
+        scopes = "openid profile email";
+        auth_url = "https://id.doofnet.uk/authorize";
+        token_url = "https://id.doofnet.uk/api/oidc/token";
+        api_url = "https://id.doofnet.uk/api/oidc/userinfo";
+        use_pkce = true;
+        use_refresh_token = true;
+        email_attribute_path = "email";
+        login_attribute_path = "preferred_username";
+        name_attribute_path = "name";
+        role_attribute_path = "contains(groups[*], 'Admin') && 'Admin' || 'Viewer'";
       };
     };
 

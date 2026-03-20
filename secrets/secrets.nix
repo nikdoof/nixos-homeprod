@@ -42,6 +42,7 @@ in
   "unpollerPassword.age".publicKeys = users ++ [ svc-02 ];
   "alertManagerTelegramToken.age".publicKeys = users ++ [ svc-02 ];
   "hcloudExporterEnvironment.age".publicKeys = users ++ [ svc-02 ];
+  "grafanaOidcClientSecret.age".publicKeys = users ++ [ svc-02 ];
 
   "mx01DovecotPasswd.age".publicKeys = users ++ [ mx-01 ];
 
