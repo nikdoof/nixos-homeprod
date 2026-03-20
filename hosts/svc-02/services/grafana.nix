@@ -30,6 +30,7 @@ in
         enforce_domain = false;
         enable_gzip = true;
         domain = "grafana.svc.doofnet.uk";
+        root_url = "https://grafana.svc.doofnet.uk";
       };
       smtp = {
         enabled = true;
