@@ -39,4 +39,11 @@ in
     }
     (firewall.allowFromPrometheus 9187 "postgres-exporter")
   ];
+
+  services.borgmatic.settings.postgresql_databases = [
+    {
+      name = "all";
+      compression = "zstd";
+    }
+  ];
 }

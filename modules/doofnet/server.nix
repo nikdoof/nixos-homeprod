@@ -83,7 +83,6 @@ in
     services.borgmatic = {
       enable = true;
       configurations."hetzner" = {
-
         repositories = [
           {
             label = "hetzner-sb1";
