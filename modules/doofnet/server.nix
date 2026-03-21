@@ -8,7 +8,7 @@ let
   alloyConfig = pkgs.writeText "alloy-config.alloy" ''
     // Collect system metrics (node_exporter replacement)
     prometheus.exporter.unix "default" {
-      enable_collectors = ["processes", "systemd"]
+      enable_collectors = ["logind", "processes", "systemd"]
 
       textfile {
         directory = "/var/lib/prometheus/node-exporter"
@@ -60,6 +60,9 @@ in
       borgmaticEncryptionKey.file = ../../secrets/borgmaticEncryptionKey.age;
       borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
     };
+
+    # Use dbus broker for Alloy access
+    services.dbus.implementation = "broker";
 
     systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0755 alloy alloy" ];
 
