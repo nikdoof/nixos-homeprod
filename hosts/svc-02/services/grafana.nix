@@ -83,7 +83,7 @@ in
       alerting.rules.settings.groups = [
         {
           orgId = 1;
-          name = "AppleTalk";
+          name = "GlobalTalk";
           folder = "Alerts";
           interval = "5m";
           rules = [
@@ -176,7 +176,6 @@ in
         }
         {
           name = "loki";
-          uid = "loki";
           type = "loki";
           url = "https://loki.svc.doofnet.uk";
         }
