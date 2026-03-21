@@ -64,12 +64,18 @@ in
     # Use dbus broker for Alloy access
     services.dbus.implementation = "broker";
 
-    systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0755 alloy alloy" ];
+    # World-writable so the DynamicUser alloy service (arbitrary UID) and any
+    # custom textfile-writing scripts can both write here.
+    systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0777 root root" ];
 
     services.alloy = {
       enable = true;
       configPath = alloyConfig;
     };
+
+    # ReadWritePaths ensures the path is accessible through systemd's filesystem
+    # isolation even though alloy runs as a DynamicUser.
+    systemd.services.alloy.serviceConfig.ReadWritePaths = [ "/var/lib/prometheus/node-exporter" ];
 
     programs.ssh.knownHosts."hetzner-storagebox" = {
       hostNames = [ "[u453638.your-storagebox.de]:23" ];
