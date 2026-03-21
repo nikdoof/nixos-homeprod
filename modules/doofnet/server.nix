@@ -8,7 +8,7 @@ let
   alloyConfig = pkgs.writeText "alloy-config.alloy" ''
     // Collect system metrics (node_exporter replacement)
     prometheus.exporter.unix "default" {
-      enable_collectors = ["logind", "processes", "systemd"]
+      enable_collectors = ["processes", "systemd"]
 
       textfile {
         directory = "/var/lib/prometheus/node-exporter"
@@ -67,8 +67,6 @@ in
       enable = true;
       configPath = alloyConfig;
     };
-
-    systemd.services.alloy.serviceConfig.PrivateIPC = lib.mkForce false;
 
     programs.ssh.knownHosts."hetzner-storagebox" = {
       hostNames = [ "[u453638.your-storagebox.de]:23" ];
