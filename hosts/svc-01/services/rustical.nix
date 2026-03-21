@@ -22,4 +22,6 @@
       "/srv/data/rustical/data:/var/lib/rustical:U"
     ];
   };
+
+  services.borgmatic.settings.source_directories = [ "/srv/data/rustical/data" ];
 }

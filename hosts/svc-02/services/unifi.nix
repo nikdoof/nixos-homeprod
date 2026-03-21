@@ -25,6 +25,8 @@
     extraOptions = [ "--network=host" ];
   };
 
+  services.borgmatic.settings.source_directories = [ "/srv/data/unifi/data/data/backup/" ];
+
   networking.firewall = {
     allowedTCPPorts = [
       5671 # UXG Adpot

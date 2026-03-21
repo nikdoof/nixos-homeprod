@@ -36,4 +36,6 @@
       TRUST_PROXY = "true";
     };
   };
+
+  services.borgmatic.settings.source_directories = [ "/srv/data/pocket-id/data" ];
 }

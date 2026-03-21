@@ -236,6 +236,8 @@ in
     };
   };
 
+  services.borgmatic.settings.source_directories = [ "/var/lib/headscale" ];
+
   systemd.services.headscale = {
     serviceConfig = {
       AmbientCapabilities = [

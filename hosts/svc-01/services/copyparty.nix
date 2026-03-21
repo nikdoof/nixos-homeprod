@@ -12,4 +12,6 @@ _: {
       "/srv/data/copyparty/config/doofnet.conf:/cfg/doofnet.conf:U"
     ];
   };
+
+  services.borgmatic.settings.source_directories = [ "/srv/data/copyparty/data" ];
 }

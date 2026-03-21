@@ -84,7 +84,6 @@ in
       enable = true;
       configurations."hetzner" = {
 
-        source_directories = [ "/srv/data" ];
         repositories = [
           {
             label = "hetzner-sb1";

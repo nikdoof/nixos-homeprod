@@ -17,4 +17,6 @@ _: {
     ];
     extraOptions = [ "--network=host" ];
   };
+
+  services.borgmatic.settings.source_directories = [ "/srv/data/jellyfin/config" ];
 }

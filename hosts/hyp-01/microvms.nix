@@ -68,4 +68,7 @@ in
   systemd.tmpfiles.rules = lib.concatMap (vm: [
     "d /srv/data/persist/microvms/${vm} 0755 root root -"
   ]) (builtins.attrNames config.microvm.vms);
+
+  # Backup persistent folders
+  services.borgmatic.settings.source_directories = [ "/srv/data/persist/microvms" ];
 }
