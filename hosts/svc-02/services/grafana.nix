@@ -169,6 +169,7 @@ in
         {
           name = "prometheus";
           type = "prometheus";
+          uid = "prometheus";
           access = "proxy";
           url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
           isDefault = true;
@@ -177,6 +178,7 @@ in
         {
           name = "loki";
           type = "loki";
+          uid = "loki";
           url = "https://loki.svc.doofnet.uk";
         }
       ];
