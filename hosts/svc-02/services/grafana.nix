@@ -109,7 +109,7 @@ in
                     queryType = "instant";
                     datasource = {
                       type = "loki";
-                      uid = "Loki";
+                      uid = "loki";
                     };
                     expr = ''count_over_time({host="afp-01", unit="atalkd.service"} |~ `rtmp_packet (last|first)net mismatch (\d*)!=(\d*)` [5m])'';
                   };
