@@ -76,6 +76,10 @@ in
       publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
     };
 
+    systemd.services.borgmatic.serviceConfig.ExecStartPre = [
+      "-${pkgs.borgmatic}/bin/borgmatic init --encryption repokey-blake2"
+    ];
+
     services.borgmatic = {
       enable = true;
       configurations."hetzner" = {
@@ -90,7 +94,6 @@ in
         remote_path = "borg";
         exclude_if_present = [ ".nobackup" ];
 
-        encryption_mode = "repokey-blake2";
         encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
         ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
 
