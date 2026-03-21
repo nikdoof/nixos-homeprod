@@ -25,4 +25,6 @@ _: {
       peerlist_url = "https://gist.githubusercontent.com/nikdoof/976fc87b0d7abd3e5ec6f583e0b202db/raw/de73d44a0ca505253743ff5a418f000b79a8d129/gistfile1.txt";
     };
   };
+
+  networking.firewall.allowedTCPPorts = [ 9459 ];
 }
