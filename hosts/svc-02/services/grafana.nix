@@ -111,7 +111,7 @@ in
                       type = "loki";
                       uid = "loki";
                     };
-                    expr = ''count_over_time({host="afp-01", unit="atalkd.service"} |~ `rtmp_packet (last|first)net mismatch (\d*)!=(\d*)` [5m])'';
+                    expr = ''count(rate({host="afp-01", unit="atalkd.service"} |~ `rtmp_packet (last|first)net mismatch (\d*)!=(\d*)` [5m]))'';
                   };
                 }
                 {
