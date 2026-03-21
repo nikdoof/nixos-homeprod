@@ -5,7 +5,52 @@
   ...
 }:
 let
-  firewall = import ../../lib/firewall.nix { inherit lib; };
+  alloyConfig = pkgs.writeText "alloy-config.alloy" ''
+    // Collect system metrics (node_exporter replacement)
+    prometheus.exporter.unix "default" {
+      enable_collectors = ["logind", "processes", "systemd"]
+
+      textfile {
+        directory = "/var/lib/prometheus/node-exporter"
+      }
+    }
+
+    prometheus.scrape "unix" {
+      targets    = prometheus.exporter.unix.default.targets
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "node_exporter"
+    }
+
+    prometheus.remote_write "default" {
+      endpoint {
+        url = "http://svc-02.int.doofnet.uk:9090/api/v1/write"
+      }
+    }
+
+    // Relabel systemd unit name from journal metadata
+    loki.relabel "journal" {
+      forward_to = []
+
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+      }
+    }
+
+    // Collect systemd journal logs
+    loki.source.journal "default" {
+      max_age       = "12h"
+      labels        = {job = "systemd-journal", host = "${config.networking.hostName}"}
+      forward_to    = [loki.write.default.receiver]
+      relabel_rules = loki.relabel.journal.rules
+    }
+
+    loki.write "default" {
+      endpoint {
+        url = "https://loki.svc.doofnet.uk/loki/api/v1/push"
+      }
+    }
+  '';
 in
 {
   options.doofnet.server = lib.mkEnableOption "Server Mode";
@@ -16,59 +61,11 @@ in
       borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
     };
 
-    services.prometheus.exporters.node = {
+    systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0755 alloy alloy" ];
+
+    services.alloy = {
       enable = true;
-      openFirewall = true;
-      enabledCollectors = [
-        "logind"
-        "processes"
-        "systemd"
-      ];
-      extraFlags = [
-        "--collector.textfile.directory=/var/lib/prometheus/node-exporter/"
-      ];
-    };
-
-    systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0755 root root" ];
-
-    # Allow node_exporter metrics port from Prometheus system
-    networking.firewall = firewall.allowFromPrometheus config.services.prometheus.exporters.node.port "node_exporter";
-
-    services.promtail = {
-      enable = true;
-      configuration = {
-        server = {
-          http_listen_port = 3031;
-          grpc_listen_port = 0;
-        };
-        positions = {
-          filename = "/var/cache/promtail/positions.yaml";
-        };
-        clients = [
-          {
-            url = "https://loki.svc.doofnet.uk/loki/api/v1/push";
-          }
-        ];
-        scrape_configs = [
-          {
-            job_name = "journal";
-            journal = {
-              max_age = "12h";
-              labels = {
-                job = "systemd-journal";
-                host = config.networking.hostName;
-              };
-            };
-            relabel_configs = [
-              {
-                source_labels = [ "__journal__systemd_unit" ];
-                target_label = "unit";
-              }
-            ];
-          }
-        ];
-      };
-      # extraFlags
+      configPath = alloyConfig;
     };
 
     programs.ssh.knownHosts."hetzner-storagebox" = {

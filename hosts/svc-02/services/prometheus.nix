@@ -1,36 +1,14 @@
 {
   config,
-  inputs,
-  lib,
   ...
 }:
-let
-  # For every nixosConfiguration that has doofnet.server enabled, read the
-  # hostname, domain, and node_exporter port from its evaluated config and
-  # build a "host.domain:port" scrape target string.
-  nodeExporterTargets =
-    let
-      allConfigs = lib.mapAttrsToList (name: nixos: {
-        inherit name;
-        cfg = nixos.config;
-      }) inputs.self.nixosConfigurations;
-
-      serverHosts = builtins.filter (h: h.cfg.doofnet.server) allConfigs;
-    in
-    map (
-      h:
-      "${h.cfg.networking.hostName}.${h.cfg.networking.domain}:${toString h.cfg.services.prometheus.exporters.node.port}"
-    ) serverHosts;
-
-  # Hosts running node_exporter that are not managed by this flake.
-  extraNodeTargets = [
-    "gw.int.doofnet.uk:9100"
-  ];
-in
 {
   services.prometheus = {
     enable = true;
     listenAddress = "0.0.0.0";
+
+    # Accept metrics pushed via remote_write from Alloy agents
+    extraFlags = [ "--web.enable-remote-write-receiver" ];
 
     enableReload = true;
     retentionTime = "365d";
@@ -50,10 +28,11 @@ in
 
     scrapeConfigs = [
       {
+        # Pull-based scrape for hosts not managed by this flake
         job_name = "node_exporter";
         static_configs = [
           {
-            targets = nodeExporterTargets ++ extraNodeTargets;
+            targets = [ "gw.int.doofnet.uk:9100" ];
           }
         ];
       }
