@@ -37,12 +37,12 @@ _: {
       "/sys:/sys:ro"
       "/var/lib/containers:/var/lib/containers:ro"
     ];
-    ports = [ "127.0.0.1:8080:8080" ];
+    ports = [ "127.0.0.1:9110:8080" ];
   };
 
   environment.etc."alloy/conf.d/02-cadvisor.alloy".text = ''
     prometheus.scrape "cadvisor" {
-      targets    = [{"__address__" = "localhost:8080"}]
+      targets    = [{"__address__" = "localhost:9110"}]
       forward_to = [prometheus.remote_write.default.receiver]
       job_name   = "cadvisor"
     }
