@@ -17,11 +17,6 @@ in
     environment = {
       DO_AUTH_TOKEN_FILE = config.age.secrets.digitaloceanApiToken.path;
     };
-    serviceConfig = {
-      # 0750 so the traefik group (which Alloy joins) can traverse the directory
-      # and read log files. Default is 0700 which blocks group access entirely.
-      StateDirectoryMode = "0750";
-    };
   };
 
   services.traefik = {
@@ -102,6 +97,11 @@ in
       };
     };
   };
+
+  # Set 0750 so the traefik group (which Alloy joins via SupplementaryGroups) can
+  # traverse the directory and read log files. NixOS Traefik uses ReadWritePaths
+  # rather than StateDirectory, so StateDirectoryMode has no effect here.
+  systemd.tmpfiles.rules = [ "d ${config.services.traefik.dataDir} 0750 traefik traefik -" ];
 
   environment.etc."alloy/conf.d/01-traefik.alloy".text = ''
     local.file_match "traefik" {
