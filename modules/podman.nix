@@ -20,9 +20,12 @@
     podman-tui
   ];
 
+  # Add podman as a supplementary group so Traefik can access the socket without
+  # changing its primary group — created files will keep traefik group ownership.
+  systemd.services.traefik.serviceConfig.SupplementaryGroups = [ "podman" ];
+
   # Configure Traefik to use Podman as a source
   services.traefik = {
-    group = "podman";
 
     staticConfigOptions = {
       providers = {

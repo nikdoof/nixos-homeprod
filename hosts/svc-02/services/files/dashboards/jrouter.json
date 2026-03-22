@@ -610,7 +610,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jrouter_aarp_bytes_in_total{}[5m])",
+          "expr": "sum(rate(jrouter_aarp_bytes_in_total{}[5m]))",
           "legendFormat": "In",
           "range": true,
           "refId": "A"
@@ -621,7 +621,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jrouter_aarp_bytes_out_total{}[5m]) * -1",
+          "expr": "sum(rate(jrouter_aarp_bytes_out_total{}[5m]) * -1)",
           "hide": false,
           "instant": false,
           "legendFormat": "Out",
@@ -1015,5 +1015,5 @@
   "timezone": "browser",
   "title": "JRouter / Overview",
   "uid": "befu6xmlga8zkb",
-  "version": 14
+  "version": 16
 }
