@@ -68,9 +68,11 @@ in
     # custom textfile-writing scripts can both write here.
     systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0777 root root" ];
 
+    environment.etc."alloy/conf.d/00-base.alloy".source = alloyConfig;
+
     services.alloy = {
       enable = true;
-      configPath = alloyConfig;
+      configPath = "/etc/alloy/conf.d";
     };
 
     # ReadWritePaths ensures the path is accessible through systemd's filesystem

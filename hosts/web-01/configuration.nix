@@ -65,6 +65,10 @@ let
           enableACME = true;
           forceSSL = true;
           root = "/persist/sites/${name}";
+          extraConfig = ''
+            access_log /var/log/nginx/access.log combined;
+            log_not_found off;
+          '';
         };
       })
       (
@@ -162,6 +166,25 @@ in
   };
 
   doofnet.server = true;
+
+  environment.etc."alloy/conf.d/01-nginx.alloy".text = ''
+    local.file_match "nginx" {
+      path_targets = [{"__path__" = "/var/log/nginx/*.log"}]
+      sync_period  = "5s"
+    }
+
+    loki.source.file "nginx" {
+      targets    = local.file_match.nginx.targets
+      forward_to = [loki.write.default.receiver]
+      labels     = {job = "nginx", host = "${hostName}"}
+    }
+  '';
+
+  # Alloy runs as a DynamicUser; nginx group grants read access to /var/log/nginx/
+  systemd.services.alloy.serviceConfig = {
+    SupplementaryGroups = [ "nginx" ];
+    ReadOnlyPaths = [ "/var/log/nginx" ];
+  };
 
   services.nginx = {
     enable = true;
