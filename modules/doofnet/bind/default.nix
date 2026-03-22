@@ -7,8 +7,6 @@
 }:
 let
   cfg = config.doofnet.bind;
-  firewall = import ../../../lib/firewall.nix { inherit lib; };
-
   # Import all zones from the zones directory
   zones = import ./zones { inherit (inputs) dns; };
 
@@ -134,13 +132,18 @@ in
 
   config = lib.mkIf cfg.enable {
     # Firewall
-    networking.firewall = lib.mkMerge [
-      {
-        allowedTCPPorts = [ 53 ];
-        allowedUDPPorts = [ 53 ];
+    networking.firewall = {
+      allowedTCPPorts = [ 53 ];
+      allowedUDPPorts = [ 53 ];
+    };
+
+    environment.etc."alloy/conf.d/02-bind.alloy".text = ''
+      prometheus.scrape "bind" {
+        targets    = [{"__address__" = "localhost:9119"}]
+        forward_to = [prometheus.remote_write.default.receiver]
+        job_name   = "bind"
       }
-      (firewall.allowFromPrometheus config.services.prometheus.exporters.bind.port "bind-exporter")
-    ];
+    '';
 
     # Secrets
     age.secrets.doofnetDnsUpdateKey = {

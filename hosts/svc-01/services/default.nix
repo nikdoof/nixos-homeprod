@@ -1,5 +1,6 @@
 _: {
   imports = [
+    ./alloy.nix
     ./copyparty.nix
     ./gitea.nix
     ./glance.nix

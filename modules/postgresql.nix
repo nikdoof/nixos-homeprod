@@ -1,12 +1,7 @@
 {
-  lib,
   pkgs,
   ...
 }:
-let
-  firewall = import ../lib/firewall.nix { inherit lib; };
-in
-
 {
   services.postgresql = {
     enable = true;
@@ -31,14 +26,19 @@ in
     port = 9187;
   };
 
-  networking.firewall = lib.mkMerge [
-    {
-      allowedTCPPorts = [
-        5432
-      ];
+  environment.etc."alloy/conf.d/02-postgres.alloy".text = ''
+    prometheus.scrape "postgres" {
+      targets    = [{"__address__" = "localhost:9187"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "postgres"
     }
-    (firewall.allowFromPrometheus 9187 "postgres-exporter")
-  ];
+  '';
+
+  networking.firewall = {
+    allowedTCPPorts = [
+      5432
+    ];
+  };
 
   services.borgmatic.settings.postgresql_databases = [
     {

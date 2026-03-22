@@ -26,5 +26,13 @@ _: {
     };
   };
 
+  environment.etc."alloy/conf.d/02-jrouter.alloy".text = ''
+    prometheus.scrape "jrouter" {
+      targets    = [{"__address__" = "localhost:9459"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "jrouter"
+    }
+  '';
+
   networking.firewall.allowedTCPPorts = [ 9459 ];
 }

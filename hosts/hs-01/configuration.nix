@@ -4,7 +4,6 @@
   ...
 }:
 let
-  firewall = import ../../lib/firewall.nix { inherit lib; };
   hostName = "hs-01";
   domainName = "doofnet.uk";
 
@@ -249,17 +248,22 @@ in
     };
   };
 
-  networking.firewall = lib.mkMerge [
-    {
-      allowedTCPPorts = [
-        80
-        443
-        3478
-      ];
-      allowedUDPPorts = [ 3478 ];
+  environment.etc."alloy/conf.d/02-headscale.alloy".text = ''
+    prometheus.scrape "headscale" {
+      targets    = [{"__address__" = "localhost:9090"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "headscale"
     }
-    (firewall.allowFromPrometheus 9090 "headscale")
-  ];
+  '';
+
+  networking.firewall = {
+    allowedTCPPorts = [
+      80
+      443
+      3478
+    ];
+    allowedUDPPorts = [ 3478 ];
+  };
 
   # Write out ACL config
   environment.etc."headscale/acl_policy.json".text = builtins.toJSON acl_config;

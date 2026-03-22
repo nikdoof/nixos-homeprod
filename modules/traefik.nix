@@ -1,11 +1,9 @@
 {
   config,
-  lib,
   ...
 }:
 let
   fqdn = with config.networking; "${hostName}.${domain}";
-  firewall = import ../lib/firewall.nix { inherit lib; };
 in
 {
   age.secrets = {
@@ -113,6 +111,12 @@ in
       targets    = local.file_match.traefik.targets
       forward_to = [loki.write.default.receiver]
     }
+
+    prometheus.scrape "traefik" {
+      targets    = [{"__address__" = "localhost:9871"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "traefik"
+    }
   '';
 
   # traefik group grants Alloy read access to the data dir (logs, NOT acme.json secrets —
@@ -121,13 +125,10 @@ in
   systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ config.services.traefik.dataDir ];
 
   # Open ports in the firewall.
-  networking.firewall = lib.mkMerge [
-    {
-      allowedTCPPorts = [
-        80
-        443
-      ];
-    }
-    (firewall.allowFromPrometheus 9871 "traefik")
-  ];
+  networking.firewall = {
+    allowedTCPPorts = [
+      80
+      443
+    ];
+  };
 }
