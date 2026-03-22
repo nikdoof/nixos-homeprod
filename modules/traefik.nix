@@ -100,6 +100,27 @@ in
     };
   };
 
+  environment.etc."alloy/conf.d/01-traefik.alloy".text = ''
+    local.file_match "traefik" {
+      path_targets = [
+        {"__path__" = "${config.services.traefik.dataDir}/traefik.log", "log_type" = "server"},
+        {"__path__" = "${config.services.traefik.dataDir}/access.log", "log_type" = "access"},
+      ]
+      sync_period = "5s"
+    }
+
+    loki.source.file "traefik" {
+      targets    = local.file_match.traefik.targets
+      forward_to = [loki.write.default.receiver]
+      labels     = {job = "traefik", host = "${config.networking.hostName}"}
+    }
+  '';
+
+  # traefik group grants Alloy read access to the data dir (logs, NOT acme.json secrets —
+  # those are 0600 within the dir). Lists merge with any other module adding to these.
+  systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "traefik" ];
+  systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ config.services.traefik.dataDir ];
+
   # Open ports in the firewall.
   networking.firewall = lib.mkMerge [
     {

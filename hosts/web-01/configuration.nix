@@ -180,11 +180,11 @@ in
     }
   '';
 
-  # Alloy runs as a DynamicUser; nginx group grants read access to /var/log/nginx/
-  systemd.services.alloy.serviceConfig = {
-    SupplementaryGroups = [ "nginx" ];
-    ReadOnlyPaths = [ "/var/log/nginx" ];
-  };
+  # Alloy runs as a DynamicUser; nginx group grants read access to /var/log/nginx/.
+  # Lists are used so NixOS merges these with any other module (e.g. traefik.nix) that
+  # also adds to SupplementaryGroups/ReadOnlyPaths for the alloy service.
+  systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "nginx" ];
+  systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/var/log/nginx" ];
 
   services.nginx = {
     enable = true;
