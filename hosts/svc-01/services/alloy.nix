@@ -44,5 +44,6 @@ _: {
     "/srv/data/gitea/data/log"
     "/var/run/podman"
     "/sys/fs/cgroup"
+    "/var/lib/containers"
   ];
 }
