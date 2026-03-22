@@ -17,6 +17,11 @@ in
     environment = {
       DO_AUTH_TOKEN_FILE = config.age.secrets.digitaloceanApiToken.path;
     };
+    serviceConfig = {
+      # 0750 so the traefik group (which Alloy joins) can traverse the directory
+      # and read log files. Default is 0700 which blocks group access entirely.
+      StateDirectoryMode = "0750";
+    };
   };
 
   services.traefik = {
