@@ -103,8 +103,8 @@ in
   environment.etc."alloy/conf.d/01-traefik.alloy".text = ''
     local.file_match "traefik" {
       path_targets = [
-        {"__path__" = "${config.services.traefik.dataDir}/traefik.log", "log_type" = "server"},
-        {"__path__" = "${config.services.traefik.dataDir}/access.log", "log_type" = "access"},
+        {"__path__" = "${config.services.traefik.dataDir}/traefik.log", "job" = "traefik", "host" = "${config.networking.hostName}", "log_type" = "server"},
+        {"__path__" = "${config.services.traefik.dataDir}/access.log", "job" = "traefik", "host" = "${config.networking.hostName}", "log_type" = "access"},
       ]
       sync_period = "5s"
     }
@@ -112,7 +112,6 @@ in
     loki.source.file "traefik" {
       targets    = local.file_match.traefik.targets
       forward_to = [loki.write.default.receiver]
-      labels     = {job = "traefik", host = "${config.networking.hostName}"}
     }
   '';
 

@@ -169,14 +169,13 @@ in
 
   environment.etc."alloy/conf.d/01-nginx.alloy".text = ''
     local.file_match "nginx" {
-      path_targets = [{"__path__" = "/var/log/nginx/*.log"}]
+      path_targets = [{"__path__" = "/var/log/nginx/*.log", "job" = "nginx", "host" = "${hostName}"}]
       sync_period  = "5s"
     }
 
     loki.source.file "nginx" {
       targets    = local.file_match.nginx.targets
       forward_to = [loki.write.default.receiver]
-      labels     = {job = "nginx", host = "${hostName}"}
     }
   '';
 
