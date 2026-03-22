@@ -55,73 +55,85 @@ in
 {
   options.doofnet.server = lib.mkEnableOption "Server Mode";
 
-  config = lib.mkIf config.doofnet.server {
-    age.secrets = {
-      borgmaticEncryptionKey.file = ../../secrets/borgmaticEncryptionKey.age;
-      borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
-    };
+  config = lib.mkIf config.doofnet.server (
+    lib.mkMerge [
+      {
+        age.secrets = {
+          borgmaticEncryptionKey.file = ../../secrets/borgmaticEncryptionKey.age;
+          borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
+        };
 
-    # Use dbus broker for Alloy access
-    services.dbus.implementation = "broker";
+        # Use dbus broker for Alloy access
+        services.dbus.implementation = "broker";
 
-    # World-writable so the DynamicUser alloy service (arbitrary UID) and any
-    # custom textfile-writing scripts can both write here.
-    systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0777 root root" ];
+        # World-writable so the DynamicUser alloy service (arbitrary UID) and any
+        # custom textfile-writing scripts can both write here.
+        systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0777 root root" ];
 
-    environment.etc."alloy/conf.d/00-base.alloy".source = alloyConfig;
+        environment.etc."alloy/conf.d/00-base.alloy".source = alloyConfig;
 
-    services.alloy = {
-      enable = true;
-      configPath = "/etc/alloy/conf.d";
-    };
+        services.alloy = {
+          enable = true;
+          configPath = "/etc/alloy/conf.d";
+        };
 
-    # ReadWritePaths ensures the path is accessible through systemd's filesystem
-    # isolation even though alloy runs as a DynamicUser.
-    systemd.services.alloy.serviceConfig.ReadWritePaths = [ "/var/lib/prometheus/node-exporter" ];
+        # ReadWritePaths ensures the path is accessible through systemd's filesystem
+        # isolation even though alloy runs as a DynamicUser.
+        systemd.services.alloy.serviceConfig.ReadWritePaths = [ "/var/lib/prometheus/node-exporter" ];
 
-    programs.ssh.knownHosts."hetzner-storagebox" = {
-      hostNames = [ "[u453638.your-storagebox.de]:23" ];
-      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
-    };
+        programs.ssh.knownHosts."hetzner-storagebox" = {
+          hostNames = [ "[u453638.your-storagebox.de]:23" ];
+          publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
+        };
 
-    systemd.services.borgmatic.serviceConfig.ExecStartPre = [
-      "-${pkgs.borgmatic}/bin/borgmatic init --encryption repokey-blake2"
-    ];
-
-    services.borgmatic = {
-      enable = true;
-      configurations."hetzner" = {
-        repositories = [
-          {
-            label = "hetzner-sb1";
-            path = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
-          }
+        systemd.services.borgmatic.serviceConfig.ExecStartPre = [
+          "-${pkgs.borgmatic}/bin/borgmatic init --encryption repokey-blake2"
         ];
-        remote_path = "borg";
-        exclude_if_present = [ ".nobackup" ];
 
-        encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
-        ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
+        services.borgmatic = {
+          enable = true;
+          configurations."hetzner" = {
+            repositories = [
+              {
+                label = "hetzner-sb1";
+                path = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
+              }
+            ];
+            remote_path = "borg";
+            exclude_if_present = [ ".nobackup" ];
 
-        keep_daily = 7;
-        keep_weekly = 4;
-        keep_monthly = 6;
-        keep_yearly = 1;
-      };
-    };
+            encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
+            ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
 
-    services.prometheus.exporters.borgmatic = {
-      enable = true;
-      port = 9996;
-      listenAddress = "127.0.0.1";
-    };
+            keep_daily = 7;
+            keep_weekly = 4;
+            keep_monthly = 6;
+            keep_yearly = 1;
+          };
+        };
 
-    environment.etc."alloy/conf.d/02-borgmatic.alloy".text = ''
-      prometheus.scrape "borgmatic" {
-        targets    = [{"__address__" = "localhost:9996"}]
-        forward_to = [prometheus.remote_write.default.receiver]
-        job_name   = "borgmatic"
       }
-    '';
-  };
+      (lib.mkIf
+        (
+          config.services.borgmatic.settings != null
+          && config.services.borgmatic.settings.source_directories != [ ]
+        )
+        {
+          services.prometheus.exporters.borgmatic = {
+            enable = true;
+            port = 9996;
+            listenAddress = "127.0.0.1";
+          };
+
+          environment.etc."alloy/conf.d/02-borgmatic.alloy".text = ''
+            prometheus.scrape "borgmatic" {
+              targets    = [{"__address__" = "localhost:9996"}]
+              forward_to = [prometheus.remote_write.default.receiver]
+              job_name   = "borgmatic"
+            }
+          '';
+        }
+      )
+    ]
+  );
 }
