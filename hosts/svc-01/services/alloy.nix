@@ -46,4 +46,10 @@ _: {
     "/sys/fs/cgroup"
     "/var/lib/containers"
   ];
+  # cAdvisor needs to read root-owned container storage metadata (layerdb, mount-id).
+  # ReadOnlyPaths makes the paths visible but DAC still blocks access for the
+  # DynamicUser. CAP_DAC_READ_SEARCH allows bypassing file read/search permission
+  # checks without granting write access.
+  systemd.services.alloy.serviceConfig.AmbientCapabilities = [ "CAP_DAC_READ_SEARCH" ];
+  systemd.services.alloy.serviceConfig.CapabilityBoundingSet = [ "CAP_DAC_READ_SEARCH" ];
 }
