@@ -11,6 +11,8 @@ _: {
         "ns-01.int.doofnet.uk"
         "ns-02.int.doofnet.uk"
         "svc-01.int.doofnet.uk"
+        "81.187.81.187"
+        "google.com"
       ];
     };
   };
