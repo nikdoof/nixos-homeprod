@@ -7,8 +7,12 @@
     enable = true;
     listenAddress = "0.0.0.0";
 
-    # Accept metrics pushed via remote_write from Alloy agents
-    extraFlags = [ "--web.enable-remote-write-receiver" ];
+    # Accept metrics pushed via remote_write from Alloy agents.
+    # out-of-order-time-window tolerates WAL replay after Alloy restarts.
+    extraFlags = [
+      "--web.enable-remote-write-receiver"
+      "--storage.tsdb.out-of-order-time-window=30m"
+    ];
 
     enableReload = true;
     retentionTime = "365d";
