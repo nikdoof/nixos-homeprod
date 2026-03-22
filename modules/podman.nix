@@ -20,6 +20,10 @@
     podman-tui
   ];
 
+  # Suppress INFO-level Podman API access log entries (container discovery calls
+  # from Traefik etc.) before they reach the journal.
+  systemd.services.podman.serviceConfig.LogLevelMax = "warning";
+
   # Add podman as a supplementary group so Traefik can access the socket without
   # changing its primary group — created files will keep traefik group ownership.
   systemd.services.traefik.serviceConfig.SupplementaryGroups = [ "podman" ];

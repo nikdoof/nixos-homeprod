@@ -109,5 +109,19 @@ in
         keep_yearly = 1;
       };
     };
+
+    services.prometheus.exporters.borgmatic = {
+      enable = true;
+      port = 9996;
+      listenAddress = "127.0.0.1";
+    };
+
+    environment.etc."alloy/conf.d/02-borgmatic.alloy".text = ''
+      prometheus.scrape "borgmatic" {
+        targets    = [{"__address__" = "localhost:9996"}]
+        forward_to = [prometheus.remote_write.default.receiver]
+        job_name   = "borgmatic"
+      }
+    '';
   };
 }

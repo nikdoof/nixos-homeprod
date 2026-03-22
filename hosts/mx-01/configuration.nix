@@ -315,9 +315,49 @@ in
           group = postfix
         }
       }
+      service stats {
+        unix_listener stats-reader {
+          group = dovecot-exporter
+          mode = 0440
+        }
+        unix_listener stats-writer {
+          group = dovecot-exporter
+          mode = 0660
+        }
+      }
     '';
 
   };
+
+  services.prometheus.exporters.postfix = {
+    enable = true;
+    port = 9154;
+    listenAddress = "127.0.0.1";
+    systemd.enable = true;
+  };
+
+  services.prometheus.exporters.dovecot = {
+    enable = true;
+    port = 9166;
+    listenAddress = "127.0.0.1";
+    socketPath = "/run/dovecot2/stats-reader";
+  };
+
+  environment.etc."alloy/conf.d/02-postfix.alloy".text = ''
+    prometheus.scrape "postfix" {
+      targets    = [{"__address__" = "localhost:9154"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "postfix"
+    }
+  '';
+
+  environment.etc."alloy/conf.d/02-dovecot.alloy".text = ''
+    prometheus.scrape "dovecot" {
+      targets    = [{"__address__" = "localhost:9166"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "dovecot"
+    }
+  '';
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?

@@ -187,9 +187,25 @@ in
 
   services.nginx = {
     enable = true;
+    statusPage = true;
 
     virtualHosts = nginx_sites // nginx_sites_redirects;
   };
+
+  services.prometheus.exporters.nginx = {
+    enable = true;
+    port = 9113;
+    listenAddress = "127.0.0.1";
+    scrapeUri = "http://127.0.0.1/nginx_status";
+  };
+
+  environment.etc."alloy/conf.d/02-nginx.alloy".text = ''
+    prometheus.scrape "nginx" {
+      targets    = [{"__address__" = "localhost:9113"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "nginx"
+    }
+  '';
 
   # Create the deployment folders
   systemd.tmpfiles.rules = nginx_site_folders;
