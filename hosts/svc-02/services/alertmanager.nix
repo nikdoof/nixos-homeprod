@@ -1,5 +1,13 @@
 { config, ... }:
 {
+  environment.etc."alloy/conf.d/02-alertmanager.alloy".text = ''
+    prometheus.scrape "alertmanager" {
+      targets    = [{"__address__" = "localhost:${toString config.services.prometheus.alertmanager.port}"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "alertmanager"
+    }
+  '';
+
   services.prometheus.alertmanager = {
     enable = true;
 

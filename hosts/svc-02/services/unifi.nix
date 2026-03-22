@@ -27,6 +27,22 @@
 
   services.borgmatic.settings.source_directories = [ "/srv/data/unifi/data/data/backup/" ];
 
+  # UniFi logs land in /srv/data/unifi/data/logs/ (volume maps /unifi → /srv/data/unifi/data).
+  # The activation script already sets o+rX on /srv/data/unifi so Alloy can traverse it.
+  environment.etc."alloy/conf.d/02-unifi-logs.alloy".text = ''
+    local.file_match "unifi" {
+      path_targets = [{"__path__" = "/srv/data/unifi/data/logs/*.log", "job" = "unifi", "host" = "svc-02"}]
+      sync_period  = "5s"
+    }
+
+    loki.source.file "unifi" {
+      targets    = local.file_match.unifi.targets
+      forward_to = [loki.write.default.receiver]
+    }
+  '';
+
+  systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/srv/data/unifi/data/logs" ];
+
   networking.firewall = {
     allowedTCPPorts = [
       5671 # UXG Adpot

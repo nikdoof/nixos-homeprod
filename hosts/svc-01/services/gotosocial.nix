@@ -59,8 +59,17 @@
         TZ = "Europe/London";
       };
       environmentFiles = [ config.age.secrets.goToSocialEnvironment.path ];
+      ports = [ "127.0.0.1:9464:9464" ];
     };
   };
+
+  environment.etc."alloy/conf.d/02-gotosocial.alloy".text = ''
+    prometheus.scrape "gotosocial" {
+      targets    = [{"__address__" = "localhost:9464"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "gotosocial"
+    }
+  '';
 
   services.postgresql = {
     ensureDatabases = [

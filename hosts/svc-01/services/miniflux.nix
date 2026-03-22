@@ -18,7 +18,7 @@
     environment = {
       BASE_URL = "https://rss.doofnet.uk/";
       DISABLE_LOCAL_AUTH = "1";
-      METRICS_ALLOWED_NETWORKS = "10.0.0.0/8";
+      METRICS_ALLOWED_NETWORKS = "10.0.0.0/8,127.0.0.1/32";
       METRICS_COLLECTOR = "1";
       OAUTH2_OIDC_DISCOVERY_ENDPOINT = "https://id.doofnet.uk";
       OAUTH2_PROVIDER = "oidc";
@@ -28,6 +28,16 @@
       TZ = "UTC";
     };
     environmentFiles = [ config.age.secrets.minifluxEnvironment.path ];
+    ports = [ "127.0.0.1:8091:8080" ];
   };
+
+  environment.etc."alloy/conf.d/02-miniflux.alloy".text = ''
+    prometheus.scrape "miniflux" {
+      targets    = [{"__address__" = "localhost:8091"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "miniflux"
+      metrics_path = "/metrics"
+    }
+  '';
 
 }

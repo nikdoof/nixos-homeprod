@@ -35,7 +35,18 @@
       PORT = "8081";
       TRUST_PROXY = "true";
     };
+    # Map host:9465 → container:9464 (OTEL prometheus default) to avoid
+    # conflicting with GoToSocial which also uses 9464.
+    ports = [ "127.0.0.1:9465:9464" ];
   };
+
+  environment.etc."alloy/conf.d/02-pocket-id.alloy".text = ''
+    prometheus.scrape "pocket_id" {
+      targets    = [{"__address__" = "localhost:9465"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "pocket_id"
+    }
+  '';
 
   services.borgmatic.settings.source_directories = [ "/srv/data/pocket-id/data" ];
 }
