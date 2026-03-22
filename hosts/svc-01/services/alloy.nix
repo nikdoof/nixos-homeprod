@@ -23,33 +23,32 @@ _: {
     }
   '';
 
-  # cAdvisor exporter for Podman containers
+  # cAdvisor — runs as a privileged container so it can access container storage
+  # internals that require root. Alloy scrapes its HTTP endpoint on localhost:8080.
+  virtualisation.oci-containers.containers.cadvisor = {
+    image = "gcr.io/cadvisor/cadvisor:latest";
+    extraOptions = [
+      "--privileged"
+      "--device=/dev/kmsg"
+    ];
+    volumes = [
+      "/:/rootfs:ro"
+      "/var/run:/var/run:ro"
+      "/sys:/sys:ro"
+      "/var/lib/containers:/var/lib/containers:ro"
+    ];
+    ports = [ "127.0.0.1:8080:8080" ];
+  };
+
   environment.etc."alloy/conf.d/02-cadvisor.alloy".text = ''
-    prometheus.exporter.cadvisor "default" {
-      docker_only = true
-    }
     prometheus.scrape "cadvisor" {
-      targets    = prometheus.exporter.cadvisor.default.targets
+      targets    = [{"__address__" = "localhost:8080"}]
       forward_to = [prometheus.remote_write.default.receiver]
       job_name   = "cadvisor"
     }
   '';
 
-  # Allow Alloy to read gitea logs and podman files
-  systemd.services.alloy.serviceConfig.SupplementaryGroups = [
-    "gitea"
-    "podman"
-  ];
-  systemd.services.alloy.serviceConfig.ReadOnlyPaths = [
-    "/srv/data/gitea/data/log"
-    "/var/run/podman"
-    "/sys/fs/cgroup"
-    "/var/lib/containers"
-  ];
-  # cAdvisor needs to read root-owned container storage metadata (layerdb, mount-id).
-  # ReadOnlyPaths makes the paths visible but DAC still blocks access for the
-  # DynamicUser. CAP_DAC_READ_SEARCH allows bypassing file read/search permission
-  # checks without granting write access.
-  systemd.services.alloy.serviceConfig.AmbientCapabilities = [ "CAP_DAC_READ_SEARCH" ];
-  systemd.services.alloy.serviceConfig.CapabilityBoundingSet = [ "CAP_DAC_READ_SEARCH" ];
+  # Allow Alloy to read gitea logs
+  systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "gitea" ];
+  systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/srv/data/gitea/data/log" ];
 }
