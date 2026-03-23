@@ -37,7 +37,7 @@ _: {
     }
 
     prometheus.scrape "blackbox" {
-      targets    = prometheus.exporter.blackbox.default.targets
+      targets    = prometheus.exporter.blackbox.blackbox.targets
       forward_to = [prometheus.remote_write.default.receiver]
       job_name   = "blackbox"
     }
