@@ -326,8 +326,6 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 20,
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -337,7 +335,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -372,7 +370,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg(avg_over_time(speedtest_ping_latency_milliseconds[60m]))",
+          "expr": "ping_rtt_mean_seconds{target=\"81.187.81.187\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "Ping",
@@ -386,7 +384,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "avg(avg_over_time(speedtest_jitter_latency_milliseconds[60m]))",
+          "expr": "ping_rtt_std_deviation_seconds{target=\"81.187.81.187\"}",
           "hide": false,
           "interval": "",
           "legendFormat": "Jitter",
@@ -541,6 +539,71 @@
       },
       "fieldConfig": {
         "defaults": {
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 14
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "d"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 13
+      },
+      "id": 59,
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.4",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "avg((time() - (prometheus_tsdb_lowest_timestamp / 1000)) / 84600)",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Prometheus Retention",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
           "color": {
             "mode": "thresholds"
           },
@@ -608,71 +671,6 @@
       ],
       "title": "CPU Usage",
       "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "fieldMinMax": false,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": 0
-              },
-              {
-                "color": "#EAB839",
-                "value": 14
-              },
-              {
-                "color": "green",
-                "value": 30
-              }
-            ]
-          },
-          "unit": "d"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 0,
-        "y": 13
-      },
-      "id": 59,
-      "options": {
-        "colorMode": "background_solid",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": true,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.4",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "avg((time() - (prometheus_tsdb_lowest_timestamp / 1000)) / 84600)",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Prometheus Retention",
-      "type": "stat"
     }
   ],
   "preload": false,
@@ -693,6 +691,6 @@
   "timezone": "utc",
   "title": "Infra / Overview",
   "uid": "uLwTLp27k",
-  "version": 11,
+  "version": 19,
   "weekStart": "monday"
 }
