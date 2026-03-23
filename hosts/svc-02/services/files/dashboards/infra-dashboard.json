@@ -671,6 +671,68 @@
       ],
       "title": "CPU Usage",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 12,
+        "y": 13
+      },
+      "id": 62,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.4",
+      "targets": [
+        {
+          "editorMode": "builder",
+          "expr": "smartctl_device_smart_status",
+          "legendFormat": "{{host}} - {{device}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Disk Status",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -691,6 +753,6 @@
   "timezone": "utc",
   "title": "Infra / Overview",
   "uid": "uLwTLp27k",
-  "version": 23,
+  "version": 25,
   "weekStart": "monday"
 }
