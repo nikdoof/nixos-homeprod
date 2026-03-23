@@ -24,9 +24,11 @@ let
     prometheus.remote_write "default" {
       endpoint {
         url = "http://svc-02.int.doofnet.uk:9090/api/v1/write"
-      }
-      external_labels = {
-        instance = "${config.networking.hostName}"
+
+        write_relabel_config {
+          target_label = "host"
+          replacement  = "${config.networking.hostName}"
+        }
       }
     }
 

@@ -1,8 +1,9 @@
-_: {
+{ config, ... }:
+{
   # Gitea log tailing
   environment.etc."alloy/conf.d/02-gitea.alloy".text = ''
     local.file_match "gitea" {
-      path_targets = [{"__path__" = "/srv/data/gitea/data/log/*.log", "job" = "gitea", "host" = "svc-01"}]
+      path_targets = [{"__path__" = "/srv/data/gitea/data/log/*.log", "job" = "gitea", "host" = "${config.networking.hostName}"}]
       sync_period  = "5s"
     }
     loki.source.file "gitea" {

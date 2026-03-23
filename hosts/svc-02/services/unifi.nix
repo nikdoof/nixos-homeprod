@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 {
   # Unifi Controller
   virtualisation.oci-containers.containers.unifi = {
@@ -31,7 +31,7 @@
   # The activation script already sets o+rX on /srv/data/unifi so Alloy can traverse it.
   environment.etc."alloy/conf.d/02-unifi-logs.alloy".text = ''
     local.file_match "unifi" {
-      path_targets = [{"__path__" = "/srv/data/unifi/data/logs/*.log", "job" = "unifi", "host" = "svc-02"}]
+      path_targets = [{"__path__" = "/srv/data/unifi/data/logs/*.log", "job" = "unifi", "host" = "${config.networking.hostName}"}]
       sync_period  = "5s"
     }
 
