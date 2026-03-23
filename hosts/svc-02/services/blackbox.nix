@@ -2,7 +2,7 @@ _: {
   # Alloy config
   environment.etc."alloy/conf.d/02-blackbox.alloy".text = ''
     prometheus.exporter.blackbox "blackbox" {
-      config = "{ modules: { https_2xx: { prober: http, timeout: 10s, http: { valid_status_codes = [], fail_if_not_ssl = true, preferred_ip_protocol = ipv4 } } } }"
+      config = "{ modules: { https_2xx: { prober: http, timeout: 10s, http: { valid_status_codes: [], fail_if_not_ssl: true, preferred_ip_protocol: ipv4 } } } }"
 
       target {
         name    = "social.doofnet.uk"
