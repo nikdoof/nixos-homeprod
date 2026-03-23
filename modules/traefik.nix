@@ -102,9 +102,9 @@ in
   # that Alloy can traverse the directory and read log files via its traefik
   # SupplementaryGroup. Using systemd.tmpfiles.settings rather than
   # systemd.tmpfiles.rules because settings generates a separate tmpfiles.d
-  # file that is processed after nixos.conf alphabetically, cleanly winning
+  # file that is processed before nixos.conf alphabetically, cleanly winning
   # over the upstream entry without clobbering other modules' rules.
-  systemd.tmpfiles.settings."traefik-perms"."${config.services.traefik.dataDir}".d = {
+  systemd.tmpfiles.settings."00-a-traefik-perms"."${config.services.traefik.dataDir}".d = {
     mode = "0750";
     user = "traefik";
     group = "traefik";
