@@ -523,7 +523,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "hcloud_storagebox_data_size / hcloud_storagebox_quota",
+          "expr": "max(hcloud_storagebox_data_size / hcloud_storagebox_quota)",
           "legendFormat": "{{ name }}",
           "range": true,
           "refId": "A"
@@ -691,6 +691,6 @@
   "timezone": "utc",
   "title": "Infra / Overview",
   "uid": "uLwTLp27k",
-  "version": 21,
+  "version": 23,
   "weekStart": "monday"
 }
