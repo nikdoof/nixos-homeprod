@@ -21,6 +21,7 @@
     );
   };
 
+  # Alloy config
   environment.etc."alloy/conf.d/02-blackbox.alloy".text = ''
     prometheus.scrape "blackbox_https" {
       targets = [

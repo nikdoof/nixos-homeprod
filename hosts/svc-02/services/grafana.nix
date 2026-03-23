@@ -199,4 +199,13 @@ in
       };
     };
   };
+
+  # Alloy config
+  environment.etc."alloy/conf.d/02-grafana.alloy".text = ''
+    prometheus.scrape "unifi" {
+      targets    = [{"__address__" = "127.0.0.1:${toString config.services.grafana.settings.server.http_port}"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "grafana"
+    }
+  '';
 }

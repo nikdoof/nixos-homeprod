@@ -1,13 +1,5 @@
 { config, ... }:
 {
-  environment.etc."alloy/conf.d/02-unpoller.alloy".text = ''
-    prometheus.scrape "unifi" {
-      targets    = [{"__address__" = "127.0.0.1:9130"}]
-      forward_to = [prometheus.remote_write.default.receiver]
-      job_name   = "unifi"
-    }
-  '';
-
   age.secrets = {
     unpollerPassword = {
       file = ../../../secrets/unpollerPassword.age;
@@ -28,4 +20,13 @@
       }
     ];
   };
+
+  # Alloy config
+  environment.etc."alloy/conf.d/02-unpoller.alloy".text = ''
+    prometheus.scrape "unifi" {
+      targets    = [{"__address__" = "127.0.0.1:9130"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "unifi"
+    }
+  '';
 }

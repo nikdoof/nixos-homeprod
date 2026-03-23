@@ -1,12 +1,4 @@
 _: {
-  environment.etc."alloy/conf.d/02-graphite.alloy".text = ''
-    prometheus.scrape "graphite" {
-      targets    = [{"__address__" = "127.0.0.1:9108"}]
-      forward_to = [prometheus.remote_write.default.receiver]
-      job_name   = "graphite"
-    }
-  '';
-
   services.prometheus.exporters = {
     graphite = {
       enable = true;
@@ -23,4 +15,14 @@ _: {
       9109
     ];
   };
+
+  # Alloy config
+  environment.etc."alloy/conf.d/02-graphite.alloy".text = ''
+    prometheus.scrape "graphite" {
+      targets    = [{"__address__" = "127.0.0.1:9108"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "graphite"
+    }
+  '';
+
 }

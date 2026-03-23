@@ -17,6 +17,7 @@ _: {
     };
   };
 
+  # Alloy config
   environment.etc."alloy/conf.d/02-ping.alloy".text = ''
     prometheus.scrape "ping" {
       targets    = [{"__address__" = "localhost:9427"}]

@@ -1,6 +1,5 @@
 _: {
   imports = [
-    ./alertmanager.nix
     ./blackbox.nix
     ./grafana.nix
     ./graphite_exporter.nix
