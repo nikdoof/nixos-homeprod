@@ -27,6 +27,13 @@ let
       }
     }
 
+    // Scrape Alloy's own internal metrics
+    prometheus.scrape "alloy" {
+      targets    = [{"__address__" = "localhost:12345"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "alloy"
+    }
+
     // Relabel systemd unit name from journal metadata
     loki.relabel "journal" {
       forward_to = []
