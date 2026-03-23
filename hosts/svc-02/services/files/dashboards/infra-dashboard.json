@@ -370,7 +370,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "ping_rtt_mean_seconds{target=\"81.187.81.187\"}",
+          "expr": "max(ping_rtt_mean_seconds{target=\"81.187.81.187\"})",
           "instant": false,
           "interval": "",
           "legendFormat": "Ping",
@@ -384,7 +384,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "ping_rtt_std_deviation_seconds{target=\"81.187.81.187\"}",
+          "expr": "max(ping_rtt_std_deviation_seconds{target=\"81.187.81.187\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Jitter",
@@ -691,6 +691,6 @@
   "timezone": "utc",
   "title": "Infra / Overview",
   "uid": "uLwTLp27k",
-  "version": 19,
+  "version": 21,
   "weekStart": "monday"
 }

@@ -70,11 +70,6 @@ in
   config = lib.mkIf config.doofnet.server (
     lib.mkMerge [
       {
-        age.secrets = {
-          borgmaticEncryptionKey.file = ../../secrets/borgmaticEncryptionKey.age;
-          borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
-        };
-
         # Use dbus broker for Alloy access
         services.dbus.implementation = "broker";
 
@@ -92,45 +87,52 @@ in
         # ReadWritePaths ensures the path is accessible through systemd's filesystem
         # isolation even though alloy runs as a DynamicUser.
         systemd.services.alloy.serviceConfig.ReadWritePaths = [ "/var/lib/prometheus/node-exporter" ];
-
-        programs.ssh.knownHosts."hetzner-storagebox" = {
-          hostNames = [ "[u453638.your-storagebox.de]:23" ];
-          publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
-        };
-
-        systemd.services.borgmatic.serviceConfig.ExecStartPre = [
-          "-${pkgs.borgmatic}/bin/borgmatic init --encryption repokey-blake2"
-        ];
-
-        services.borgmatic = {
-          enable = true;
-          configurations."hetzner" = {
-            repositories = [
-              {
-                label = "hetzner-sb1";
-                path = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
-              }
-            ];
-            remote_path = "borg";
-            exclude_if_present = [ ".nobackup" ];
-
-            encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
-            ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
-
-            keep_daily = 7;
-            keep_weekly = 4;
-            keep_monthly = 6;
-            keep_yearly = 1;
-          };
-        };
-
       }
+      # Borgmatic is only enabled on hosts that have source_directories configured.
+      # Keeping secrets and service conditional avoids agenix decryption failures
+      # on hosts (e.g. microvms) whose SSH keys are not in the secret recipients list.
       (lib.mkIf
         (
           config.services.borgmatic.settings != null
           && config.services.borgmatic.settings.source_directories != [ ]
         )
         {
+          age.secrets = {
+            borgmaticEncryptionKey.file = ../../secrets/borgmaticEncryptionKey.age;
+            borgmaticSSHKey.file = ../../secrets/borgmaticSSHKey.age;
+          };
+
+          programs.ssh.knownHosts."hetzner-storagebox" = {
+            hostNames = [ "[u453638.your-storagebox.de]:23" ];
+            publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
+          };
+
+          systemd.services.borgmatic.serviceConfig.ExecStartPre = [
+            "-${pkgs.borgmatic}/bin/borgmatic init --encryption repokey-blake2"
+          ];
+
+          services.borgmatic = {
+            enable = true;
+            configurations."hetzner" = {
+              repositories = [
+                {
+                  label = "hetzner-sb1";
+                  path = "ssh://u453638-sub3@u453638.your-storagebox.de:23/./${config.networking.hostName}.borg";
+                }
+              ];
+              remote_path = "borg";
+              exclude_if_present = [ ".nobackup" ];
+
+              encryption_passcommand = "${pkgs.coreutils}/bin/cat ${config.age.secrets.borgmaticEncryptionKey.path}";
+              ssh_command = "ssh -i ${config.age.secrets.borgmaticSSHKey.path}";
+
+              keep_daily = 7;
+              keep_weekly = 4;
+              keep_monthly = 6;
+              keep_yearly = 1;
+            };
+          };
+
           services.prometheus.exporters.borgmatic = {
             enable = true;
             port = 9996;
