@@ -125,20 +125,6 @@
 
   doofnet.server = true;
 
-  services.prometheus.exporters.smartctl = {
-    enable = true;
-    port = 9633;
-    listenAddress = "127.0.0.1";
-  };
-
-  environment.etc."alloy/conf.d/02-smartctl.alloy".text = ''
-    prometheus.scrape "smartctl" {
-      targets    = [{"__address__" = "localhost:9633"}]
-      forward_to = [prometheus.remote_write.default.receiver]
-      job_name   = "smartctl"
-    }
-  '';
-
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
 }

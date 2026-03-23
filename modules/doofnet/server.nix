@@ -134,6 +134,22 @@ in
           '';
         }
       )
+      # Configure smart monitoring if not a VM
+      (lib.mkIf (!(config.doofnet ? microvm) || !config.doofnet.microvm.enable) {
+        services.prometheus.exporters.smartctl = {
+          enable = true;
+          port = 9633;
+          listenAddress = "127.0.0.1";
+        };
+
+        environment.etc."alloy/conf.d/02-smartctl.alloy".text = ''
+          prometheus.scrape "smartctl" {
+            targets    = [{"__address__" = "localhost:9633"}]
+            forward_to = [prometheus.remote_write.default.receiver]
+            job_name   = "smartctl"
+          }
+        '';
+      })
     ]
   );
 }
