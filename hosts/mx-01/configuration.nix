@@ -316,13 +316,8 @@ in
         }
       }
       service stats {
-        unix_listener stats-reader {
-          group = dovecot-exporter
-          mode = 0440
-        }
-        unix_listener stats-writer {
-          group = dovecot-exporter
-          mode = 0660
+        inet_listener http {
+          port = 9166
         }
       }
     '';
@@ -334,13 +329,6 @@ in
     port = 9154;
     listenAddress = "127.0.0.1";
     systemd.enable = true;
-  };
-
-  services.prometheus.exporters.dovecot = {
-    enable = true;
-    port = 9166;
-    listenAddress = "127.0.0.1";
-    socketPath = "/run/dovecot2/stats-reader";
   };
 
   environment.etc."alloy/conf.d/02-postfix.alloy".text = ''
