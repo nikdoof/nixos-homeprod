@@ -25,6 +25,9 @@ let
       endpoint {
         url = "http://svc-02.int.doofnet.uk:9090/api/v1/write"
       }
+      external_labels = {
+        instance = "${config.networking.hostName}"
+      }
     }
 
     // Scrape Alloy's own internal metrics
