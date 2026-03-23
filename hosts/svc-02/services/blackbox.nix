@@ -35,5 +35,11 @@ _: {
         module  = "https_2xx"
       }
     }
+
+    prometheus.scrape "blackbox" {
+      targets    = prometheus.exporter.blackbox.default.targets
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "blackbox"
+    }
   '';
 }
