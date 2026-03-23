@@ -23,10 +23,10 @@
 
   # Alloy config
   environment.etc."alloy/conf.d/02-unpoller.alloy".text = ''
-    prometheus.scrape "unifi" {
+    prometheus.scrape "unpoller" {
       targets    = [{"__address__" = "127.0.0.1:9130"}]
       forward_to = [prometheus.remote_write.default.receiver]
-      job_name   = "unifi"
+      job_name   = "unpoller"
     }
   '';
 }

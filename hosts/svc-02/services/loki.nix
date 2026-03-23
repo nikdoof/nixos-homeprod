@@ -66,7 +66,7 @@
 
   # Alloy config
   environment.etc."alloy/conf.d/02-loki.alloy".text = ''
-    prometheus.scrape "unifi" {
+    prometheus.scrape "loki" {
       targets    = [{"__address__" = "127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}"}]
       forward_to = [prometheus.remote_write.default.receiver]
       job_name   = "loki"
