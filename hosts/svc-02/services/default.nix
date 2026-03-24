@@ -1,5 +1,6 @@
 _: {
   imports = [
+    ./aaisp.nix
     ./blackbox.nix
     ./grafana.nix
     ./graphite_exporter.nix
