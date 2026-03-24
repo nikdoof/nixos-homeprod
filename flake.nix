@@ -22,6 +22,10 @@
       url = "github:nikdoof/globaltalk-scraper";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    aaisp-chaos = {
+      url = "github:nikdoof/aaisp-chaos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -79,7 +83,7 @@
         hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
         ns-01 = mkSystem "ns-01" { system = "aarch64-linux"; };
         svc-01 = mkSystem "svc-01" { };
-        svc-02 = mkSystem "svc-02" { };
+        svc-02 = mkSystem "svc-02" { extraModules = [ inputs.aaisp-chaos.nixosModules.default ]; };
 
         # VMs
         afp-01 = mkSystem "afp-01" {
