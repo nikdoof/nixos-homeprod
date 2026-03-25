@@ -11,6 +11,7 @@ let
     "${hostName}.${domainName}"
     "2315media.com"
     "bluecalx.co.uk"
+    "dimension.sh"
     "doofnet.uk"
     "hereforthis.uk"
     "incognitus.net"
