@@ -251,7 +251,7 @@ in
       master = {
         "policyd-spf" = {
           type = "unix";
-          privileged = false;
+          privileged = true;
           chroot = false;
           maxproc = 0;
           command = "spawn";
