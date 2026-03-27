@@ -297,7 +297,7 @@ in
         # the full e-mail address inside passwd-file is the username (%u)
         # user@example.com
         # %d for domain_name %n for user_name
-        args = uid=vmail gid=vmail username_format=%u home=/persist/vmail/%d/%n
+        args = uid=vmail gid=vmail username_format=%u home=${config.users.users.vmail.home}/%d/%n
       }
 
       # connection to postfix via lmtp
@@ -345,7 +345,7 @@ in
   };
 
   systemd.services.dovecot.serviceConfig.ExecStartPre =
-    "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.user}:${config.services.dovecot2.group} /persist/vmail";
+    "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.user}:${config.services.dovecot2.group} ${config.users.users.vmail.home}";
 
   services.prometheus.exporters.postfix = {
     enable = true;
