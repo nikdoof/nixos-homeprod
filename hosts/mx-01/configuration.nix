@@ -60,6 +60,17 @@ in
       file = ../../secrets/digitalOceanApiToken.age;
       owner = "acme";
     };
+    dovecot = {
+      file = ../../secrets/mx01DovecotPasswd.age;
+      # -rw-------
+      mode = "600";
+      owner = config.services.dovecot2.user;
+      inherit (config.services.dovecot2) group;
+    };
+    dmarcReportsPassword = {
+      file = ../../secrets/mx01DmarcReportsPassword.age;
+      owner = config.services.prometheus.exporters.dmarc.user;
+    };
   };
 
   security.acme = {
@@ -299,14 +310,6 @@ in
     home = "/var/spool/postfix";
   };
 
-  age.secrets.dovecot = {
-    file = ../../secrets/mx01DovecotPasswd.age;
-    # -rw-------
-    mode = "600";
-    owner = config.services.dovecot2.user;
-    inherit (config.services.dovecot2) group;
-  };
-
   services.dovecot2 = {
     enable = true;
 
@@ -440,13 +443,6 @@ in
     port = 9154;
     listenAddress = "127.0.0.1";
     systemd.enable = true;
-  };
-
-  age.secrets = {
-    dmarcReportsPassword = {
-      file = ../../secrets/mx01DmarcReportsPassword.age;
-      owner = config.services.prometheus.exporters.dmarc.user;
-    };
   };
 
   services.prometheus.exporters.dmarc = {
