@@ -344,6 +344,9 @@ in
 
   };
 
+  systemd.services.dovecot.serviceConfig.ExecStartPre =
+    "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.user}:${config.services.dovecot2.group} /persist/vmail";
+
   services.prometheus.exporters.postfix = {
     enable = true;
     port = 9154;
