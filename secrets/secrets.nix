@@ -46,6 +46,7 @@ in
   "aaispLogin.age".publicKeys = users ++ [ svc-02 ];
 
   "mx01DovecotPasswd.age".publicKeys = users ++ [ mx-01 ];
+  "mx01DmarcReportsPassword.age".publicKeys = users ++ [ mx-01 ];
 
   "doofnetDnsUpdateKey.age".publicKeys = users ++ systems;
 

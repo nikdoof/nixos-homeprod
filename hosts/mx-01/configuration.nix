@@ -259,8 +259,8 @@ in
     file = ../../secrets/mx01DovecotPasswd.age;
     # -rw-------
     mode = "600";
-    owner = "dovecot2";
-    group = "dovecot2";
+    owner = config.services.dovecot2.user;
+    inherit (config.services.dovecot2) group;
   };
 
   services.dovecot2 = {
@@ -398,9 +398,25 @@ in
     systemd.enable = true;
   };
 
+  age.secrets = {
+    dmarcReportsPassword = {
+      file = ../../secrets/mx01DmarcReportsPassword.age;
+      owner = config.services.prometheus.exporters.dmarc.user;
+    };
+  };
+
+  services.prometheus.exporters.dmarc = {
+    enable = true;
+    imap = {
+      host = "localhost";
+      username = "dmarc-reports@doofnet.uk";
+      passwordFile = config.age.secrets.dmarcReportsPassword.path;
+    };
+  };
+
   environment.etc."alloy/conf.d/02-postfix.alloy".text = ''
     prometheus.scrape "postfix" {
-      targets    = [{"__address__" = "localhost:9154"}]
+      targets    = [{"__address__" = "localhost:${toString config.services.prometheus.exporters.postfix.port}"}]
       forward_to = [prometheus.remote_write.default.receiver]
       job_name   = "postfix"
     }
@@ -411,6 +427,14 @@ in
       targets    = [{"__address__" = "localhost:9166"}]
       forward_to = [prometheus.remote_write.default.receiver]
       job_name   = "dovecot"
+    }
+  '';
+
+  environment.etc."alloy/conf.d/02-dmarc.alloy".text = ''
+    prometheus.scrape "dmarc" {
+      targets    = [{"__address__" = "localhost:${toString config.services.prometheus.exporters.dmarc.port}"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "dmarc"
     }
   '';
 
