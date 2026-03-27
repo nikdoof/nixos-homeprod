@@ -225,18 +225,18 @@ in
           "permit"
         ];
       };
-    };
 
-    masterConfig."policyd-spf" = {
-      type = "unix";
-      privileged = false;
-      chroot = false;
-      maxproc = 0;
-      command = "spawn";
-      args = [
-        "user=nobody"
-        "argv=${pkgs.spf-engine}/bin/policyd-spf"
-      ];
+      master."policyd-spf" = {
+        type = "unix";
+        privileged = false;
+        chroot = false;
+        maxproc = 0;
+        command = "spawn";
+        args = [
+          "user=nobody"
+          "argv=${pkgs.spf-engine}/bin/policyd-spf"
+        ];
+      };
     };
 
     extraAliases = lib.strings.concatMapStrings (x: x + "\n") [
