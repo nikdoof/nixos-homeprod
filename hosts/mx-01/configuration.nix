@@ -433,7 +433,7 @@ in
   };
 
   systemd.services.dovecot.serviceConfig.ExecStartPre =
-    "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.user}:${config.services.dovecot2.group} ${config.users.users.vmail.home}";
+    "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.mailUser}:${config.services.dovecot2.mailGroup} ${config.users.users.vmail.home}";
 
   services.prometheus.exporters.postfix = {
     enable = true;
@@ -451,6 +451,8 @@ in
 
   services.prometheus.exporters.dmarc = {
     enable = true;
+    user = "dmarc-exporter";
+    group = "dmarc-exporter";
     imap = {
       host = "${config.networking.hostName}.${config.networking.domain}";
       username = "dmarc-reports@doofnet.uk";
