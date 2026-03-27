@@ -408,7 +408,7 @@ in
   services.prometheus.exporters.dmarc = {
     enable = true;
     imap = {
-      host = "localhost";
+      host = "${config.networking.hostName}.${config.networking.domain}";
       username = "dmarc-reports@doofnet.uk";
       passwordFile = config.age.secrets.dmarcReportsPassword.path;
     };
