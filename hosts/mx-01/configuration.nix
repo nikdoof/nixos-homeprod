@@ -83,7 +83,8 @@ in
         '';
         reloadServices = [
           "postfix"
-          "dovecot"
+          "dovecot2"
+          "opendmarc"
         ];
       };
     };
@@ -92,6 +93,27 @@ in
   services.postfix = {
     enable = true;
     enableSmtp = true;
+    enableSubmission = true;
+    enableSubmissions = true;
+
+    submissionOptions = {
+      smtpd_tls_security_level = "encrypt";
+      smtpd_sasl_auth_enable = "yes";
+      smtpd_sasl_type = "dovecot";
+      smtpd_sasl_path = "/var/spool/postfix/auth";
+      smtpd_client_restrictions = "permit_sasl_authenticated,reject";
+      milter_macro_daemon_name = "ORIGINATING";
+    };
+
+    submissionsOptions = {
+      smtpd_tls_wrappermode = "yes";
+      smtpd_tls_security_level = "encrypt";
+      smtpd_sasl_auth_enable = "yes";
+      smtpd_sasl_type = "dovecot";
+      smtpd_sasl_path = "/var/spool/postfix/auth";
+      smtpd_client_restrictions = "permit_sasl_authenticated,reject";
+      milter_macro_daemon_name = "ORIGINATING";
+    };
 
     settings = {
       main = {
@@ -112,11 +134,12 @@ in
           "${config.networking.hostName}.${config.networking.domain}"
         ];
 
-        # OpenDKIM
+        # Milters: OpenDKIM (signing) + OpenDMARC (policy enforcement)
         milter_default_action = "accept";
         milter_protocol = "6";
         smtpd_milters = [
           "unix:${lib.removePrefix "local:" config.services.opendkim.socket}"
+          "unix:${lib.removePrefix "local:" config.doofnet.opendmarc.socket}"
         ];
         non_smtpd_milters = "$smtpd_milters";
 
@@ -137,6 +160,15 @@ in
 
         smtp_tls_note_starttls_offer = "yes";
         smtp_tls_security_level = "may";
+        smtp_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
+        smtp_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
+        smtp_tls_loglevel = "1";
+
+        smtpd_relay_restrictions = lib.strings.concatMapStrings (x: x + ",") [
+          "permit_mynetworks"
+          "permit_sasl_authenticated"
+          "reject_unauth_destination"
+        ];
 
         smtpd_helo_required = "yes";
         smtpd_helo_restrictions = lib.strings.concatMapStrings (x: x + ",") [
@@ -196,6 +228,18 @@ in
       InternalHosts = lib.strings.concatMapStrings (
         x: x + ","
       ) config.services.postfix.settings.main.mynetworks;
+    };
+  };
+
+  doofnet.opendmarc = {
+    enable = true;
+    inherit (config.services.postfix) user group;
+    settings = {
+      AuthservID = "${config.networking.hostName}.${config.networking.domain}";
+      TrustedAuthservIDs = "${config.networking.hostName}.${config.networking.domain}";
+      # Start in monitoring mode; set to true once SPF/DKIM are confirmed working
+      RejectFailures = false;
+      IgnoreAuthenticatedClients = true;
     };
   };
 
