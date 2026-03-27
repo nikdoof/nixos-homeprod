@@ -186,6 +186,7 @@ in
 
       cacheNetworks = [
         "10.0.0.0/8"
+        "217.169.25.8/29"
         "2001:8b0:bd9::/48"
         "fddd:d00f:dab0::/48"
       ];
@@ -198,6 +199,8 @@ in
       );
 
       extraOptions = ''
+        dnssec-validation auto;
+
         // RPZ
         response-policy { zone "rpz"; };
       '';

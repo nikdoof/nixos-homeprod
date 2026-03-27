@@ -151,17 +151,27 @@ in
         smtpd_sasl_path = "/var/spool/postfix/auth";
         smtpd_sasl_auth_enable = "yes";
 
-        tls_medium_cipherlist = "AES128+EECDH:AES128+EDH";
+        # Inbound TLS (smtpd)
         smtpd_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
         smtpd_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
         smtpd_tls_received_header = "yes";
         smtpd_tls_security_level = "may";
         smtpd_tls_auth_only = "yes";
+        smtpd_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
+        smtpd_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
+        smtpd_tls_mandatory_ciphers = "high";
+        smtpd_tls_loglevel = "1";
 
+        # Outbound TLS (smtp client)
+        # DANE: upgrade to DNSSEC-verified TLS for servers publishing TLSA records,
+        # fall back to opportunistic TLS for those that don't.
         smtp_tls_note_starttls_offer = "yes";
-        smtp_tls_security_level = "may";
+        smtp_tls_security_level = "dane";
+        smtp_dns_support_level = "dnssec";
         smtp_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
         smtp_tls_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
+        smtp_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
+        smtp_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtp_tls_loglevel = "1";
 
         smtpd_relay_restrictions = lib.strings.concatMapStrings (x: x + ",") [
@@ -169,6 +179,19 @@ in
           "permit_sasl_authenticated"
           "reject_unauth_destination"
         ];
+
+        # Rate limiting — protect against compromised accounts/hosts flooding outbound
+        anvil_rate_time_unit = "60s";
+        smtpd_client_connection_rate_limit = "10";
+        smtpd_client_message_rate_limit = "100";
+        smtpd_client_recipient_rate_limit = "100";
+        smtpd_client_auth_rate_limit = "10";
+
+        # Bounce and error management — high bounce rates trigger blacklisting
+        bounce_queue_lifetime = "1d";
+        smtpd_soft_error_limit = "3";
+        smtpd_hard_error_limit = "10";
+        smtpd_error_sleep_time = "1s";
 
         smtpd_helo_required = "yes";
         smtpd_helo_restrictions = lib.strings.concatMapStrings (x: x + ",") [
@@ -198,9 +221,22 @@ in
           "reject_rbl_client cbl.abuseat.org"
           "reject_rbl_client b.barracudacentral.org"
           "reject_rbl_client dnsbl-1.uceprotect.net"
+          "check_policy_service unix:private/policyd-spf"
           "permit"
         ];
       };
+    };
+
+    masterConfig."policyd-spf" = {
+      type = "unix";
+      privileged = false;
+      chroot = false;
+      maxproc = 0;
+      command = "spawn";
+      args = [
+        "user=nobody"
+        "argv=${pkgs.spf-engine}/bin/policyd-spf"
+      ];
     };
 
     extraAliases = lib.strings.concatMapStrings (x: x + "\n") [
@@ -217,6 +253,14 @@ in
       "root@dmz.${config.networking.domain} root-mail@m.tensixtyone.com"
     ];
   };
+
+  environment.etc."python-policyd-spf/policyd-spf.conf".text = ''
+    # Reject on hard SPF fail; log but pass on softfail
+    HELO_reject = SPF_Not_Pass
+    Mail_From_reject = Fail
+    PermError_reject = False
+    TempError_Defer = False
+  '';
 
   services.opendkim = {
     enable = true;
