@@ -160,7 +160,6 @@ in
         virtual_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
         smtpd_sasl_type = "dovecot";
         smtpd_sasl_path = "/var/spool/postfix/auth";
-        smtpd_sasl_auth_enable = "yes";
 
         # Inbound TLS (smtpd)
         smtpd_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
@@ -176,7 +175,6 @@ in
         # Outbound TLS (smtp client)
         # DANE: upgrade to DNSSEC-verified TLS for servers publishing TLSA records,
         # fall back to opportunistic TLS for those that don't.
-        smtp_tls_note_starttls_offer = "yes";
         smtp_tls_security_level = "dane";
         smtp_dns_support_level = "dnssec";
         smtp_tls_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
@@ -184,6 +182,8 @@ in
         smtp_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtp_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtp_tls_loglevel = "1";
+        smtp_tls_session_cache_database = "btree:/var/lib/postfix/data/smtp_scache";
+        smtpd_tls_session_cache_database = "btree:/var/lib/postfix/data/smtpd_scache";
 
         smtpd_relay_restrictions = lib.strings.concatMapStrings (x: x + ",") [
           "permit_mynetworks"
@@ -204,11 +204,22 @@ in
         smtpd_hard_error_limit = "10";
         smtpd_error_sleep_time = "1s";
 
+        # Postscreen — pre-screen inbound SMTP connections before they reach smtpd
+        postscreen_access_list = "permit_mynetworks";
+        postscreen_blacklist_action = "drop";
+        postscreen_greet_action = "enforce";
+        postscreen_dnsbl_action = "enforce";
+        postscreen_dnsbl_threshold = "2";
+        postscreen_dnsbl_whitelist_threshold = "-2";
+        postscreen_dnsbl_sites = "zen.spamhaus.org*2 dnsbl.dronebl.org*2 bl.spamcop.net*1";
+        postscreen_cache_map = "btree:/var/lib/postfix/data/postscreen_cache";
+
         smtpd_helo_required = "yes";
         smtpd_helo_restrictions = lib.strings.concatMapStrings (x: x + ",") [
           "permit_mynetworks"
           "reject_non_fqdn_helo_hostname"
           "reject_invalid_helo_hostname"
+          "reject_rhsbl_helo dbl.spamhaus.org"
           "permit"
         ];
         smtpd_sender_restrictions = lib.strings.concatMapStrings (x: x + ",") [
@@ -216,6 +227,7 @@ in
           "permit_sasl_authenticated"
           "reject_non_fqdn_sender"
           "reject_unknown_sender_domain"
+          "reject_rhsbl_sender dbl.spamhaus.org"
           "permit"
         ];
         smtpd_recipient_restrictions = lib.strings.concatMapStrings (x: x + ",") [
@@ -229,7 +241,6 @@ in
           "reject_rbl_client zen.spamhaus.org"
           "reject_rbl_client bl.spamcop.net"
           "reject_rbl_client dnsbl.sorbs.net"
-          "reject_rbl_client cbl.abuseat.org"
           "reject_rbl_client b.barracudacentral.org"
           "reject_rbl_client dnsbl-1.uceprotect.net"
           "check_policy_service unix:private/policyd-spf"
@@ -237,16 +248,43 @@ in
         ];
       };
 
-      master."policyd-spf" = {
-        type = "unix";
-        privileged = false;
-        chroot = false;
-        maxproc = 0;
-        command = "spawn";
-        args = [
-          "user=nobody"
-          "argv=${pkgs.spf-engine}/bin/policyd-spf"
-        ];
+      master = {
+        "policyd-spf" = {
+          type = "unix";
+          privileged = false;
+          chroot = false;
+          maxproc = 0;
+          command = "spawn";
+          args = [
+            "user=nobody"
+            "argv=${pkgs.spf-engine}/bin/policyd-spf"
+          ];
+        };
+        # Postscreen replaces the smtp inet listener on port 25; smtpd becomes a pass-through
+        smtp = {
+          type = "inet";
+          private = false;
+          maxproc = 1;
+          command = "postscreen";
+        };
+        smtpd = {
+          type = "pass";
+          private = false;
+          maxproc = 0;
+          command = "smtpd";
+        };
+        dnsblog = {
+          type = "unix";
+          private = false;
+          maxproc = 0;
+          command = "dnsblog";
+        };
+        tlsproxy = {
+          type = "unix";
+          private = false;
+          maxproc = 0;
+          command = "tlsproxy";
+        };
       };
     };
 
@@ -377,7 +415,7 @@ in
       auth_username_format = %Lu
 
       # Authentication configuration:
-      auth_mechanisms = plain
+      auth_mechanisms = plain login
       passdb {
         driver = passwd-file
         args = ${config.age.secrets.dovecot.path}
