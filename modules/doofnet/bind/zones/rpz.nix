@@ -4,6 +4,10 @@ _: {
       nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
       serial = 2026031301;
+      refresh = 3600;
+      retry = 900;
+      expire = 604800;
+      minimum = 300;
     };
     NS = [
       "ns-01.int.doofnet.uk."

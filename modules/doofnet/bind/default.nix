@@ -51,7 +51,11 @@ let
     master = true;
     file = if hasDynamicUpdates zone then "${zoneDir}/${zone.name}.zone" else writeZoneFile zone;
     slaves = secondaryServers ++ lib.optionals (hasHeNetNameservers zone) heNetServers;
-    extraConfig = zone.value.extraConfig or "";
+    extraConfig =
+      (zone.value.extraConfig or "")
+      + lib.optionalString (hasHeNetNameservers zone) ''
+        also-notify { ${lib.concatMapStringsSep " " (s: "${s};") heNetServers} };
+      '';
   };
 
   mkSecondaryZone = zone: {
@@ -133,7 +137,10 @@ in
   config = lib.mkIf cfg.enable {
     # Firewall
     networking.firewall = {
-      allowedTCPPorts = [ 53 ];
+      allowedTCPPorts = [
+        53
+        853
+      ];
       allowedUDPPorts = [ 53 ];
     };
 
@@ -178,6 +185,40 @@ in
       script = lib.concatMapStringsSep "\n" mkZoneUpdateScript dynamicZones;
     };
 
+    age.secrets = {
+      digitaloceanApiToken = {
+        file = ../../../secrets/digitalOceanApiToken.age;
+        owner = "acme";
+      };
+    };
+
+    # Get a ACME cert for DNS
+    security.acme = {
+      certs = {
+        "${config.networking.hostName}.${config.networking.domain}" = {
+          dnsProvider = "digitalocean";
+          dnsResolver = "1.1.1.1:53";
+          environmentFile = pkgs.writeText "acme-env" ''
+            DO_AUTH_TOKEN_FILE=${config.age.secrets.digitaloceanApiToken.path}
+          '';
+          postRun = ''
+            # set permission on dir
+            ${pkgs.acl}/bin/setfacl -m \
+            u:bind:rx \
+            /var/lib/acme/${config.networking.hostName}.${config.networking.domain}
+
+            # set permission on key file
+            ${pkgs.acl}/bin/setfacl -m \
+            u:bind:r \
+            /var/lib/acme/${config.networking.hostName}.${config.networking.domain}/*.pem
+          '';
+          reloadServices = [
+            "bind"
+          ];
+        };
+      };
+    };
+
     # BIND configuration
     services.bind = {
       enable = true;
@@ -199,7 +240,17 @@ in
       );
 
       extraOptions = ''
+        version "none";
+        hostname none;
+        server-id none;
         dnssec-validation auto;
+        qname-minimization strict;
+        rate-limit {
+          responses-per-second 10;
+          window 5;
+        };
+        listen-on port 853 tls local-tls { any; };
+        listen-on-v6 port 853 tls local-tls { any; };
 
         // RPZ
         response-policy { zone "rpz"; };
@@ -221,6 +272,12 @@ in
         include "${config.age.secrets.doofnetDnsUpdateKey.path}";
         acl "doofnet-dhcp-updates" {
           key doofnet-dhcp-updates;
+        };
+
+        //
+        tls local-tls {
+          cert-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
+          key-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
         };
       '';
     };

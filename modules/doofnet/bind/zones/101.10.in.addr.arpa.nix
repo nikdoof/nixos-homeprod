@@ -8,7 +8,11 @@ with dns.lib.combinators;
     SOA = {
       nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2025030101;
+      serial = 2026032801;
+      refresh = 3600;
+      retry = 900;
+      expire = 604800;
+      minimum = 300;
     };
     NS = [
       "ns-01.int.doofnet.uk."
@@ -25,20 +29,15 @@ with dns.lib.combinators;
     subdomains."3.1".PTR = [ "ns-02.int.doofnet.uk." ];
 
     # Infrastructure
-    subdomains."11.3".PTR = [ "nas-afp.int.doofnet.uk." ];
-    subdomains."15.3".PTR = [ "esx-01.int.doofnet.uk." ];
     subdomains."16.3".PTR = [ "nas-03.int.doofnet.uk." ];
 
     # Service hosts
     subdomains."20.3".PTR = [ "svc-01.int.doofnet.uk." ];
-    subdomains."21.3".PTR = [ "svc-01.int.doofnet.uk." ];
+    subdomains."21.3".PTR = [ "svc-02.int.doofnet.uk." ];
     subdomains."22.3".PTR = [ "hyp-01.int.doofnet.uk." ];
 
     # VMs
     subdomains."30.3".PTR = [ "afp-01.int.doofnet.uk." ];
-
-    # Kubernetes Masters
-    subdomains."13.10".PTR = [ "prod-master-03.int.doofnet.uk." ];
   };
   extraConfig = ''
     allow-update { doofnet-dhcp-updates; };
