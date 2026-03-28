@@ -261,6 +261,15 @@ in
           }
         }
 
+        stage.structured_metadata {
+          values = {
+            client_ip   = "client_ip",
+            client_port = "client_port",
+            qname       = "qname",
+            flags       = "flags",
+          }
+        }
+
         forward_to = [loki.write.default.receiver]
       }
 
@@ -278,6 +287,13 @@ in
           values = {
             category = "category",
             severity = "severity",
+          }
+        }
+
+        stage.structured_metadata {
+          values = {
+            client_ip   = "client_ip",
+            client_port = "client_port",
           }
         }
 
