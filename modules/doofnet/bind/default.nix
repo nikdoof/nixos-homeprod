@@ -224,13 +224,63 @@ in
     systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/var/log/named" ];
 
     environment.etc."alloy/conf.d/03-bind-logs.alloy".text = ''
-      local.file_match "bind" {
-        path_targets = [{"__path__" = "/var/log/named/*.log", "job" = "bind", "host" = "${config.networking.hostName}"}]
+      local.file_match "bind_queries" {
+        path_targets = [{"__path__" = "/var/log/named/queries.log", "job" = "bind", "host" = "${config.networking.hostName}", "logtype" = "queries"}]
         sync_period  = "5s"
       }
 
-      loki.source.file "bind" {
-        targets    = local.file_match.bind.targets
+      local.file_match "bind_security" {
+        path_targets = [{"__path__" = "/var/log/named/security.log", "job" = "bind", "host" = "${config.networking.hostName}", "logtype" = "security"}]
+        sync_period  = "5s"
+      }
+
+      loki.source.file "bind_queries" {
+        targets    = local.file_match.bind_queries.targets
+        forward_to = [loki.process.bind_queries.receiver]
+      }
+
+      loki.source.file "bind_security" {
+        targets    = local.file_match.bind_security.targets
+        forward_to = [loki.process.bind_security.receiver]
+      }
+
+      loki.process "bind_queries" {
+        stage.regex {
+          expression = `^(?P<timestamp>\d{2}-\w{3}-\d{4} \d{2}:\d{2}:\d{2}\.\d{3}) client (?:@\S+ )?(?P<client_ip>[0-9a-f.:]+)#(?P<client_port>\d+) \([^)]+\): query: (?P<qname>\S+) (?P<qclass>\S+) (?P<qtype>\S+) (?P<flags>\S+)`
+        }
+
+        stage.timestamp {
+          source = "timestamp"
+          format = "02-Jan-2006 15:04:05.000"
+        }
+
+        stage.labels {
+          values = {
+            qtype  = "qtype",
+            qclass = "qclass",
+          }
+        }
+
+        forward_to = [loki.write.default.receiver]
+      }
+
+      loki.process "bind_security" {
+        stage.regex {
+          expression = `^(?P<timestamp>\d{2}-\w{3}-\d{4} \d{2}:\d{2}:\d{2}\.\d{3}) (?P<category>\w[\w-]+): (?P<severity>\w+):`
+        }
+
+        stage.timestamp {
+          source = "timestamp"
+          format = "02-Jan-2006 15:04:05.000"
+        }
+
+        stage.labels {
+          values = {
+            category = "category",
+            severity = "severity",
+          }
+        }
+
         forward_to = [loki.write.default.receiver]
       }
     '';
