@@ -232,18 +232,20 @@ in
           "reject_invalid_hostname"
           "reject_unknown_recipient_domain"
           "reject_unauth_pipelining"
+          "reject_multi_recipient_bounce"
           "permit_mynetworks"
           "reject_non_fqdn_recipient"
           "reject_unauth_destination"
           "reject_rbl_client dnsbl.dronebl.org"
           "reject_rbl_client zen.spamhaus.org"
           "reject_rbl_client bl.spamcop.net"
-          "reject_rbl_client dnsbl.sorbs.net"
           "reject_rbl_client b.barracudacentral.org"
           "reject_rbl_client dnsbl-1.uceprotect.net"
           "check_policy_service unix:private/policyd-spf"
           "permit"
         ];
+
+        smtpd_policy_service_timeout = "30s";
       };
 
       master = {
@@ -316,9 +318,7 @@ in
     domains = config.networking.domain;
     inherit (config.services.postfix) user group;
     settings = {
-      InternalHosts = lib.strings.concatMapStrings (
-        x: x + ","
-      ) config.services.postfix.settings.main.mynetworks;
+      InternalHosts = lib.strings.concatStringsSep "," config.services.postfix.settings.main.mynetworks;
     };
   };
 
@@ -408,6 +408,10 @@ in
     };
 
     extraConfig = ''
+      # TLS hardening — match Postfix's TLSv1.2+ requirement for IMAP clients
+      ssl_min_protocol = TLSv1.2
+      ssl_prefer_server_ciphers = yes
+
       # force to use full user name plus domain name
       # for disambiguation
       auth_username_format = %Lu
