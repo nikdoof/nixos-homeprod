@@ -202,7 +202,7 @@ in
       logtail = {
         enabled = false;
       };
-      metrics_listen_addr = "0.0.0.0:9090";
+      metrics_listen_addr = "127.0.0.1:9090";
       noise = {
         private_key_path = "/var/lib/headscale/noise_private.key";
       };
