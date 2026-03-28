@@ -111,6 +111,13 @@ in
     enableSubmission = true;
     enableSubmissions = true;
 
+    # Restore the outbound smtp unix transport — settings.master can only hold one
+    # entry named "smtp" (the inet postscreen one), so the unix delivery transport
+    # must be added here as a raw master.cf line.
+    extraMasterConf = ''
+      smtp unix - - n - - smtp
+    '';
+
     submissionOptions = {
       smtpd_tls_security_level = "encrypt";
       smtpd_sasl_auth_enable = "yes";
