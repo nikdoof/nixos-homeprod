@@ -335,9 +335,8 @@ in
     inherit (config.services.postfix) user group;
     settings = {
       InternalHosts = lib.strings.concatStringsSep "," config.services.postfix.settings.main.mynetworks;
-      # Sign outbound and verify inbound; ARC signing preserves auth chain for forwarded mail
+      # Sign outbound and verify inbound
       Mode = "sv";
-      ArcSign = "yes";
     };
   };
 
