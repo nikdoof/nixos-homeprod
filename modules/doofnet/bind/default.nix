@@ -117,6 +117,9 @@ let
           echo "Zone ${zone.name}: Update complete"
         fi
       fi
+
+      # Remove backups older than 7 days for this zone
+      find "${zoneDir}" -maxdepth 1 -name "${zone.name}.zone.backup-*" -mtime +7 -delete
     '';
 
 in
@@ -152,17 +155,16 @@ in
       }
     '';
 
-    # Secrets
-    age.secrets.doofnetDnsUpdateKey = {
-      file = ../../../secrets/doofnetDnsUpdateKey.age;
-      owner = "named";
-    };
-
     # Zone directory and files
     systemd.tmpfiles.settings."bind-zones" =
       let
         baseDir = {
           ${zoneDir}.d = {
+            user = "named";
+            group = "named";
+            mode = "0750";
+          };
+          "/var/log/named".d = {
             user = "named";
             group = "named";
             mode = "0750";
@@ -177,6 +179,7 @@ in
       description = "Update BIND zone files when Nix configuration changes";
       wantedBy = [ "bind.service" ];
       before = [ "bind.service" ];
+      after = [ "systemd-tmpfiles-setup.service" ];
       serviceConfig = {
         Type = "oneshot";
         User = "named";
@@ -186,6 +189,10 @@ in
     };
 
     age.secrets = {
+      doofnetDnsUpdateKey = {
+        file = ../../../secrets/doofnetDnsUpdateKey.age;
+        owner = "named";
+      };
       digitaloceanApiToken = {
         file = ../../../secrets/digitalOceanApiToken.age;
         owner = "acme";
@@ -208,6 +215,25 @@ in
         };
       };
     };
+
+    # Allow bind to write logs; ProtectSystem=strict requires explicit opt-in
+    systemd.services.bind.serviceConfig.ReadWritePaths = [ "/var/log/named" ];
+
+    # Alloy reads bind logs to ship to Loki
+    systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "named" ];
+    systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/var/log/named" ];
+
+    environment.etc."alloy/conf.d/03-bind-logs.alloy".text = ''
+      local.file_match "bind" {
+        path_targets = [{"__path__" = "/var/log/named/*.log", "job" = "bind", "host" = "${config.networking.hostName}"}]
+        sync_period  = "5s"
+      }
+
+      loki.source.file "bind" {
+        targets    = local.file_match.bind.targets
+        forward_to = [loki.write.default.receiver]
+      }
+    '';
 
     # BIND configuration
     services.bind = {
@@ -233,17 +259,43 @@ in
         version "none";
         hostname none;
         server-id none;
+
+        // Zone transfer default-deny; per-zone allow-transfer overrides this
+        allow-transfer { none; };
+
         dnssec-validation auto;
         qname-minimization strict;
+        minimal-responses yes;
+
+        // Cache limits — keeps memory usage bounded, especially on low-RAM hosts
+        max-cache-size 256m;
+        max-cache-ttl 86400;
+        max-ncache-ttl 3600;
+
+        // Prefetch cache entries before they expire to avoid latency spikes
+        prefetch 2 9;
+
+        // Serve stale cache entries for up to 30s while refreshing, avoiding
+        // SERVFAIL during brief upstream outages
+        stale-answer-enable yes;
+        stale-cache-enable yes;
+        stale-answer-ttl 30;
+
         rate-limit {
           responses-per-second 10;
           window 5;
+          exempt-clients {
+            10.0.0.0/8;
+            217.169.25.8/29;
+            2001:8b0:bd9::/48;
+            fddd:d00f:dab0::/48;
+          };
         };
         listen-on port 853 tls local-tls { any; };
         listen-on-v6 port 853 tls local-tls { any; };
 
-        // RPZ
-        response-policy { zone "rpz"; };
+        // RPZ — break-dnssec allows rewrites to override DNSSEC-signed responses
+        response-policy { zone "rpz"; } break-dnssec yes;
       '';
 
       extraConfig = ''
@@ -252,22 +304,50 @@ in
           inet 127.0.0.1 port 8053 allow { 127.0.0.1; };
         };
 
-        // HE.net DNS transfer
-        acl "he-dns" {
-          216.218.133.2;
-          2001:470:600::2;
-        };
-
         // DHCP update key
         include "${config.age.secrets.doofnetDnsUpdateKey.path}";
         acl "doofnet-dhcp-updates" {
           key doofnet-dhcp-updates;
         };
 
-        //
+        // DNS-over-TLS certificate
         tls local-tls {
           cert-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
           key-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
+        };
+
+        logging {
+          // Security-relevant events: DNSSEC failures, TSIG errors, zone transfers
+          channel security_file {
+            file "/var/log/named/security.log" versions 3 size 20m;
+            print-time yes;
+            print-severity yes;
+            print-category yes;
+            severity dynamic;
+          };
+
+          // Full query log — high volume, rotated aggressively
+          channel queries_file {
+            file "/var/log/named/queries.log" versions 5 size 100m;
+            print-time yes;
+            severity info;
+          };
+
+          channel null_channel { null; };
+
+          category default      { security_file; };
+          category security     { security_file; };
+          category dnssec       { security_file; };
+          category query-errors { security_file; };
+          category xfer-in      { security_file; };
+          category xfer-out     { security_file; };
+          category notify       { security_file; };
+          category queries      { queries_file;  };
+
+          // Suppress noisy low-signal categories
+          category lame-servers  { null_channel; };
+          category edns-disabled { null_channel; };
+          category rpz           { null_channel; };
         };
       '';
     };
