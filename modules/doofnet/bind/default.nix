@@ -204,12 +204,12 @@ in
           postRun = ''
             # set permission on dir
             ${pkgs.acl}/bin/setfacl -m \
-            u:bind:rx \
+            u:named:rx \
             /var/lib/acme/${config.networking.hostName}.${config.networking.domain}
 
             # set permission on key file
             ${pkgs.acl}/bin/setfacl -m \
-            u:bind:r \
+            u:named:r \
             /var/lib/acme/${config.networking.hostName}.${config.networking.domain}/*.pem
           '';
           reloadServices = [
