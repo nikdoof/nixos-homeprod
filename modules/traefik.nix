@@ -4,6 +4,7 @@
 }:
 let
   fqdn = with config.networking; "${hostName}.${domain}";
+  logFolder = "/var/log/traefik";
 in
 {
   age.secrets = {
@@ -54,13 +55,13 @@ in
 
       log = {
         level = "INFO";
-        filePath = "${config.services.traefik.dataDir}/traefik.log";
+        filePath = "${logFolder}/traefik.log";
         format = "json";
       };
 
       accessLog = {
         format = "common";
-        filePath = "${config.services.traefik.dataDir}/access.log";
+        filePath = "${logFolder}/access.log";
       };
 
       certificatesResolvers = {
@@ -104,7 +105,7 @@ in
   # systemd.tmpfiles.rules because settings generates a separate tmpfiles.d
   # file that is processed before nixos.conf alphabetically, cleanly winning
   # over the upstream entry without clobbering other modules' rules.
-  systemd.tmpfiles.settings."00-a-traefik-perms"."${config.services.traefik.dataDir}".d = {
+  systemd.tmpfiles.settings."000-traefik-logs"."${logFolder}".d = {
     mode = "0750";
     user = "traefik";
     group = "traefik";
@@ -113,8 +114,8 @@ in
   environment.etc."alloy/conf.d/01-traefik.alloy".text = ''
     local.file_match "traefik" {
       path_targets = [
-        {"__path__" = "${config.services.traefik.dataDir}/traefik.log", "job" = "traefik", "host" = "${config.networking.hostName}", "log_type" = "server"},
-        {"__path__" = "${config.services.traefik.dataDir}/access.log", "job" = "traefik", "host" = "${config.networking.hostName}", "log_type" = "access"},
+        {"__path__" = "${logFolder}/traefik.log", "job" = "traefik", "host" = "${config.networking.hostName}", "log_type" = "server"},
+        {"__path__" = "${logFolder}/access.log", "job" = "traefik", "host" = "${config.networking.hostName}", "log_type" = "access"},
       ]
       sync_period = "5s"
     }
