@@ -201,17 +201,7 @@ in
           environmentFile = pkgs.writeText "acme-env" ''
             DO_AUTH_TOKEN_FILE=${config.age.secrets.digitaloceanApiToken.path}
           '';
-          postRun = ''
-            # set permission on dir
-            ${pkgs.acl}/bin/setfacl -m \
-            u:named:rx \
-            /var/lib/acme/${config.networking.hostName}.${config.networking.domain}
-
-            # set permission on key file
-            ${pkgs.acl}/bin/setfacl -m \
-            u:named:r \
-            /var/lib/acme/${config.networking.hostName}.${config.networking.domain}/*.pem
-          '';
+          group = "named";
           reloadServices = [
             "bind"
           ];
