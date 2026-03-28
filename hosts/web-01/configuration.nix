@@ -207,9 +207,7 @@ in
     recommendedTlsSettings = true;
     recommendedOptimisation = true;
     recommendedGzipSettings = true;
-    appendHttpConfig = ''
-      client_max_body_size 64k;
-    '';
+    clientMaxBodySize = "64k";
 
     virtualHosts = nginx_sites // nginx_sites_redirects;
   };
