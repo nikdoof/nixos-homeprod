@@ -91,5 +91,11 @@ in
         bits = 4096;
       }
     ];
+
+    # Persist DHE params — prevents regeneration on every boot
+    fileSystems."/var/lib/dhparams" = {
+      device = "/persist/dhparams";
+      options = [ "bind" ];
+    };
   };
 }
