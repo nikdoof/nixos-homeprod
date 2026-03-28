@@ -69,6 +69,11 @@ let
           extraConfig = ''
             access_log /var/log/nginx/access.log combined;
             log_not_found off;
+            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header X-Frame-Options "SAMEORIGIN" always;
+            add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+            add_header X-XSS-Protection "0" always;
           '';
         };
       })
@@ -157,7 +162,7 @@ in
     groups.deploy = { };
     users.deploy = {
       group = "deploy";
-      shell = pkgs.zsh;
+      shell = pkgs.shadow;
       isSystemUser = true;
       home = "/persist/sites";
       openssh.authorizedKeys.keys = [
@@ -165,6 +170,15 @@ in
       ];
     };
   };
+
+  # Restrict the deploy user to rsync transfers into /persist/sites only
+  services.openssh.extraConfig = ''
+    Match User deploy
+      ForceCommand ${pkgs.rsync}/bin/rrsync /persist/sites
+      AllowTcpForwarding no
+      X11Forwarding no
+      PermitTTY no
+  '';
 
   doofnet.server = true;
 
@@ -189,6 +203,13 @@ in
   services.nginx = {
     enable = true;
     statusPage = true;
+    serverTokens = false;
+    recommendedTlsSettings = true;
+    recommendedOptimisation = true;
+    recommendedGzipSettings = true;
+    appendHttpConfig = ''
+      client_max_body_size 64k;
+    '';
 
     virtualHosts = nginx_sites // nginx_sites_redirects;
   };
