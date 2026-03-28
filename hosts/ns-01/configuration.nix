@@ -51,8 +51,8 @@
     enable = lib.mkForce false;
   };
 
-  # We need to do remote rebuilds, and its just easier to connect as root
-  services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
+  # Allow wheel users to perform remote rebuilds via nixos-rebuild --use-remote-sudo
+  nix.settings.trusted-users = [ "@wheel" ];
 
   doofnet.server = true;
 
