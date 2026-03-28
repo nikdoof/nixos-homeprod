@@ -80,8 +80,11 @@
     VISUAL = "nano";
   };
 
-  # Disable zsh NEWUSER by creating the zshrc file for users
-  system.userActivationScripts.zshrc = "touch .zshrc";
+  # Disable zsh NEWUSER prompt by ensuring .zshrc exists for each user
+  system.userActivationScripts.zshrc = "touch $HOME/.zshrc";
+
+  # Suppress the sudo first-use lecture
+  security.sudo.extraConfig = "Defaults lecture=never";
 
   environment.systemPackages = with pkgs; [
     eza
