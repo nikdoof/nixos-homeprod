@@ -60,7 +60,7 @@ in
       };
 
       accessLog = {
-        format = "common";
+        format = "json";
         filePath = "${logFolder}/access.log";
       };
 
