@@ -111,13 +111,6 @@ in
     enableSubmission = true;
     enableSubmissions = true;
 
-    # Restore the outbound smtp unix transport — settings.master can only hold one
-    # entry named "smtp" (the inet postscreen one), so the unix delivery transport
-    # must be added here as a raw master.cf line.
-    extraMasterConf = ''
-      smtp unix - - n - - smtp
-    '';
-
     submissionOptions = {
       smtpd_tls_security_level = "encrypt";
       smtpd_sasl_auth_enable = "yes";
@@ -283,12 +276,15 @@ in
             "argv=${pkgs.spf-engine}/bin/policyd-spf"
           ];
         };
-        # Postscreen replaces the smtp inet listener on port 25; smtpd becomes a pass-through
-        smtp = {
+        # smtp_inet is the NixOS key for the inbound smtp inet listener (outputs as "smtp" in master.cf).
+        # Overriding it here replaces the default smtpd command with postscreen.
+        # The default smtp = {} unix transport key is left intact for outbound delivery.
+        smtp_inet = {
+          name = "smtp";
           type = "inet";
           private = false;
           maxproc = 1;
-          command = "postscreen";
+          command = lib.mkForce "postscreen";
         };
         smtpd = {
           type = "pass";
