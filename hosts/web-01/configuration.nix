@@ -152,12 +152,6 @@ in
     ];
   };
 
-  # Persist the ACME folder
-  fileSystems."/var/lib/acme" = {
-    device = "/persist/acme";
-    options = [ "bind" ];
-  };
-
   users = {
     groups.deploy = { };
     users.deploy = {

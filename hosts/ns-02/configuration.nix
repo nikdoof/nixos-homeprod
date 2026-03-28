@@ -37,12 +37,6 @@ in
 
   doofnet.server = true;
 
-  # Persist the ACME folder (required for bind DoT)
-  fileSystems."/var/lib/acme" = {
-    device = "/persist/acme";
-    options = [ "bind" ];
-  };
-
   doofnet.bind = {
     enable = true;
     mode = "secondary";

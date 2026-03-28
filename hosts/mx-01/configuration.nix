@@ -55,12 +55,6 @@ in
 
   doofnet.server = true;
 
-  # Persist the ACME folder
-  fileSystems."/var/lib/acme" = {
-    device = "/persist/acme";
-    options = [ "bind" ];
-  };
-
   age.secrets = {
     digitaloceanApiToken = {
       file = ../../secrets/digitalOceanApiToken.age;

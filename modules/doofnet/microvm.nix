@@ -97,5 +97,11 @@ in
       device = "/persist/dhparams";
       options = [ "bind" ];
     };
+
+    # Persist the ACME folder
+    fileSystems."/var/lib/acme" = {
+      device = "/persist/acme";
+      options = [ "bind" ];
+    };
   };
 }
