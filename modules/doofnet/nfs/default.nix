@@ -9,6 +9,9 @@ let
   nfs_options = [
     "rw"
     "noatime"
+    "nosuid"
+    "nodev"
+    "noexec"
     "nfsvers=4"
     "proto=tcp"
   ];
