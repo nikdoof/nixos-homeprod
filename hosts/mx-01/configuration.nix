@@ -62,14 +62,12 @@ in
     };
     dovecot = {
       file = ../../secrets/mx01DovecotPasswd.age;
-      # -rw-------
       mode = "600";
       owner = config.services.dovecot2.user;
       inherit (config.services.dovecot2) group;
     };
     dmarcReportsPassword = {
       file = ../../secrets/mx01DmarcReportsPassword.age;
-      owner = config.services.prometheus.exporters.dmarc.user;
     };
   };
 
@@ -490,7 +488,14 @@ in
     imap = {
       host = "${config.networking.hostName}.${config.networking.domain}";
       username = "dmarc-reports@doofnet.uk";
-      passwordFile = config.age.secrets.dmarcReportsPassword.path;
+      passwordFile = "$\{CREDENTIALS_DIRECTORY\}/imapPassword";
+    };
+  };
+
+  # Support DynamicUser by loading the password file as a credential file
+  systemd.services.prometheus-dmarc-exporter = {
+    serviceConfig = {
+      LoadCredentials = "imapPassword:${config.age.secrets.dmarcReportsPassword.path}";
     };
   };
 
