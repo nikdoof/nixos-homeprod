@@ -180,8 +180,16 @@ in
         smtp_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtp_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtp_tls_loglevel = "1";
+        smtp_tls_fingerprint_digest = "sha256";
         smtp_tls_session_cache_database = "btree:/var/lib/postfix/data/smtp_scache";
         smtpd_tls_session_cache_database = "btree:/var/lib/postfix/data/smtpd_scache";
+
+        # SMTP request smuggling protection (CVE-2023-51764)
+        smtpd_forbid_bare_newline = "yes";
+        smtpd_forbid_bare_newline_exclusions = "$mynetworks";
+
+        # Disable VRFY command to prevent recipient enumeration
+        disable_vrfy_command = "yes";
 
         smtpd_relay_restrictions = lib.strings.concatMapStrings (x: x + ",") [
           "permit_mynetworks"
@@ -206,6 +214,8 @@ in
         postscreen_access_list = "permit_mynetworks";
         postscreen_blacklist_action = "drop";
         postscreen_greet_action = "enforce";
+        postscreen_bare_newline_enable = "yes";
+        postscreen_bare_newline_action = "enforce";
         postscreen_dnsbl_action = "enforce";
         postscreen_dnsbl_threshold = "2";
         postscreen_dnsbl_whitelist_threshold = "-2";
@@ -319,6 +329,9 @@ in
     inherit (config.services.postfix) user group;
     settings = {
       InternalHosts = lib.strings.concatStringsSep "," config.services.postfix.settings.main.mynetworks;
+      # Sign outbound and verify inbound; ARC signing preserves auth chain for forwarded mail
+      Mode = "sv";
+      ArcSign = "yes";
     };
   };
 
