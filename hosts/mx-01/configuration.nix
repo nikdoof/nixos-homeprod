@@ -6,6 +6,12 @@
 }:
 let
   domainName = "doofnet.uk";
+
+  # Domains that'll be used for virtual users
+  virtualDomains = [
+    domainName
+    "dimension.sh"
+  ];
 in
 {
   doofnet.microvm = {
@@ -153,7 +159,7 @@ in
         non_smtpd_milters = "$smtpd_milters";
 
         # Dovecot
-        virtual_mailbox_domains = "${config.networking.domain}";
+        virtual_mailbox_domains = lib.strings.concatStringsSep " " virtualDomains;
         mailbox_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
         virtual_transport = "lmtp:unix:/var/spool/postfix/dovecot-lmtp";
         smtpd_sasl_type = "dovecot";
@@ -325,7 +331,7 @@ in
     enable = true;
     keyPath = "/persist/opendkim/keys";
     selector = builtins.hashString "sha1" "${config.services.postfix.settings.main.myhostname}";
-    domains = config.networking.domain;
+    domains = lib.strings.concatStringsSep "," virtualDomains;
     inherit (config.services.postfix) user group;
     settings = {
       InternalHosts = lib.strings.concatStringsSep "," config.services.postfix.settings.main.mynetworks;
