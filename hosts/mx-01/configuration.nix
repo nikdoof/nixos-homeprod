@@ -288,19 +288,16 @@ in
         };
         smtpd = {
           type = "pass";
-          private = false;
           maxproc = 0;
           command = "smtpd";
         };
         dnsblog = {
           type = "unix";
-          private = false;
           maxproc = 0;
           command = "dnsblog";
         };
         tlsproxy = {
           type = "unix";
-          private = false;
           maxproc = 0;
           command = "tlsproxy";
         };
