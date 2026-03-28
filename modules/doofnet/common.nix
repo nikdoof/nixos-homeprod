@@ -1,4 +1,6 @@
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
@@ -80,8 +82,11 @@
     VISUAL = "nano";
   };
 
-  # Disable zsh NEWUSER prompt by ensuring .zshrc exists for each user
-  system.userActivationScripts.zshrc = "touch $HOME/.zshrc";
+  # Ensure .zshrc exists for all normal users before their shell starts,
+  # preventing the zsh-newuser-install wizard from running.
+  systemd.tmpfiles.rules = lib.mapAttrsToList (
+    name: user: "f ${user.home}/.zshrc 0644 ${name} ${name} - -"
+  ) (lib.filterAttrs (_: u: u.isNormalUser) config.users.users);
 
   # Suppress the sudo first-use lecture
   security.sudo.extraConfig = "Defaults lecture=never";
