@@ -495,7 +495,7 @@ in
   # Support DynamicUser by loading the password file as a credential file
   systemd.services.prometheus-dmarc-exporter = {
     serviceConfig = {
-      LoadCredentials = "imapPassword:${config.age.secrets.dmarcReportsPassword.path}";
+      LoadCredential = "imapPassword:${config.age.secrets.dmarcReportsPassword.path}";
     };
   };
 
