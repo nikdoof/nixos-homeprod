@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -217,7 +218,7 @@ in
       };
       policy = {
         mode = "file";
-        path = "/etc/headscale/acl_policy.json";
+        path = pkgs.writeText "headscale/acl_policy.json" (builtins.toJSON acl_config);
       };
       prefixes = {
         allocation = "sequential";
@@ -234,8 +235,6 @@ in
       unix_socket_permission = "0770";
     };
   };
-
-  services.borgmatic.settings.source_directories = [ "/var/lib/headscale" ];
 
   systemd.services.headscale = {
     serviceConfig = {
@@ -264,9 +263,6 @@ in
     ];
     allowedUDPPorts = [ 3478 ];
   };
-
-  # Write out ACL config
-  environment.etc."headscale/acl_policy.json".text = builtins.toJSON acl_config;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
