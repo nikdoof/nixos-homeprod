@@ -156,7 +156,7 @@ in
     groups.deploy = { };
     users.deploy = {
       group = "deploy";
-      shell = pkgs.shadow;
+      shell = pkgs.bash;
       isSystemUser = true;
       home = "/persist/sites";
       openssh.authorizedKeys.keys = [
