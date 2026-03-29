@@ -250,8 +250,9 @@ in
         }
 
         stage.timestamp {
-          source = "timestamp"
-          format = "02-Jan-2006 15:04:05.000"
+          source   = "timestamp"
+          format   = "02-Jan-2006 15:04:05.000"
+          location = "Europe/London"
         }
 
         stage.labels {
@@ -279,8 +280,9 @@ in
         }
 
         stage.timestamp {
-          source = "timestamp"
-          format = "02-Jan-2006 15:04:05.000"
+          source   = "timestamp"
+          format   = "02-Jan-2006 15:04:05.000"
+          location = "Europe/London"
         }
 
         stage.labels {
