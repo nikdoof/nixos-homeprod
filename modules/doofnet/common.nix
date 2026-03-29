@@ -6,21 +6,25 @@
 }:
 
 {
-  nix = {
-    settings = {
-      experimental-features = [
+  nix = lib.mkMerge [
+    {
+      settings.experimental-features = [
         "nix-command"
         "flakes"
       ];
-      auto-optimise-store = true;
-    };
-
-    gc = {
-      automatic = true;
-      dates = "daily";
-      options = "--delete-older-than 7d";
-    };
-  };
+    }
+    # Disable store maintenance on microvms — they share the host's /nix/store
+    # via virtiofs and may remount it rw, so running GC or optimise from a guest
+    # would corrupt the host store.
+    (lib.mkIf (!(config.doofnet ? microvm) || !config.doofnet.microvm.enable) {
+      settings.auto-optimise-store = true;
+      gc = {
+        automatic = true;
+        dates = "daily";
+        options = "--delete-older-than 7d";
+      };
+    })
+  ];
 
   networking.firewall = {
     logRefusedConnections = false;
