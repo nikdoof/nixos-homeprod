@@ -168,7 +168,7 @@ in
   # Restrict the deploy user to rsync transfers into /persist/sites only
   services.openssh.extraConfig = ''
     Match User deploy
-      ForceCommand ${pkgs.rsync}/bin/rrsync /persist/sites
+      ForceCommand ${pkgs.rrsync}/bin/rrsync /persist/sites
       AllowTcpForwarding no
       X11Forwarding no
       PermitTTY no
