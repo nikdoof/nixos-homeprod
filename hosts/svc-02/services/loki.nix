@@ -55,6 +55,7 @@
         routers.loki = {
           rule = "Host(`loki.svc.doofnet.uk`)";
           service = "loki";
+          observability.accessLogs = false;
         };
 
         services.loki.loadBalancer.servers = [
