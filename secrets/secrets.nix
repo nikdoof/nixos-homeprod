@@ -3,6 +3,7 @@ let
   users = [ nikdoof ];
 
   afp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDoO2RnmZOgSEIfziRh7FJsJPUZe5dLpFXysea5yvEnB";
+  gw = "";
   hs-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEqU636TZeQGoqkmGUQpkHvs6/AB4cjFgBcmNFJIGWMQ";
   hyp-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKTI5LxG1wD5ee7rhYq9Kv9ArjkgooCODqqCFWh0hvNl";
   mx-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH2WGGEH1jk+Z0Q7zRMXF/ENZtEk8EtfWY3AYBinNtdr";
@@ -12,6 +13,7 @@ let
   svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
   web-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILBF2Kjr3uDks2Ga1Cm9ItmBuvYthNW0muBccotcIhmZ";
   systems = [
+    gw
     hyp-01
     mx-01
     ns-01
@@ -27,6 +29,9 @@ in
 
   "borgmaticEncryptionKey.age".publicKeys = users ++ systems;
   "borgmaticSSHKey.age".publicKeys = users ++ systems;
+
+  "doofnetDhcpUpdateKeyRaw.age".publicKeys = users ++ [ gw ];
+  "pppoeCredentials.age".publicKeys = users ++ [ gw ];
 
   "swarmMirrorConfig.age".publicKeys = users ++ [ svc-01 ];
   "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];
