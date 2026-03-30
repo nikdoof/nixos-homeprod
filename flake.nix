@@ -80,6 +80,7 @@
 
       nixosConfigurations = {
         # Physical Hosts
+        gw = mkSystem "gw" { };
         hyp-01 = mkSystem "hyp-01" { extraModules = [ inputs.microvm.nixosModules.host ]; };
         ns-01 = mkSystem "ns-01" { system = "aarch64-linux"; };
         svc-01 = mkSystem "svc-01" { };
