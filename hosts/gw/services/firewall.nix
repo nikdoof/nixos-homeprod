@@ -76,6 +76,15 @@ _: {
 
         # SSH — private VLAN and management interface (enp2s0, DHCP fallback)
         iifname { "vlan-private", "enp2s0" } tcp dport 22 accept
+
+        # mDNS — Avahi reflector must receive on each VLAN it serves
+        iifname { "vlan-private", "vlan-lab", "vlan-ha" } udp dport 5353 accept
+
+        # UPnP SSDP discovery (multicast UDP 1900)
+        iifname { "vlan-private", "vlan-public" } udp dport 1900 accept
+
+        # NAT-PMP / PCP (UDP 5351)
+        iifname { "vlan-private", "vlan-public" } udp dport 5351 accept
       }
 
       chain forward {
