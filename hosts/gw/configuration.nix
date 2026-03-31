@@ -133,7 +133,14 @@
         DHCP = "ipv6";
         IPv6AcceptRA = true;
       };
-      dhcpV6Config.WithoutRA = "solicit";
+      dhcpV6Config = {
+        UseDNS = "no";
+        WithoutRA = "solicit";
+      };
+      ipv6AcceptRAConfig = {
+        UseDNS = "no";
+        DHCPv6Client = "always";
+      };
       linkConfig.RequiredForOnline = "no";
     };
   };

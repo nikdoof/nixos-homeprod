@@ -18,13 +18,13 @@ _: {
         user "aw143@a.2"
 
         noipdefault
+        defaultroute
         hide-password
         lcp-echo-interval 1
-        lcp-echo-failure 4
+        lcp-echo-failure 10
         noauth
         persist
         maxfail 0
-        holdoff 5
         mtu 1500
         noaccomp
         default-asyncmap
