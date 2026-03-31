@@ -57,6 +57,7 @@
           Metric = 2048;
         }
       ];
+      linkConfig.RequiredForOnline = "no";
     };
 
     # Internal VLANs on enp3s0f0
@@ -97,10 +98,7 @@
 
     "10-vlan-ha" = {
       matchConfig.Name = config.systemd.network.netdevs."10-vlan-ha".netdevConfig.Name;
-      networkConfig.Address = [
-        "10.105.1.1/16"
-        "2001:8b0:bd9:105::1/64"
-      ];
+      networkConfig.Address = [ "10.105.1.1/16" ];
     };
 
     # Hosted VLAN uses a publicly routable /29 block (not NATed)
