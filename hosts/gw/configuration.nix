@@ -20,7 +20,7 @@
   networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
 
-  # WAN: eno2 → VLAN 911 → ppp0 (PPPoE to CityFibre ONT)
+  # WAN: enp3s0f1 → VLAN 911 → ppp0 (PPPoE to CityFibre ONT)
   systemd.network.netdevs."05-vlan-wan" = {
     netdevConfig = {
       Name = "vlan-wan";
@@ -30,9 +30,18 @@
   };
 
   systemd.network.networks = {
-    # Internal VLANs on eno1
-    "10-eno1" = {
-      matchConfig.Name = "eno1";
+    # On-board default DHCP interface (fallback)
+    "10-enp2s0" = {
+      matchConfig.Name = "enp2s0";
+      networkConfig = {
+        DHCP = "ipv4";
+        IPv6AcceptRA = true;
+      };
+    };
+
+    # Internal VLANs on enp3s0f0
+    "10-enp3s0f0" = {
+      matchConfig.Name = "enp3s0f0";
       networkConfig.VLAN = [
         config.systemd.network.netdevs."10-vlan-private".netdevConfig.Name
         config.systemd.network.netdevs."10-vlan-public".netdevConfig.Name
@@ -88,9 +97,9 @@
       linkConfig.RequiredForOnline = "routable";
     };
 
-    # WAN — eno2 carries VLAN 911 to the CityFibre ONT; pppd creates ppp0 over it
-    "05-eno2" = {
-      matchConfig.Name = "eno2";
+    # WAN — enp3s0f1 carries VLAN 911 to the CityFibre ONT; pppd creates ppp0 over it
+    "05-enp3s0f1" = {
+      matchConfig.Name = "enp3s0f1";
       networkConfig.VLAN = [ "vlan-wan" ];
     };
 

@@ -54,10 +54,10 @@ _: {
         ip6 nexthdr icmpv6 accept
 
         # DHCPv4 server — VLAN interfaces only (not WAN)
-        iif { vlan-private, vlan-public, vlan-lab, vlan-ha, vlan-hosted } udp dport 67 accept
+        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-ha", "vlan-hosted" } udp dport 67 accept
 
         # DHCPv6 server — IPv6-enabled VLANs (HA is IPv4-only)
-        iif { vlan-private, vlan-public, vlan-lab, vlan-hosted } udp dport 547 accept
+        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } udp dport 547 accept
 
         # DNS — internal networks
         ip  saddr @local4 tcp dport { 53, 853 } accept
@@ -75,7 +75,7 @@ _: {
         ip6 saddr @local6 udp dport 123 accept
 
         # SSH — private VLAN only
-        iif vlan-private tcp dport 22 accept
+        iifname "vlan-private" tcp dport 22 accept
       }
 
       chain forward {
@@ -95,29 +95,29 @@ _: {
         ct status dnat accept
 
         # Private VLAN — unrestricted outbound (LAN admin network)
-        iif vlan-private accept
+        iifname "vlan-private" accept
 
         # Lab VLAN — unrestricted outbound (pfSense floating "Allow All")
-        iif vlan-lab accept
+        iifname "vlan-lab" accept
 
         # Public VLAN — internet + specific internal services only
-        iif vlan-public oif ppp0                                    accept
-        iif vlan-public ip  daddr 10.101.3.20  tcp dport 443       accept
+        iifname "vlan-public" oifname "ppp0"                                    accept
+        iifname "vlan-public" ip  daddr 10.101.3.20  tcp dport 443              accept
 
         # HA VLAN — no forwarding; hosts only reach the gateway itself (INPUT)
 
         # Hosted VLAN — publicly routable /29; restricted outbound
-        iif vlan-hosted oif ppp0 tcp dport @hosted_out_tcp         accept
-        iif vlan-hosted oif ppp0 udp dport @hosted_out_udp         accept
-        iif vlan-hosted ip daddr 10.101.3.20  tcp dport 443        accept
-        iif vlan-hosted ip daddr 10.101.3.21  tcp dport { 443, 9090 } accept
+        iifname "vlan-hosted" oifname "ppp0" tcp dport @hosted_out_tcp          accept
+        iifname "vlan-hosted" oifname "ppp0" udp dport @hosted_out_udp          accept
+        iifname "vlan-hosted" ip daddr 10.101.3.20  tcp dport 443               accept
+        iifname "vlan-hosted" ip daddr 10.101.3.21  tcp dport { 443, 9090 }     accept
 
         # WAN → Hosted VLAN (inbound to publicly routed /29, no NAT)
-        iif ppp0 oif vlan-hosted accept
+        iifname "ppp0" oifname "vlan-hosted" accept
 
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
-        iif { vlan-private, vlan-lab, vlan-ha } \
-          oif { vlan-private, vlan-lab, vlan-ha } \
+        iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
+          oifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           udp dport 5353 accept
       }
     }
@@ -129,19 +129,19 @@ _: {
         type nat hook prerouting priority -100;
 
         # HTTPS → svc-01 (WAN dynamic IP; remainder of :443 on ppp0)
-        iif ppp0 tcp dport 443 dnat to 10.101.3.20:8443
-        iif ppp0 udp dport 443 dnat to 10.101.3.20:8443
+        iifname "ppp0" tcp dport 443 dnat to 10.101.3.20:8443
+        iifname "ppp0" udp dport 443 dnat to 10.101.3.20:8443
 
         # DNS → ns1 (for HE secondary nameservers only)
-        iif ppp0 ip saddr 216.218.133.2 tcp dport 53 dnat to 10.101.1.2
-        iif ppp0 ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" ip saddr 216.218.133.2 tcp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
 
         # BitTorrent → QBittorrent
-        iif ppp0 tcp dport 51413 dnat to 10.101.3.16:32710
-        iif ppp0 udp dport 51413 dnat to 10.101.3.16:32710
+        iifname "ppp0" tcp dport 51413 dnat to 10.101.3.16:32710
+        iifname "ppp0" udp dport 51413 dnat to 10.101.3.16:32710
 
         # JRouter discovery port
-        iif ppp0 udp dport 387 dnat to 10.101.3.21:387
+        iifname "ppp0" udp dport 387 dnat to 10.101.3.21:387
       }
 
       chain postrouting {
@@ -149,7 +149,7 @@ _: {
 
         # Masquerade all RFC1918 traffic leaving via WAN.
         # 217.169.25.8/29 (hosted) is excluded — it is publicly routable.
-        oif ppp0 ip saddr 10.0.0.0/8 masquerade
+        oifname "ppp0" ip saddr 10.0.0.0/8 masquerade
       }
     }
   '';
