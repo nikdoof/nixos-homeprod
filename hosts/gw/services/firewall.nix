@@ -71,6 +71,10 @@ _: {
         # DHCPv6 server — IPv6-enabled VLANs (HA is IPv4-only)
         iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } udp dport 547 accept
 
+        # DHCPv6 client on WAN — Solicit goes to multicast so conntrack won't
+        # track it; allow the unicast Advertise/Reply back on port 546 explicitly
+        iifname "ppp0" udp dport 546 accept
+
         # DNS — HE secondaries only (DNAT in prerouting forwards to ns1 at 10.101.1.2)
         ip  saddr @he_dns4 tcp dport 53 accept
         ip6 saddr @he_dns6 tcp dport 53 accept
