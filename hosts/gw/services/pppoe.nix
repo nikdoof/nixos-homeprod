@@ -18,6 +18,7 @@ _: {
         user "aw143@a.2"
         noauth
         defaultroute
+        +ipv6
         persist
         mtu 1500
         mru 1500
