@@ -29,6 +29,17 @@ _: {
         elements = { 2001:470:600::2 }
       }
 
+      # Internal recursive resolvers (ns1 + ns2 on vlan-private)
+      set ns4 {
+        type ipv4_addr
+        elements = { 10.101.1.2, 10.101.1.3 }
+      }
+
+      set ns6 {
+        type ipv6_addr
+        elements = { 2001:8b0:bd9:101::2, 2001:8b0:bd9:101::3 }
+      }
+
       # Ports the hosted VLAN is permitted to use outbound
       set hosted_out_tcp {
         type inet_service
@@ -103,11 +114,17 @@ _: {
         # Lab VLAN — unrestricted outbound (pfSense floating "Allow All")
         iifname "vlan-lab" accept
 
+        # DNS — all client VLANs → internal nameservers on vlan-private
+        iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip  daddr @ns4 udp dport 53 accept
+        iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip  daddr @ns4 tcp dport 53 accept
+        iifname { "vlan-public", "vlan-hosted" }            ip6 daddr @ns6 udp dport 53 accept
+        iifname { "vlan-public", "vlan-hosted" }            ip6 daddr @ns6 tcp dport 53 accept
+
         # Public VLAN — internet + specific internal services only
         iifname "vlan-public" oifname "ppp0"                                    accept
         iifname "vlan-public" ip  daddr 10.101.3.20  tcp dport 443              accept
 
-        # HA VLAN — no forwarding; hosts only reach the gateway itself (INPUT)
+        # HA VLAN — no forwarding except DNS above; hosts only reach the gateway itself (INPUT)
 
         # Hosted VLAN — publicly routable /29; restricted outbound
         iifname "vlan-hosted" oifname "ppp0" tcp dport @hosted_out_tcp          accept
