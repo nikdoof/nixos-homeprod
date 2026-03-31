@@ -149,6 +149,9 @@
     };
   };
 
+  # PPP comes up after boot; waiting for all interfaces would always time out.
+  systemd.network.wait-online.enable = false;
+
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv6.conf.all.forwarding" = true;
