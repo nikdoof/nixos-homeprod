@@ -57,6 +57,10 @@
           Metric = 2048;
         }
       ];
+      # gw is the router — never accept RAs on the management interface.
+      # Without this, gw installs its own radvd RA as a default route via
+      # enp2s0 (metric 512, pref high) which beats the ppp0 default and loops.
+      networkConfig.IPv6AcceptRA = false;
       linkConfig.RequiredForOnline = "no";
     };
 
