@@ -7,7 +7,7 @@ _: {
     enable = true;
     extraArgs = [
       "-I"
-      "enp3s0f0,enp3s0f1"
+      "enp3s0f0"
     ];
   };
 }

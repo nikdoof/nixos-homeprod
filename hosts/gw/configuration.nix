@@ -30,15 +30,19 @@
   };
 
   systemd.network.networks = {
-    # On-board management interface — DHCP for address, but must not install a
-    # default route (ppp0 is the WAN gateway). IPv6 RA disabled for same reason.
+    # On-board management interface — host-only prefixes (/32, /128) so that no
+    # subnet route is generated. vlan-private remains the sole owner of
+    # 10.101.0.0/16 and 2001:8b0:bd9:101::/64. enp2s0 is still reachable via
+    # ARP/NDP on the L2 segment and via the vlan-private subnet route from
+    # other subnets, but never competes for routing preference.
     "10-enp2s0" = {
       matchConfig.Name = "enp2s0";
       networkConfig = {
-        DHCP = "ipv4";
-        IPv6AcceptRA = false;
+        Address = [
+          "10.101.3.23/32"
+          "2001:8b0:bd9:101::3:23/128"
+        ];
       };
-      dhcpV4Config.UseGateway = false;
     };
 
     # Internal VLANs on enp3s0f0

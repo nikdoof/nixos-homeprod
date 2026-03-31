@@ -37,6 +37,7 @@ with dns.lib.combinators;
       svc-01 = host "10.101.3.20" "fddd:d00f:dab0:101::20";
       svc-02 = host "10.101.3.21" "fddd:d00f:dab0:101::21";
       hyp-01 = host "10.101.3.22" "fddd:d00f:dab0:101::22";
+      gw-mgmt = host "10.101.3.23" "fddd:d00f:dab0:101::3:23";
 
       # VMs
       afp-01 = host "10.101.3.30" "fddd:d00f:dab0:101::3:30";
