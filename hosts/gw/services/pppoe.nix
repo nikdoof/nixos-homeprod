@@ -16,14 +16,20 @@ _: {
       config = ''
         plugin pppoe.so vlan-wan
         user "aw143@a.2"
-        noauth
-        defaultroute
-        +ipv6
-        persist
-        mtu 1500
-        mru 1500
-        lcp-echo-interval 30
+
+        noipdefault
+        hide-password
+        lcp-echo-interval 1
         lcp-echo-failure 4
+        noauth
+        persist
+        maxfail 0
+        holdoff 5
+        mtu 1500
+        noaccomp
+        default-asyncmap
+        +ipv6
+        ipv6cp-use-ipaddr
       '';
     };
   };
