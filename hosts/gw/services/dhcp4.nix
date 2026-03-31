@@ -15,6 +15,11 @@ _: {
         name = "/var/lib/kea/dhcp4.leases";
       };
 
+      "control-socket" = {
+        socket-type = "unix";
+        socket-name = "/run/kea/kea4-ctrl-socket";
+      };
+
       valid-lifetime = 86400;
 
       # Send DNS updates to kea-dhcp-ddns; server handles updates, not client.
