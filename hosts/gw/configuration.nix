@@ -122,15 +122,18 @@
     };
 
     # ppp0 is created by pppd. AAISP assigns the WAN IPv6 address via DHCPv6
-    # IA_NA (pfSense: ipaddrv6=dhcp6, ia-na 0) — not SLAAC. DHCP=ipv6 starts
-    # the DHCPv6 client; IPv6AcceptRA=true is kept so that systemd-networkd
-    # sets accept_ra=2 (required to receive RAs despite global IPv6 forwarding).
+    # IA_NA but never sends an RA over PPP, so WithoutRA=solicit forces the
+    # DHCPv6 client to send a Solicit immediately on link-local assignment
+    # rather than waiting for an RA with M/O flags.
+    # IPv6AcceptRA=true keeps accept_ra=2 in the kernel (required for RA
+    # processing on VLANs despite global IPv6 forwarding being enabled).
     "30-ppp0" = {
       matchConfig.Name = "ppp0";
       networkConfig = {
         DHCP = "ipv6";
         IPv6AcceptRA = true;
       };
+      dhcpV6Config.WithoutRA = "solicit";
       linkConfig.RequiredForOnline = "no";
     };
   };
