@@ -10,6 +10,11 @@ _: {
         # vlan-ha is IPv4-only — no DHCPv6 server
       ];
 
+      "control-socket" = {
+        socket-type = "unix";
+        socket-name = "/run/kea/kea6-ctrl-socket";
+      };
+
       lease-database = {
         type = "memfile";
         persist = true;
