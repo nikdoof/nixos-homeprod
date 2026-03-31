@@ -74,8 +74,8 @@ _: {
         ip  saddr @local4 udp dport 123 accept
         ip6 saddr @local6 udp dport 123 accept
 
-        # SSH — private VLAN only
-        iifname "vlan-private" tcp dport 22 accept
+        # SSH — private VLAN and management interface (enp2s0, DHCP fallback)
+        iifname { "vlan-private", "enp2s0" } tcp dport 22 accept
       }
 
       chain forward {
