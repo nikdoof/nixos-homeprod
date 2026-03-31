@@ -30,13 +30,15 @@
   };
 
   systemd.network.networks = {
-    # On-board default DHCP interface (fallback)
+    # On-board management interface — DHCP for address, but must not install a
+    # default route (ppp0 is the WAN gateway). IPv6 RA disabled for same reason.
     "10-enp2s0" = {
       matchConfig.Name = "enp2s0";
       networkConfig = {
         DHCP = "ipv4";
-        IPv6AcceptRA = true;
+        IPv6AcceptRA = false;
       };
+      dhcpV4Config.UseGateway = false;
     };
 
     # Internal VLANs on enp3s0f0
@@ -57,7 +59,6 @@
         "10.101.1.1/16"
         "2001:8b0:bd9:101::1/64"
       ];
-      linkConfig.RequiredForOnline = "routable";
     };
 
     "10-vlan-public" = {
@@ -66,7 +67,6 @@
         "10.102.1.1/16"
         "2001:8b0:bd9:102::1/64"
       ];
-      linkConfig.RequiredForOnline = "routable";
     };
 
     "10-vlan-lab" = {
@@ -75,7 +75,6 @@
         "10.104.1.1/16"
         "2001:8b0:bd9:104::1/64"
       ];
-      linkConfig.RequiredForOnline = "routable";
     };
 
     "10-vlan-ha" = {
@@ -84,7 +83,6 @@
         "10.105.1.1/16"
         "2001:8b0:bd9:105::1/64"
       ];
-      linkConfig.RequiredForOnline = "routable";
     };
 
     # Hosted VLAN uses a publicly routable /29 block (not NATed)
@@ -94,7 +92,6 @@
         "217.169.25.9/29"
         "2001:8b0:bd9:106::1/64"
       ];
-      linkConfig.RequiredForOnline = "routable";
     };
 
     # WAN — enp3s0f1 carries VLAN 911 to the CityFibre ONT; pppd creates ppp0 over it
@@ -108,12 +105,14 @@
       networkConfig.LinkLocalAddressing = "no";
     };
 
-    # ppp0 is created by pppd; networkd applies IPv6 RA acceptance.
-    # systemd-networkd sets accept_ra=2 so RA works despite global forwarding.
+    # ppp0 is created by pppd. AAISP assigns the WAN IPv6 address via DHCPv6
+    # IA_NA (pfSense: ipaddrv6=dhcp6, ia-na 0) — not SLAAC. DHCP=ipv6 starts
+    # the DHCPv6 client; IPv6AcceptRA=true is kept so that systemd-networkd
+    # sets accept_ra=2 (required to receive RAs despite global IPv6 forwarding).
     "30-ppp0" = {
       matchConfig.Name = "ppp0";
       networkConfig = {
-        DHCP = "no";
+        DHCP = "ipv6";
         IPv6AcceptRA = true;
       };
       linkConfig.RequiredForOnline = "no";
