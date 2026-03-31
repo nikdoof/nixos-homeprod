@@ -16,6 +16,10 @@ _: {
       allow 10.0.0.0/8
       allow 2001:8b0:bd9::/48
       allow fc00::/7
+
+      # Step the clock on the first 3 updates if off by more than 1 second
+      # (fast correction on boot before ntpd has enough samples to slew)
+      makestep 1.0 3
     '';
   };
 }

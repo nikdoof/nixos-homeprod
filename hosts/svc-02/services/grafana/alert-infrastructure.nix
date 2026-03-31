@@ -208,6 +208,107 @@ mkPromData: {
     }
 
     {
+      uid = "infra-gw-ppp0-down";
+      title = "Gateway WAN Interface Down";
+      condition = "C";
+      for = "2m";
+      noDataState = "Alerting";
+      execErrState = "Error";
+      labels.severity = "critical";
+      annotations = {
+        summary = "ppp0 WAN interface is down on gw";
+        description = ''
+          The ppp0 PPPoE interface on gw has been absent or down for more than
+          2 minutes. WAN connectivity is lost. Check the CityFibre ONT, vlan-wan,
+          and pppd service status.
+        '';
+      };
+      data = mkPromData {
+        expr = ''min(node_network_up{instance="gw:9100",device="ppp0"})'';
+        threshold = 1;
+        thresholdType = "lt";
+      };
+    }
+
+    {
+      uid = "infra-gw-dhcp4-pool";
+      title = "Gateway DHCPv4 Pool Near Exhaustion";
+      condition = "C";
+      for = "5m";
+      noDataState = "OK";
+      execErrState = "Error";
+      labels.severity = "warning";
+      annotations = {
+        summary = "DHCPv4 pool above 85% utilisation on {{ $labels.subnet }}";
+        description = ''
+          Kea DHCPv4 pool on subnet {{ $labels.subnet }} has been above 85%
+          utilised for more than 5 minutes.
+          Current ratio: {{ printf "%.2f" $values.B.Value }}.
+          Check for lease exhaustion or rogue clients.
+        '';
+      };
+      data = mkPromData {
+        expr = ''
+          max by(subnet) (
+            kea_dhcp4_allocated_addresses / kea_dhcp4_total_addresses
+          )
+        '';
+        threshold = 0.85;
+      };
+    }
+
+    {
+      uid = "infra-gw-conntrack";
+      title = "Gateway Conntrack Near Saturation";
+      condition = "C";
+      for = "5m";
+      noDataState = "OK";
+      execErrState = "Error";
+      labels.severity = "warning";
+      annotations = {
+        summary = "nf_conntrack table above 80% on gw";
+        description = ''
+          The netfilter conntrack table on gw has been above 80% full for more
+          than 5 minutes.
+          Current ratio: {{ printf "%.2f" $values.B.Value }}.
+          At saturation new connections will be dropped. Consider raising
+          nf_conntrack_max or investigating high-connection-count processes.
+        '';
+      };
+      data = mkPromData {
+        expr = ''
+          max(
+            node_nf_conntrack_entries{instance="gw:9100"}
+            / node_nf_conntrack_entries_limit{instance="gw:9100"}
+          )
+        '';
+        threshold = 0.80;
+      };
+    }
+
+    {
+      uid = "infra-gw-chrony-unsync";
+      title = "Gateway NTP Not Synchronised";
+      condition = "C";
+      for = "10m";
+      noDataState = "OK";
+      execErrState = "Error";
+      labels.severity = "warning";
+      annotations = {
+        summary = "Chrony on gw is not synchronised to a time source";
+        description = ''
+          Chrony stratum on gw has been 16 or higher (unsynchronised) for more
+          than 10 minutes. Current stratum: {{ printf "%.0f" $values.B.Value }}.
+          Check upstream NTP server reachability and chrony service status.
+        '';
+      };
+      data = mkPromData {
+        expr = ''max(chrony_tracking_stratum{instance="gw:9123"})'';
+        threshold = 15;
+      };
+    }
+
+    {
       uid = "infra-prometheus-retention";
       title = "Prometheus Retention Low";
       condition = "C";

@@ -47,8 +47,9 @@ _: {
         ct state invalid drop
         iif lo accept
 
-        # ICMPv4 — rate-limited to mitigate reflection floods
-        ip protocol icmp limit rate 10/second accept
+        # ICMPv4 — restrict to useful types only; rate-limited to prevent floods.
+        # Redirects (5) and router-advertisement (9/10) from WAN are dropped.
+        ip protocol icmp icmp type { echo-request, destination-unreachable, time-exceeded } limit rate 10/second accept
 
         # ICMPv6 — unrestricted; required for NDP, RA, PMTUD, MLD
         ip6 nexthdr icmpv6 accept
@@ -59,14 +60,7 @@ _: {
         # DHCPv6 server — IPv6-enabled VLANs (HA is IPv4-only)
         iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } udp dport 547 accept
 
-        # DNS — internal networks
-        ip  saddr @local4 tcp dport { 53, 853 } accept
-        ip  saddr @local4 udp dport 53          accept
-        ip6 saddr @local6 tcp dport { 53, 853 } accept
-        ip6 saddr @local6 udp dport 53          accept
-
-        # DNS — HE secondaries (zone transfer / NOTIFY inbound to gateway;
-        #       DNAT in prerouting forwards these to ns1 at 10.101.1.2)
+        # DNS — HE secondaries only (DNAT in prerouting forwards to ns1 at 10.101.1.2)
         ip  saddr @he_dns4 tcp dport 53 accept
         ip6 saddr @he_dns6 tcp dport 53 accept
 
@@ -128,6 +122,10 @@ _: {
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           oifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           udp dport 5353 accept
+
+        # Log anything that hits the default drop so cross-VLAN and WAN denials
+        # are visible in the journal for debugging.
+        log prefix "nft-forward-drop: " flags all
       }
     }
 
