@@ -6,7 +6,7 @@ _: {
   services.avahi = {
     enable = true;
     reflector = true;
-    interfaces = [
+    allowInterfaces = [
       "vlan-private"
       "vlan-lab"
       "vlan-ha"
