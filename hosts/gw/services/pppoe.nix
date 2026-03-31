@@ -19,6 +19,7 @@ _: {
         noauth
         defaultroute
         +ipv6
+        ipv6cp-use-ipaddr
         persist
         mtu 1500
         mru 1500
