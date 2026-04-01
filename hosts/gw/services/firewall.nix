@@ -162,20 +162,23 @@ _: {
       chain prerouting {
         type nat hook prerouting priority -100;
 
-        # HTTPS -> svc-01 (WAN dynamic IP; remainder of :443 on ppp0)
-        iifname "ppp0" tcp dport 443 dnat to 10.101.3.20:8443
-        iifname "ppp0" udp dport 443 dnat to 10.101.3.20:8443
+        # Hosted /29 is publicly routed - skip all NAT rules
+        iifname "ppp0" ip daddr 217.169.25.8/29 return
+
+        # HTTPS -> svc-01
+        iifname "ppp0" fib daddr . iif type local tcp dport 443 dnat to 10.101.3.20:8443
+        iifname "ppp0" fib daddr . iif type local udp dport 443 dnat to 10.101.3.20:8443
 
         # DNS -> ns1 (for HE secondary nameservers only)
-        iifname "ppp0" ip saddr 216.218.133.2 tcp dport 53 dnat to 10.101.1.2
-        iifname "ppp0" ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" fib daddr . iif type local ip saddr 216.218.133.2 tcp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" fib daddr . iif type local ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
 
         # BitTorrent -> QBittorrent
-        iifname "ppp0" tcp dport 51413 dnat to 10.101.3.16
-        iifname "ppp0" udp dport 51413 dnat to 10.101.3.16
+        iifname "ppp0" fib daddr . iif type local tcp dport 51413 dnat to 10.101.3.16
+        iifname "ppp0" fib daddr . iif type local udp dport 51413 dnat to 10.101.3.16
 
         # AARP -> JRouter
-        iifname "ppp0" udp dport 387 dnat to 10.101.3.21
+        iifname "ppp0" fib daddr . iif type local udp dport 387 dnat to 10.101.3.21
       }
 
       chain postrouting {
