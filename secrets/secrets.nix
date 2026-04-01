@@ -32,6 +32,7 @@ in
 
   "doofnetDhcpUpdateKeyRaw.age".publicKeys = users ++ [ gw ];
   "pppoeCredentials.age".publicKeys = users ++ [ gw ];
+  "tailscaleAuthKey.age".publicKeys = users ++ [ gw ];
 
   "swarmMirrorConfig.age".publicKeys = users ++ [ svc-01 ];
   "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];

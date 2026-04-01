@@ -11,6 +11,7 @@ _: {
     ./ntp.nix
     ./pppoe.nix
     ./radvd.nix
+    ./tailscale.nix
     ./upnp.nix
   ];
 }

@@ -76,7 +76,7 @@ _: {
         # track it; allow the unicast Advertise/Reply back on port 546 explicitly
         iifname "ppp0" udp dport 546 accept
 
-        # DNS
+        # DNS - HE secondary nameservers (zone transfer / NOTIFY)
         ip  saddr @he_dns4 tcp dport 53 accept
         ip6 saddr @he_dns6 tcp dport 53 accept
 
@@ -89,7 +89,7 @@ _: {
         ip6 saddr @local6 udp dport 123 accept
 
         # SSH
-        iifname { "vlan-private", "enp2s0" } tcp dport 22 accept
+        iifname { "vlan-private", "enp2s0", "tailscale0" } tcp dport 22 accept
 
         # mDNS
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } udp dport 5353 accept
@@ -129,6 +129,9 @@ _: {
 
         # Lab VLAN
         iifname "vlan-lab" accept
+
+        # Tailscale
+        iifname "tailscale0" accept
 
         # Public VLAN
         iifname "vlan-public" oifname "ppp0"                                    accept
