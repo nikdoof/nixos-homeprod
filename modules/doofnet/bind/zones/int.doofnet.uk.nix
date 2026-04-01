@@ -49,7 +49,7 @@ with dns.lib.combinators;
   };
   extraConfig = ''
     update-policy {
-      # Protect all statically-defined records — DDNS may never overwrite these
+      # Protect all statically-defined records
       deny doofnet-dhcp-updates name gw.int.doofnet.uk.      ANY;
       deny doofnet-dhcp-updates name ns-01.int.doofnet.uk.   ANY;
       deny doofnet-dhcp-updates name ns-02.int.doofnet.uk.   ANY;

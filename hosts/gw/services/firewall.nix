@@ -58,41 +58,42 @@ _: {
         ct state invalid drop
         iif lo accept
 
-        # ICMPv4 — restrict to useful types only; rate-limited to prevent floods.
-        # Redirects (5) and router-advertisement (9/10) from WAN are dropped.
+        # Rules for accept on gw interfaces
+
+        # ICMPv4
         ip protocol icmp icmp type { echo-request, destination-unreachable, time-exceeded } limit rate 10/second accept
 
-        # ICMPv6 — unrestricted; required for NDP, RA, PMTUD, MLD
+        # ICMPv6
         ip6 nexthdr icmpv6 accept
 
-        # DHCPv4 server — VLAN interfaces only (not WAN)
+        # DHCPv4 server
         iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-ha", "vlan-hosted" } udp dport 67 accept
 
-        # DHCPv6 server — IPv6-enabled VLANs (HA is IPv4-only)
+        # DHCPv6 server
         iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } udp dport 547 accept
 
-        # DHCPv6 client on WAN — Solicit goes to multicast so conntrack won't
+        # DHCPv6 client on WAN
         # track it; allow the unicast Advertise/Reply back on port 546 explicitly
         iifname "ppp0" udp dport 546 accept
 
-        # DNS — HE secondaries only (DNAT in prerouting forwards to ns1 at 10.101.1.2)
+        # DNS
         ip  saddr @he_dns4 tcp dport 53 accept
         ip6 saddr @he_dns6 tcp dport 53 accept
 
-        # NTP — internal networks
+        # NTP
         ip  saddr @local4 udp dport 123 accept
         ip6 saddr @local6 udp dport 123 accept
 
-        # SSH — private VLAN and management interface (enp2s0, DHCP fallback)
+        # SSH
         iifname { "vlan-private", "enp2s0" } tcp dport 22 accept
 
-        # mDNS — Avahi reflector must receive on each VLAN it serves
+        # mDNS
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } udp dport 5353 accept
 
-        # UPnP SSDP discovery (multicast UDP 1900)
+        # UPnP SSDP
         iifname { "vlan-private", "vlan-public" } udp dport 1900 accept
 
-        # NAT-PMP / PCP (UDP 5351)
+        # NAT-PMP / PCP
         iifname { "vlan-private", "vlan-public" } udp dport 5351 accept
       }
 
@@ -102,86 +103,78 @@ _: {
         ct state established,related accept
         ct state invalid drop
 
-        # ICMPv6 must be forwarded for NDP proxying, PMTUD, and diagnostics
+        # ICMPv6
         ip6 nexthdr icmpv6 accept
 
-        # Allow all traffic that has been DNAT'd in prerouting (port forwards)
+        # Allow DNATs
         ct status dnat accept
 
-        # Private VLAN — unrestricted outbound (LAN admin network)
-        iifname "vlan-private" accept
-
-        # Lab VLAN — unrestricted outbound (pfSense floating "Allow All")
-        iifname "vlan-lab" accept
-
-        # DNS — all client VLANs → internal nameservers on vlan-private
+        # DNS
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip  daddr @ns4 udp dport 53 accept
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip  daddr @ns4 tcp dport 53 accept
         iifname { "vlan-public", "vlan-hosted" }            ip6 daddr @ns6 udp dport 53 accept
         iifname { "vlan-public", "vlan-hosted" }            ip6 daddr @ns6 tcp dport 53 accept
-
-        # Public VLAN — internet + specific internal services only
-        iifname "vlan-public" oifname "ppp0"                                    accept
-        iifname "vlan-public" ip  daddr 10.101.3.20  tcp dport 443              accept
-
-        # HA VLAN — no forwarding except DNS above; hosts only reach the gateway itself (INPUT)
-
-        # Hosted VLAN — publicly routable /29; restricted outbound
-        iifname "vlan-hosted" oifname "ppp0" tcp dport @hosted_out_tcp          accept
-        iifname "vlan-hosted" oifname "ppp0" udp dport @hosted_out_udp          accept
-        iifname "vlan-hosted" ip daddr 10.101.3.20  tcp dport 443               accept
-        iifname "vlan-hosted" ip daddr 10.101.3.21  tcp dport { 443, 9090 }     accept
-
-        # WAN → Hosted VLAN (inbound to publicly routed /29, no NAT)
-        iifname "ppp0" oifname "vlan-hosted" accept
-
-        # IPv6 port forwards — no NAT for IPv6; traffic arrives at the host's
-        # direct /48 address so ct status dnat never matches. Mirror each IPv4
-        # DNAT rule with an explicit IPv6 forward permit.
-        # Match by port only — the host may have both a static (::16) and a
-        # SLAAC/EUI-64 address; this mirrors the IPv4 DNAT which forwards any
-        # traffic on the port regardless of destination address.
-        iifname "ppp0" oifname "vlan-private" tcp dport 51413 accept  # QBittorrent
-        iifname "ppp0" oifname "vlan-private" udp dport 51413 accept  # QBittorrent
 
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           oifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           udp dport 5353 accept
 
-        # Log anything that hits the default drop so cross-VLAN and WAN denials
-        # are visible in the journal for debugging.
+        # Private VLAN
+        iifname "vlan-private" accept
+
+        # Lab VLAN
+        iifname "vlan-lab" accept
+
+        # Public VLAN
+        iifname "vlan-public" oifname "ppp0"                                    accept
+        iifname "vlan-public" ip  daddr 10.101.3.20  tcp dport 443              accept
+
+        # Hosted VLAN
+        iifname "vlan-hosted" oifname "ppp0" tcp dport @hosted_out_tcp          accept
+        iifname "vlan-hosted" oifname "ppp0" udp dport @hosted_out_udp          accept
+        iifname "vlan-hosted" ip daddr 10.101.3.20  tcp dport 443               accept
+        iifname "vlan-hosted" ip daddr 10.101.3.21  tcp dport { 443, 9090 }     accept
+
+        # WAN -> Hosted VLAN (inbound to publicly routed /29, no NAT)
+        iifname "ppp0" oifname "vlan-hosted" accept
+
+        # WAN Inbound IPv6
+        iifname "ppp0" oifname "vlan-private" tcp dport 51413 accept  # QBittorrent
+        iifname "ppp0" oifname "vlan-private" udp dport 51413 accept  # QBittorrent
+
+        # Log drops
         log prefix "nft-forward-drop: " flags all
       }
     }
 
-    # IPv4 NAT only — IPv6 is natively routed from the static /48
+    # IPv4 NAT only
     table ip nat {
 
       chain prerouting {
         type nat hook prerouting priority -100;
 
-        # HTTPS → svc-01 (WAN dynamic IP; remainder of :443 on ppp0)
+        # HTTPS -> svc-01 (WAN dynamic IP; remainder of :443 on ppp0)
         iifname "ppp0" tcp dport 443 dnat to 10.101.3.20:8443
         iifname "ppp0" udp dport 443 dnat to 10.101.3.20:8443
 
-        # DNS → ns1 (for HE secondary nameservers only)
+        # DNS -> ns1 (for HE secondary nameservers only)
         iifname "ppp0" ip saddr 216.218.133.2 tcp dport 53 dnat to 10.101.1.2
         iifname "ppp0" ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
 
-        # BitTorrent → QBittorrent
+        # BitTorrent -> QBittorrent
         iifname "ppp0" tcp dport 51413 dnat to 10.101.3.16
         iifname "ppp0" udp dport 51413 dnat to 10.101.3.16
 
-        # JRouter discovery port
+        # AARP -> JRouter
         iifname "ppp0" udp dport 387 dnat to 10.101.3.21
       }
 
       chain postrouting {
         type nat hook postrouting priority 100;
 
-        # Masquerade all RFC1918 traffic leaving via WAN.
-        # 217.169.25.8/29 (hosted) is excluded — it is publicly routable.
+        # NAT IPv4 out of WAN
+        # 217.169.25.8/29 (hosted) is excluded.
         oifname "ppp0" ip saddr 10.0.0.0/8 masquerade
       }
     }

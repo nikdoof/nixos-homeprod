@@ -1,6 +1,4 @@
 _: {
-  # Chrony NTP server — gw advertises itself as 10.101.1.1 in DHCP NTP option.
-  # Upstream servers: UK/AA.net NTP pool from pfSense config.
   services.chrony = {
     enable = true;
     servers = [

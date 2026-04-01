@@ -18,7 +18,7 @@ let
     }
   ) config.microvm.vms;
 
-  # Group VMs by CID value — any group with more than one entry is a duplicate.
+  # Group VMs by CID value - any group with more than one entry is a duplicate.
   cidGroups = lib.groupBy (vm: toString vm.cid) vmCIDs;
   duplicates = lib.filterAttrs (_: vms: builtins.length vms > 1) cidGroups;
 

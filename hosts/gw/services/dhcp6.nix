@@ -6,8 +6,6 @@ _: {
         "vlan-private"
         "vlan-public"
         "vlan-lab"
-        # vlan-hosted uses RA mode "router" (SLAAC only) — no DHCPv6 server
-        # vlan-ha is IPv4-only — no DHCPv6 server
       ];
 
       "control-socket" = {

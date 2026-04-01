@@ -30,10 +30,7 @@
   };
 
   systemd.network.networks = {
-    # On-board management interface. AddPrefixRoute=false suppresses the
-    # auto-generated subnet route so vlan-private (metric 0) is always
-    # preferred. Explicit routes at metric 2048 are added as fallback — if
-    # vlan-private goes down these take over, restoring reachability via enp2s0.
+    # management interface, if trunk is down
     "10-enp2s0" = {
       matchConfig.Name = "enp2s0";
       addresses = [
@@ -57,14 +54,12 @@
           Metric = 2048;
         }
       ];
-      # gw is the router — never accept RAs on the management interface.
-      # Without this, gw installs its own radvd RA as a default route via
-      # enp2s0 (metric 512, pref high) which beats the ppp0 default and loops.
+      # avoid loopback routes from self-advertisements
       networkConfig.IPv6AcceptRA = false;
       linkConfig.RequiredForOnline = "no";
     };
 
-    # Internal VLANs on enp3s0f0 — trunk port carries no addresses itself
+    # Internal VLANs trunk
     "10-enp3s0f0" = {
       matchConfig.Name = "enp3s0f0";
       linkConfig.RequiredForOnline = "no";
@@ -77,6 +72,7 @@
       ];
     };
 
+    # VLAN 101 - Private
     "10-vlan-private" = {
       matchConfig.Name = config.systemd.network.netdevs."10-vlan-private".netdevConfig.Name;
       networkConfig.Address = [
@@ -85,6 +81,7 @@
       ];
     };
 
+    # VLAN 102 - Public
     "10-vlan-public" = {
       matchConfig.Name = config.systemd.network.netdevs."10-vlan-public".netdevConfig.Name;
       networkConfig.Address = [
@@ -93,6 +90,7 @@
       ];
     };
 
+    # VLAN 104 - Lab
     "10-vlan-lab" = {
       matchConfig.Name = config.systemd.network.netdevs."10-vlan-lab".netdevConfig.Name;
       networkConfig.Address = [
@@ -101,6 +99,7 @@
       ];
     };
 
+    # VLAN 105 - HA/IoT
     "10-vlan-ha" = {
       matchConfig.Name = config.systemd.network.netdevs."10-vlan-ha".netdevConfig.Name;
       networkConfig.Address = [ "10.105.1.1/16" ];
@@ -115,7 +114,7 @@
       ];
     };
 
-    # WAN — enp3s0f1 carries VLAN 911 to the CityFibre ONT; pppd creates ppp0 over it
+    # WAN intf
     "05-enp3s0f1" = {
       matchConfig.Name = "enp3s0f1";
       linkConfig.RequiredForOnline = "no";
@@ -128,12 +127,7 @@
       networkConfig.LinkLocalAddressing = "no";
     };
 
-    # ppp0 is created by pppd. AAISP assigns the WAN IPv6 address via DHCPv6
-    # IA_NA but never sends an RA over PPP, so WithoutRA=solicit forces the
-    # DHCPv6 client to send a Solicit immediately on link-local assignment
-    # rather than waiting for an RA with M/O flags.
-    # IPv6AcceptRA=true keeps accept_ra=2 in the kernel (required for RA
-    # processing on VLANs despite global IPv6 forwarding being enabled).
+    # PPP to AAISP
     "30-ppp0" = {
       matchConfig.Name = "ppp0";
       networkConfig = {
@@ -151,10 +145,6 @@
       linkConfig.RequiredForOnline = "no";
     };
   };
-
-  # Only the internal VLAN interfaces are required to be online before
-  # network-online.target is reached. WAN/management/trunk interfaces are
-  # excluded so ppp0 coming up late doesn't block kea, radvd, and other services.
 
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;

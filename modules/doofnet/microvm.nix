@@ -92,7 +92,7 @@ in
       }
     ];
 
-    # Persist DHE params — prevents regeneration on every boot
+    # Persist DHE params
     fileSystems."/var/lib/dhparams" = {
       device = "/persist/dhparams";
       options = [ "bind" ];

@@ -71,8 +71,8 @@ in
   # switch invocations.
   #
   # Arguments:
-  #   port    — TCP port the exporter listens on
-  #   comment — iptables comment string (use the exporter name, e.g. "node_exporter")
+  #   port    - TCP port the exporter listens on
+  #   comment - iptables comment string (use the exporter name, e.g. "node_exporter")
   allowFromPrometheus = port: comment: {
     extraCommands = mkAddRules port comment;
     extraStopCommands = mkDelRules port comment;

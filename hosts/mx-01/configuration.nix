@@ -197,20 +197,20 @@ in
           "reject_unauth_destination"
         ];
 
-        # Rate limiting — protect against compromised accounts/hosts flooding outbound
+        # Rate limiting - protect against compromised accounts/hosts flooding outbound
         anvil_rate_time_unit = "60s";
         smtpd_client_connection_rate_limit = "10";
         smtpd_client_message_rate_limit = "100";
         smtpd_client_recipient_rate_limit = "100";
         smtpd_client_auth_rate_limit = "10";
 
-        # Bounce and error management — high bounce rates trigger blacklisting
+        # Bounce and error management - high bounce rates trigger blacklisting
         bounce_queue_lifetime = "1d";
         smtpd_soft_error_limit = "3";
         smtpd_hard_error_limit = "10";
         smtpd_error_sleep_time = "1s";
 
-        # Postscreen — pre-screen inbound SMTP connections before they reach smtpd
+        # Postscreen - pre-screen inbound SMTP connections before they reach smtpd
         postscreen_access_list = "permit_mynetworks";
         postscreen_blacklist_action = "drop";
         postscreen_greet_action = "enforce";
@@ -420,7 +420,7 @@ in
     };
 
     extraConfig = ''
-      # TLS hardening — match Postfix's TLSv1.2+ requirement for IMAP clients
+      # TLS hardening - match Postfix's TLSv1.2+ requirement for IMAP clients
       ssl_min_protocol = TLSv1.2
       ssl_prefer_server_ciphers = yes
 

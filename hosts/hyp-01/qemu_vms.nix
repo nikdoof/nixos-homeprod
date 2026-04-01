@@ -55,7 +55,7 @@ let
         Group = "qemu-vm";
 
         ExecStartPre = [
-          # Tap interface setup — runs as root
+          # Tap interface setup - runs as root
           "+${pkgs.iproute2}/bin/ip tuntap add dev ${tapIface} mode tap"
           "+${pkgs.iproute2}/bin/ip link set ${tapIface} up"
           # Seed a writable EFI vars store on first boot

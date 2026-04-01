@@ -339,7 +339,7 @@ in
         qname-minimization strict;
         minimal-responses yes;
 
-        // Cache limits — keeps memory usage bounded, especially on low-RAM hosts
+        // Cache limits
         max-cache-size 256m;
         max-cache-ttl 86400;
         max-ncache-ttl 3600;
@@ -366,7 +366,7 @@ in
         listen-on port 853 tls local-tls { any; };
         listen-on-v6 port 853 tls local-tls { any; };
 
-        // RPZ — break-dnssec allows rewrites to override DNSSEC-signed responses
+        // RPZ
         response-policy { zone "rpz"; } break-dnssec yes;
       '';
 
@@ -398,7 +398,7 @@ in
             severity dynamic;
           };
 
-          // Full query log — high volume, rotated aggressively
+          // query log
           channel queries_file {
             file "/var/log/named/queries.log" versions 5 size 100m;
             print-time yes;

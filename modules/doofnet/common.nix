@@ -13,7 +13,7 @@
         "flakes"
       ];
     }
-    # Disable store maintenance on microvms — they share the host's /nix/store
+    # Disable store maintenance on microvms - they share the host's /nix/store
     # via virtiofs and may remount it rw, so running GC or optimise from a guest
     # would corrupt the host store.
     (lib.mkIf (!(config.doofnet ? microvm) || !config.doofnet.microvm.enable) {

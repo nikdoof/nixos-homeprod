@@ -1,7 +1,5 @@
 _: {
-  # Kea DHCP exporter — connects directly to the Unix control sockets
-  # configured in dhcp4.nix and dhcp6.nix; no ctrl-agent daemon required.
-  # Exposes per-subnet lease counts, pool utilization, and packet statistics.
+  # Kea DHCP exporter
   services.prometheus.exporters.kea = {
     enable = true;
     port = 9547;
@@ -12,7 +10,7 @@ _: {
     ];
   };
 
-  # Chrony exporter — clock offset, jitter, stratum, and upstream peer status.
+  # Chrony exporter
   services.prometheus.exporters.chrony = {
     enable = true;
     port = 9123;
@@ -34,11 +32,4 @@ _: {
       job_name   = "chrony"
     }
   '';
-
-  # The base server.nix prometheus.exporter.unix (node_exporter) already captures:
-  #   netdev   — per-interface RX/TX bytes, packets, errors, drops
-  #              (covers vlan-private, vlan-public, vlan-lab, vlan-ha,
-  #               vlan-hosted, ppp0, enp2s0, enp3s0f0, enp3s0f1, vlan-wan)
-  #   conntrack — nf_conntrack_entries and nf_conntrack_entries_limit
-  # Both are default-enabled collectors; no additional configuration needed.
 }

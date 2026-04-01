@@ -24,7 +24,7 @@
     }
   '';
 
-  # cAdvisor — runs as a privileged container so it can access container storage
+  # cAdvisor - runs as a privileged container so it can access container storage
   # internals that require root. Alloy scrapes its HTTP endpoint on localhost:8080.
   virtualisation.oci-containers.containers.cadvisor = {
     image = "gcr.io/cadvisor/cadvisor:latest";
