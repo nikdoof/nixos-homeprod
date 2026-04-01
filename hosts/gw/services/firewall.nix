@@ -105,10 +105,6 @@ _: {
         # ICMPv6 must be forwarded for NDP proxying, PMTUD, and diagnostics
         ip6 nexthdr icmpv6 accept
 
-        # Block 2001:8b0:bd9:300::/64 from reaching addresses outside the /48
-        # (pfSense "Log Thread" rule — prevents this subnet escaping to the internet)
-        ip6 saddr 2001:8b0:bd9:300::/64 ip6 daddr != 2001:8b0:bd9::/48 drop
-
         # Allow all traffic that has been DNAT'd in prerouting (port forwards)
         ct status dnat accept
 
@@ -139,6 +135,12 @@ _: {
         # WAN → Hosted VLAN (inbound to publicly routed /29, no NAT)
         iifname "ppp0" oifname "vlan-hosted" accept
 
+        # IPv6 port forwards — no NAT for IPv6; traffic arrives at the host's
+        # direct /48 address so ct status dnat never matches. Mirror each IPv4
+        # DNAT rule with an explicit IPv6 forward permit.
+        iifname "ppp0" oifname "vlan-private" ip6 daddr 2001:8b0:bd9:101::16 tcp dport { 51413 } accept  # QBittorrent
+        iifname "ppp0" oifname "vlan-private" ip6 daddr 2001:8b0:bd9:101::16 udp dport { 51413 } accept  # QBittorrent
+
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           oifname { "vlan-private", "vlan-lab", "vlan-ha" } \
@@ -165,11 +167,11 @@ _: {
         iifname "ppp0" ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
 
         # BitTorrent → QBittorrent
-        iifname "ppp0" tcp dport 51413 dnat to 10.101.3.16:32710
-        iifname "ppp0" udp dport 51413 dnat to 10.101.3.16:32710
+        iifname "ppp0" tcp dport 51413 dnat to 10.101.3.16
+        iifname "ppp0" udp dport 51413 dnat to 10.101.3.16
 
         # JRouter discovery port
-        iifname "ppp0" udp dport 387 dnat to 10.101.3.21:387
+        iifname "ppp0" udp dport 387 dnat to 10.101.3.21
       }
 
       chain postrouting {
