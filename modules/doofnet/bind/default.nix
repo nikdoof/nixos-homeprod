@@ -29,6 +29,10 @@ let
     "2001:470:600::2"
   ];
 
+  heNetNotifyServers = [
+    "216.218.130.2"
+  ];
+
   # Directory for mutable zone files
   zoneDir = "/var/lib/bind/zones";
 
@@ -54,7 +58,7 @@ let
     extraConfig =
       (zone.value.extraConfig or "")
       + lib.optionalString (hasHeNetNameservers zone) ''
-        also-notify { ${lib.concatMapStringsSep " " (s: "${s};") heNetServers} };
+        also-notify { ${lib.concatMapStringsSep " " (s: "${s};") heNetNotifyServers} };
       '';
   };
 
