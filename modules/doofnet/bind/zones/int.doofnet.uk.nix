@@ -48,6 +48,22 @@ with dns.lib.combinators;
     };
   };
   extraConfig = ''
-    allow-update { doofnet-dhcp-updates; };
+    update-policy {
+      # Protect all statically-defined records — DDNS may never overwrite these
+      deny doofnet-dhcp-updates name gw.int.doofnet.uk.      ANY;
+      deny doofnet-dhcp-updates name ns-01.int.doofnet.uk.   ANY;
+      deny doofnet-dhcp-updates name ns-02.int.doofnet.uk.   ANY;
+      deny doofnet-dhcp-updates name nas-01.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name nas-03.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name svc-01.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name svc-02.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name hyp-01.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name gw-mgmt.int.doofnet.uk. ANY;
+      deny doofnet-dhcp-updates name afp-01.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name grf-01.int.doofnet.uk.  ANY;
+      deny doofnet-dhcp-updates name unifi.int.doofnet.uk.   ANY;
+      # Allow DDNS updates for all other names in the zone (DHCP clients)
+      grant doofnet-dhcp-updates zonesub ANY;
+    };
   '';
 }
