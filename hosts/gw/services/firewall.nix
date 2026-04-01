@@ -128,6 +128,7 @@ _: {
 
         # Public VLAN
         iifname "vlan-public" oifname "ppp0"                                    accept
+        iifname "vlan-public" oifname "vlan-hosted"                             accept
         iifname "vlan-public" ip  daddr 10.101.3.20  tcp dport 443              accept
 
         # Hosted VLAN
