@@ -49,11 +49,28 @@ let
       }
     }
 
+    // Journal pipeline — relabels specific log streams before writing to Loki.
+    // stage.match only fires when lines are present; harmless on hosts that
+    // never produce the matched pattern.
+    loki.process "journal_pipeline" {
+      // nftables kernel drop messages have no systemd unit; reassign their job
+      // label so they can be queried as {job="firewall"} separately in Grafana.
+      stage.match {
+        selector = `{job="systemd-journal"} |= "nft-forward-drop:"`
+
+        stage.static_labels {
+          values = {job = "firewall"}
+        }
+      }
+
+      forward_to = [loki.write.default.receiver]
+    }
+
     // Collect systemd journal logs
     loki.source.journal "default" {
       max_age       = "12h"
       labels        = {job = "systemd-journal", host = "${config.networking.hostName}"}
-      forward_to    = [loki.write.default.receiver]
+      forward_to    = [loki.process.journal_pipeline.receiver]
       relabel_rules = loki.relabel.journal.rules
     }
 
