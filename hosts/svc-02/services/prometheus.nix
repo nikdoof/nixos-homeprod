@@ -28,15 +28,6 @@
 
     scrapeConfigs = [
       {
-        # Pull-based scrape for hosts not managed by this flake
-        job_name = "node_exporter";
-        static_configs = [
-          {
-            targets = [ "gw.int.doofnet.uk:9100" ];
-          }
-        ];
-      }
-      {
         job_name = "homeassistant";
         metrics_path = "/api/prometheus";
         scheme = "https";
