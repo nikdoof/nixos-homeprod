@@ -195,7 +195,7 @@ in
       ephemeral_node_inactivity_timeout = "30m";
       grpc_allow_insecure = false;
       grpc_listen_addr = "127.0.0.1:50443";
-      listen_addr = "0.0.0.0:443";
+      listen_addr = "[::]:443";
       log = {
         format = "text";
         level = "info";
