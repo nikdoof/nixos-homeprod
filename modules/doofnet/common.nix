@@ -89,7 +89,7 @@
   # Ensure .zshrc exists for all normal users before their shell starts,
   # preventing the zsh-newuser-install wizard from running.
   systemd.tmpfiles.rules = lib.mapAttrsToList (
-    name: user: "f ${user.home}/.zshrc 0644 ${name} ${name} - -"
+    name: user: "f ${user.home}/.zshrc 0644 ${name} users - -"
   ) (lib.filterAttrs (_: u: u.isNormalUser) config.users.users);
 
   # Suppress the sudo first-use lecture
