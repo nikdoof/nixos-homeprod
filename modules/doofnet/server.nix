@@ -49,7 +49,7 @@ let
       }
     }
 
-    // Journal pipeline — relabels specific log streams before writing to Loki.
+    // Journal pipeline - relabels specific log streams before writing to Loki.
     // stage.match only fires when lines are present; harmless on hosts that
     // never produce the matched pattern.
     loki.process "journal_pipeline" {
@@ -165,7 +165,7 @@ in
           '';
         }
       )
-      # Configure smart monitoring if not a VM
+      # Configure SMART monitoring and LLDP
       (lib.mkIf (!(config.doofnet ? microvm) || !config.doofnet.microvm.enable) {
         services.prometheus.exporters.smartctl = {
           enable = true;
@@ -180,6 +180,10 @@ in
             job_name   = "smartctl"
           }
         '';
+
+        services.lldpd = {
+          enable = true;
+        };
       })
     ]
   );
