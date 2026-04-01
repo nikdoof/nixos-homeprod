@@ -32,6 +32,8 @@ in
   networking.nameservers = [
     "10.101.1.2"
     "10.101.1.3"
+    "2001:8b0:bd9:101::2"
+    "2001:8b0:bd9:101::3"
   ];
   networking.domain = domainName;
   networking.search = [ domainName ];

@@ -80,6 +80,10 @@ _: {
         ip  saddr @he_dns4 tcp dport 53 accept
         ip6 saddr @he_dns6 tcp dport 53 accept
 
+        # DNS - hosted VLAN relay (unbound forwards to ns-01/ns-02)
+        iifname "vlan-hosted" udp dport 53 accept
+        iifname "vlan-hosted" tcp dport 53 accept
+
         # NTP
         ip  saddr @local4 udp dport 123 accept
         ip6 saddr @local6 udp dport 123 accept

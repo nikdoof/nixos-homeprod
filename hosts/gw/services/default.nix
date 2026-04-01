@@ -1,6 +1,7 @@
 _: {
   imports = [
     ./alloy.nix
+    ./dns.nix
     ./avahi.nix
     ./ddns.nix
     ./dhcp4.nix
