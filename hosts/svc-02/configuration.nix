@@ -23,8 +23,14 @@ _: {
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "eno1";
     networkConfig = {
-      DHCP = "ipv4";
+      Address = [
+        "10.101.3.21/16"
+        "2001:8b0:bd9:101::21/64"
+        "fddd:d00f:dab0:101::21/64"
+      ];
+      Gateway = "10.101.1.1";
       IPv6AcceptRA = true;
+      DHCP = "no";
     };
   };
 
