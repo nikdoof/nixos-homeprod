@@ -7,6 +7,7 @@
   services.tailscale = {
     enable = true;
     authKeyParameters = {
+      preauthorized = true;
       baseURL = "https://hs.doofnet.uk";
     };
     authKeyFile = config.age.secrets.tailscaleAuthKey.path;
@@ -16,6 +17,10 @@
       "--advertise-routes"
       "10.0.0.0/8"
       "--advertise-exit-node"
+      "--login-server=${config.services.tailscale.authKeyParameters.baseURL}"
+    ];
+    extraDaemonFlags = [
+      "--no-logs-no-support"
     ];
   };
 }
