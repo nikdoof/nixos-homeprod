@@ -64,9 +64,10 @@
       linkConfig.RequiredForOnline = "no";
     };
 
-    # Internal VLANs on enp3s0f0
+    # Internal VLANs on enp3s0f0 — trunk port carries no addresses itself
     "10-enp3s0f0" = {
       matchConfig.Name = "enp3s0f0";
+      linkConfig.RequiredForOnline = "no";
       networkConfig.VLAN = [
         config.systemd.network.netdevs."10-vlan-private".netdevConfig.Name
         config.systemd.network.netdevs."10-vlan-public".netdevConfig.Name
@@ -117,11 +118,13 @@
     # WAN — enp3s0f1 carries VLAN 911 to the CityFibre ONT; pppd creates ppp0 over it
     "05-enp3s0f1" = {
       matchConfig.Name = "enp3s0f1";
+      linkConfig.RequiredForOnline = "no";
       networkConfig.VLAN = [ "vlan-wan" ];
     };
 
     "05-vlan-wan" = {
       matchConfig.Name = "vlan-wan";
+      linkConfig.RequiredForOnline = "no";
       networkConfig.LinkLocalAddressing = "no";
     };
 
@@ -149,8 +152,9 @@
     };
   };
 
-  # PPP comes up after boot; waiting for all interfaces would always time out.
-  systemd.network.wait-online.enable = false;
+  # Only the internal VLAN interfaces are required to be online before
+  # network-online.target is reached. WAN/management/trunk interfaces are
+  # excluded so ppp0 coming up late doesn't block kea, radvd, and other services.
 
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
