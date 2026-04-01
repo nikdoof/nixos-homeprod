@@ -138,8 +138,11 @@ _: {
         # IPv6 port forwards — no NAT for IPv6; traffic arrives at the host's
         # direct /48 address so ct status dnat never matches. Mirror each IPv4
         # DNAT rule with an explicit IPv6 forward permit.
-        iifname "ppp0" oifname "vlan-private" ip6 daddr 2001:8b0:bd9:101::16 tcp dport { 51413 } accept  # QBittorrent
-        iifname "ppp0" oifname "vlan-private" ip6 daddr 2001:8b0:bd9:101::16 udp dport { 51413 } accept  # QBittorrent
+        # Match by port only — the host may have both a static (::16) and a
+        # SLAAC/EUI-64 address; this mirrors the IPv4 DNAT which forwards any
+        # traffic on the port regardless of destination address.
+        iifname "ppp0" oifname "vlan-private" tcp dport 51413 accept  # QBittorrent
+        iifname "ppp0" oifname "vlan-private" udp dport 51413 accept  # QBittorrent
 
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
