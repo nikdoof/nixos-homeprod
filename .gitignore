@@ -14,3 +14,8 @@ __pycache__
 
 # Claude
 .claude
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform

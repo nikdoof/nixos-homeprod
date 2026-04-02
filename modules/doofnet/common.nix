@@ -116,7 +116,7 @@
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
-        PermitRootLogin = "no";
+        PermitRootLogin = lib.mkForce "no";
       };
     };
     fstrim.enable = true;
