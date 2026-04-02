@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../../hardware/prodesk-600-g3-dm.nix
+    ../../hardware/prodesk-400-g4-sff.nix
     ./hardware-configuration.nix
     ./services
   ];

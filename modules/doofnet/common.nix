@@ -104,6 +104,9 @@
     starship
     tcpdump
     yq
+    pciutils
+    dmidecode
+    htop
   ];
 
   services = {

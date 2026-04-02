@@ -3,13 +3,13 @@
   ...
 }:
 {
-  # HP Prodesk 600 G3 DM
+  # HP Prodesk 400 G4 SFF
   #
-  # Intel Sky Lake platform, Q270, DDR4, PCIe 3.0, M2 4x
-  # https://support.hp.com/us-en/drivers/hp-prodesk-600-g3-desktop-mini-pc/15257642
+  # Intel Kaby Lake platform, H270, DDR4, PCIe 3.0
+  # https://support.hp.com/gb-en/product/details/model/15292381
 
   imports = [
-    "${inputs.nixos-hardware}/common/cpu/intel/skylake"
+    inputs.nixos-hardware.nixosModules.common-gpu-intel-kaby-lake
     "${inputs.nixos-hardware}/common/pc/ssd"
   ];
 
