@@ -224,7 +224,9 @@ mkPromData: {
         '';
       };
       data = mkPromData {
-        expr = ''min(node_network_up{instance="gw:9100",device="ppp0"})'';
+        # node_network_up is always 0 for PPP (operstate=unknown is normal);
+        # node_network_carrier reflects actual link state
+        expr = ''min(node_network_carrier{instance="gw",device="ppp0"})'';
         threshold = 1;
         thresholdType = "lt";
       };
