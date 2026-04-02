@@ -37,7 +37,14 @@ let
   zoneDir = "/var/lib/bind/zones";
 
   # Helper functions
-  hasDynamicUpdates = zone: builtins.match ".*allow-update.*" (zone.value.extraConfig or "") != null;
+  # A zone is dynamic if it accepts updates via either allow-update or update-policy;
+  # both require a writable (non-store) zone file so BIND can maintain a journal.
+  hasDynamicUpdates =
+    zone:
+    let
+      extra = zone.value.extraConfig or "";
+    in
+    builtins.match ".*allow-update.*" extra != null || builtins.match ".*update-policy.*" extra != null;
   hasHeNetNameservers =
     zone:
     builtins.any (ns: builtins.match ".*he\\.net\\..*" ns != null) (zone.value.zoneData.NS or [ ]);
@@ -314,6 +321,8 @@ in
       forwarders = [ ];
 
       cacheNetworks = [
+        "127.0.0.0/8"
+        "::1"
         "10.0.0.0/8"
         "217.169.25.8/29"
         "2001:8b0:bd9::/48"
