@@ -5,7 +5,7 @@
 {
   # HP Prodesk 400 G4 SFF
   #
-  # Intel Kaby Lake platform, H270, DDR4, PCIe 3.0
+  # Intel Kaby Lake platform, H270, DDR4, PCIe 3.0, Intel HD Graphics 630
   # https://support.hp.com/gb-en/product/details/model/15292381
 
   imports = [
