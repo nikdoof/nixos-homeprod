@@ -318,6 +318,7 @@ in
         "217.169.25.8/29"
         "2001:8b0:bd9::/48"
         "fddd:d00f:dab0::/48"
+        "fc00::/7"
       ];
 
       zones = lib.listToAttrs (
