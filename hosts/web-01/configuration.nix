@@ -175,6 +175,7 @@ in
   '';
 
   doofnet.server = true;
+  doofnet.fail2ban.enable = true;
 
   environment.etc."alloy/conf.d/01-nginx.alloy".text = ''
     local.file_match "nginx" {
