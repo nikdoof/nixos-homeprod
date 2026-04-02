@@ -92,24 +92,7 @@ _: {
             {
               hw-address = "10:e7:c6:03:97:18";
               ip-address = "10.101.3.22";
-              hostname = "svc-03";
-            }
-            {
-              hw-address = "00:0c:29:3b:52:4f";
-              ip-address = "10.101.3.104";
-              hostname = "raq-restore-nfs";
-            }
-            {
-              # raq boots via raq-restore-nfs, not the subnet's next-server
-              hw-address = "00:10:e0:02:14:87";
-              ip-address = "10.101.3.105";
-              hostname = "raq";
-              next-server = "10.101.3.104";
-            }
-            {
-              hw-address = "18:60:24:e5:9a:92";
-              ip-address = "10.101.10.13";
-              hostname = "prod-master-03";
+              hostname = "hyp-01";
             }
           ];
         }
