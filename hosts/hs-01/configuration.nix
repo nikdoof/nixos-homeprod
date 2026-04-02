@@ -121,6 +121,7 @@ in
   };
 
   doofnet.server = true;
+  doofnet.fail2ban.enable = true;
 
   services.headscale = {
     enable = true;

@@ -54,6 +54,8 @@ in
   };
 
   doofnet.server = true;
+  doofnet.fail2ban.enable = true;
+  doofnet.fail2ban.jails.dovecot = true;
 
   age.secrets = {
     digitaloceanApiToken = {

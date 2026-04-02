@@ -165,6 +165,8 @@ _: {
         # Hosted /29 is publicly routed - skip all NAT rules
         iifname "ppp0" ip daddr 217.169.25.8/29 return
 
+        # ppp0 NAT rules (81.187.48.147)
+
         # HTTPS -> svc-01
         iifname "ppp0" fib daddr . iif type local tcp dport 443 dnat to 10.101.3.20:8443
         iifname "ppp0" fib daddr . iif type local udp dport 443 dnat to 10.101.3.20:8443
