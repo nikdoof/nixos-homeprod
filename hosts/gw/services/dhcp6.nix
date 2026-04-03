@@ -43,6 +43,8 @@ _: {
               prefix = "2001:8b0:bd9:200::";
               prefix-len = 56;
               delegated-len = 64;
+              preferred-lifetime = 3600;
+              valid-lifetime = 7200;
             }
           ];
           option-data = [
