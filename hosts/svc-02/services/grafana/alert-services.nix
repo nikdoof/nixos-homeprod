@@ -84,6 +84,30 @@ mkPromData: {
     }
 
     {
+      uid = "svc-fail2ban-high-bans";
+      title = "fail2ban High Active Ban Count";
+      condition = "C";
+      for = "10m";
+      noDataState = "OK";
+      execErrState = "Error";
+      labels.severity = "warning";
+      annotations = {
+        summary = "{{ $labels.host }} has more than 10 active fail2ban bans in jail {{ $labels.jail }}";
+        description = ''
+          fail2ban jail {{ $labels.jail }} on {{ $labels.host }} currently has
+          more than 10 IPs banned, sustained for 10 minutes. This may indicate
+          an active credential-stuffing or brute-force campaign.
+          Current ban count: {{ printf "%.0f" $values.B.Value }}.
+          Check with `fail2ban-client status {{ $labels.jail }}` on the host.
+        '';
+      };
+      data = mkPromData {
+        expr = "fail2ban_banned_ips";
+        threshold = 10;
+      };
+    }
+
+    {
       uid = "svc-exporter-down";
       title = "Exporter Scrape Failing";
       condition = "C";
