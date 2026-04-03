@@ -143,6 +143,7 @@ _: {
         iifname "vlan-hosted" oifname "ppp0" udp dport @hosted_out_udp          accept
         iifname "vlan-hosted" ip daddr 10.101.3.20  tcp dport 443               accept
         iifname "vlan-hosted" ip daddr 10.101.3.21  tcp dport { 443, 9090 }     accept
+        iifname "vlan-hosted" udp dport 41641                                   accept
 
         # WAN -> Hosted VLAN (inbound to publicly routed /29, no NAT)
         iifname "ppp0" oifname "vlan-hosted" accept
