@@ -48,6 +48,7 @@ in
       IPv6AcceptRA = true;
       DHCP = "no";
     };
+    dhcpV6Config.UseDelegatedPrefix = false;
   };
 
   doofnet.server = true;

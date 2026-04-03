@@ -51,6 +51,7 @@ in
       DHCP = "no";
       MulticastDNS = true;
     };
+    dhcpV6Config.UseDelegatedPrefix = false;
   };
 
   doofnet.server = true;

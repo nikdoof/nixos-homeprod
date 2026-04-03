@@ -42,6 +42,7 @@ in
     networkConfig = {
       IPv6AcceptRA = true;
     };
+    dhcpV6Config.UseDelegatedPrefix = false;
   };
 
   networking.firewall = {

@@ -46,6 +46,7 @@
       IPv6AcceptRA = true;
       DHCP = "no";
     };
+    dhcpV6Config.UseDelegatedPrefix = false;
   };
   networking.wireless = {
     enable = lib.mkForce false;
