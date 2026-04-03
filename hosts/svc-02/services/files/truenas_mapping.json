@@ -724,6 +724,18 @@
       }
     },
     {
+      "match": "truenas\\.(.*)\\.(.*)\\.io\\.(.*)",
+      "match_type": "regex",
+      "name": "cgroup_io_usage",
+      "labels": {
+        "job": "truenas",
+        "type": "${3}",
+        "instance": "${1}",
+        "cgroup": "${2}",
+        "unit": "KiB/s"
+      }
+    },
+    {
       "match": "truenas\\.(.*)\\.(.*)\\.io_full_pressure\\.(.*)",
       "match_type": "regex",
       "name": "cgroup_io_full_pressure",
@@ -772,6 +784,18 @@
       }
     },
     {
+      "match": "truenas\\.(.*)\\.(.*)\\.mem\\.(.*)",
+      "match_type": "regex",
+      "name": "cgroup_memory_detailed_usage",
+      "labels": {
+        "job": "truenas",
+        "type": "${3}",
+        "instance": "${1}",
+        "cgroup": "${2}",
+        "unit": "MiB"
+      }
+    },
+    {
       "match": "truenas\\.(.*)\\.(.*)\\.mem_full_pressure\\.(.*)",
       "match_type": "regex",
       "name": "cgroup_mem_full_pressure",
@@ -784,7 +808,7 @@
       }
     },
     {
-      "match": "truenas\\.(.*)\\.(.*)\\.mem_full_pressure_stall_time\\.time",
+      "match": "truenas\\.(.*)\\.(.*)\\.memory_full_pressure_stall_time\\.time",
       "match_type": "regex",
       "name": "cgroup_mem_full_pressure_stall_time",
       "labels": {
@@ -808,7 +832,7 @@
       }
     },
     {
-      "match": "truenas\\.(.*)\\.(.*)\\.mem_some_pressure_stall_time\\.time",
+      "match": "truenas\\.(.*)\\.(.*)\\.memory_some_pressure_stall_time\\.time",
       "match_type": "regex",
       "name": "cgroup_mem_some_pressure_stall_time",
       "labels": {
@@ -898,6 +922,130 @@
         "instance": "${1}",
         "cgroup": "${2}",
         "unit": "MiB"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.(.*)\\.serviced_ops\\.(.*)",
+      "match_type": "regex",
+      "name": "cgroup_serviced_ops",
+      "labels": {
+        "job": "truenas",
+        "type": "${3}",
+        "instance": "${1}",
+        "cgroup": "${2}",
+        "unit": "op/s"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.truenas_arcstats\\.(.*)\\.(.*)",
+      "match_type": "regex",
+      "name": "truenas_arcstats",
+      "labels": {
+        "job": "truenas",
+        "type": "${2}",
+        "subtype": "${3}",
+        "instance": "${1}"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.truenas_disk_stats\\.(.*)\\.(reads|writes)",
+      "match_type": "regex",
+      "name": "disk_io",
+      "labels": {
+        "job": "truenas",
+        "disk": "${2}",
+        "instance": "${1}",
+        "op": "${3}",
+        "unit": "KiB/s"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.truenas_disk_stats\\.ops\\.(.*)\\.(read_ops|write_ops)",
+      "match_type": "regex",
+      "name": "disk_io_ops",
+      "labels": {
+        "job": "truenas",
+        "disk": "${2}",
+        "instance": "${1}",
+        "op": "${3}",
+        "unit": "op/s"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.truenas_disk_stats\\.busy\\.(.*)\\.busy",
+      "match_type": "regex",
+      "name": "disk_busy",
+      "labels": {
+        "job": "truenas",
+        "disk": "${2}",
+        "instance": "${1}",
+        "unit": "ms"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.disk_space\\.(.*)\\.used",
+      "match_type": "regex",
+      "name": "disk_bytes_used",
+      "labels": {
+        "job": "truenas",
+        "mountpoint": "${2}",
+        "instance": "${1}",
+        "unit": "GiB"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.disk_space\\.(.*)\\.avail",
+      "match_type": "regex",
+      "name": "disk_bytes_avail",
+      "labels": {
+        "job": "truenas",
+        "mountpoint": "${2}",
+        "instance": "${1}",
+        "unit": "GiB"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.disk_space\\.(.*)\\.reserved_for_root",
+      "match_type": "regex",
+      "name": "disk_bytes_reserved_for_root",
+      "labels": {
+        "job": "truenas",
+        "mountpoint": "${2}",
+        "instance": "${1}",
+        "unit": "GiB"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.disk_inodes\\.(.*)\\.used",
+      "match_type": "regex",
+      "name": "disk_inodes_used",
+      "labels": {
+        "job": "truenas",
+        "mountpoint": "${2}",
+        "instance": "${1}",
+        "unit": "inodes"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.disk_inodes\\.(.*)\\.avail",
+      "match_type": "regex",
+      "name": "disk_inodes_avail",
+      "labels": {
+        "job": "truenas",
+        "mountpoint": "${2}",
+        "instance": "${1}",
+        "unit": "inodes"
+      }
+    },
+    {
+      "match": "truenas\\.(.*)\\.disk_inodes\\.(.*)\\.reserved_for_root",
+      "match_type": "regex",
+      "name": "disk_inodes_reserved_for_root",
+      "labels": {
+        "job": "truenas",
+        "mountpoint": "${2}",
+        "instance": "${1}",
+        "unit": "inodes"
       }
     }
   ]
