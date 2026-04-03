@@ -13,6 +13,8 @@ _: {
         type = "memfile";
         persist = true;
         name = "/var/lib/kea/dhcp4.leases";
+        lfc-interval = 1800;
+        max-row-errors = 100;
       };
 
       "control-socket" = {

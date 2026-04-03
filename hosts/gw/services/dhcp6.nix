@@ -17,6 +17,8 @@ _: {
         type = "memfile";
         persist = true;
         name = "/var/lib/kea/dhcp6.leases";
+        lfc-interval = 1800;
+        max-row-errors = 100;
       };
 
       # Send DNS updates to kea-dhcp-ddns; server handles updates, not client.
