@@ -311,6 +311,55 @@ mkPromData: {
     }
 
     {
+      uid = "infra-gw-fw-drop-spike";
+      title = "Gateway Firewall Internal Drop Rate Spike";
+      condition = "C";
+      for = "3m";
+      noDataState = "OK";
+      execErrState = "Error";
+      labels.severity = "warning";
+      annotations = {
+        summary = "Elevated internal forward-drop rate on gw";
+        description = ''
+          The nftables fw_forward_drop counter on gw is increasing at more than
+          50 packets/s, sustained for 3 minutes. This counter fires on traffic
+          that is not WAN-inbound noise — it indicates unexpected internal traffic
+          being blocked (misconfigured host, lateral movement attempt, etc.).
+          Check `nft list counter inet filter fw_forward_drop` and the
+          {job="firewall"} Loki stream for source/destination details.
+        '';
+      };
+      data = mkPromData {
+        expr = ''rate(nftables_counter_packets_total{host="gw",name="fw_forward_drop"}[5m])'';
+        threshold = 50;
+      };
+    }
+
+    {
+      uid = "infra-gw-ppp0-flapping";
+      title = "Gateway PPPoE Link Flapping";
+      condition = "C";
+      for = "0s";
+      noDataState = "OK";
+      execErrState = "Error";
+      labels.severity = "warning";
+      annotations = {
+        summary = "ppp0 carrier has changed more than 3 times in the last hour on gw";
+        description = ''
+          The ppp0 interface on gw has had more than 3 carrier-state changes in
+          the last hour, indicating an unstable PPPoE session. This can cause
+          brief WAN outages and BGP/routing churn. Check the CityFibre ONT,
+          VLAN 911 trunk, and pppd logs (`journalctl -u ppp-aaisp`).
+          Carrier changes: {{ printf "%.0f" $values.B.Value }}.
+        '';
+      };
+      data = mkPromData {
+        expr = ''increase(node_network_carrier_changes_total{host="gw",device="ppp0"}[1h])'';
+        threshold = 3;
+      };
+    }
+
+    {
       uid = "infra-prometheus-retention";
       title = "Prometheus Retention Low";
       condition = "C";

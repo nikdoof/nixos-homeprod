@@ -101,6 +101,11 @@ _: {
         iifname { "vlan-private", "vlan-public" } udp dport 5351 accept
       }
 
+      # Named counters — exported to Prometheus via the nftables textfile collector.
+      counter fw_wan_forward_drop { comment "WAN inbound packets dropped (ppp0 forward chain)" }
+      counter fw_hosted_blocked   { comment "Hosted VLAN outbound packets blocked" }
+      counter fw_forward_drop     { comment "All other forward chain drops (logged)" }
+
       chain forward {
         type filter hook forward priority 0; policy drop;
 
@@ -144,6 +149,8 @@ _: {
         iifname "vlan-hosted" ip daddr 10.101.3.20  tcp dport 443               accept
         iifname "vlan-hosted" ip daddr 10.101.3.21  tcp dport { 443, 9090 }     accept
         iifname "vlan-hosted" udp dport 41641                                   accept
+        # Count hosted VLAN packets that fell through all accept rules
+        iifname "vlan-hosted" counter name fw_hosted_blocked
 
         # WAN -> Hosted VLAN (inbound to publicly routed /29, no NAT)
         iifname "ppp0" oifname "vlan-hosted" accept
@@ -152,9 +159,10 @@ _: {
         iifname "ppp0" oifname "vlan-private" tcp dport 51413 accept  # QBittorrent
         iifname "ppp0" oifname "vlan-private" udp dport 51413 accept  # QBittorrent
 
-        # Log drops (suppress ppp0 inbound noise)
-        iifname "ppp0" drop
-        log prefix "nft-forward-drop: " flags all
+        # WAN inbound drops - count without logging (suppress noise)
+        iifname "ppp0" counter name fw_wan_forward_drop drop
+        # Log and count all remaining (internal) drops
+        log prefix "nft-forward-drop: " flags all counter name fw_forward_drop
       }
     }
 
