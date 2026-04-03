@@ -151,6 +151,16 @@
     "net.ipv6.conf.all.forwarding" = true;
   };
 
+  services.auto-cpufreq = {
+    enable = true;
+    settings = {
+      charger = {
+        governor = "powersave";
+        turbo = "auto";
+      };
+    };
+  };
+
   doofnet.network.vlans = true;
   doofnet.server = true;
 
