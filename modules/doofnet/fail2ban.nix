@@ -20,13 +20,13 @@ let
       printf '# HELP fail2ban_failed_total Total failed attempts per jail (since service start)\n'
       printf '# TYPE fail2ban_failed_total counter\n'
 
-      fail2ban-client status 2>/dev/null \
+      ${pkgs.fail2ban}/bin/fail2ban-client status 2>/dev/null \
         | ${pkgs.gnused}/bin/sed -n 's/.*Jail list:\s*//p' \
         | tr ',' '\n' \
         | tr -d ' \t' \
         | while IFS= read -r jail; do
             [ -z "$jail" ] && continue
-            status=$(fail2ban-client status "$jail" 2>/dev/null) || continue
+            status=$(${pkgs.fail2ban}/bin/fail2ban-client status "$jail" 2>/dev/null) || continue
             banned=$(printf '%s' "$status" | ${pkgs.gnugrep}/bin/grep 'Currently banned:' | ${pkgs.gawk}/bin/awk '{print $NF}')
             failed=$(printf '%s' "$status" | ${pkgs.gnugrep}/bin/grep 'Total failed:'     | ${pkgs.gawk}/bin/awk '{print $NF}')
             printf 'fail2ban_banned_ips{jail="%s"} %s\n'   "$jail" "''${banned:-0}"
