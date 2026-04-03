@@ -58,23 +58,29 @@ _: {
         ct state invalid drop
         iif lo accept
 
-        # Rules for accept on gw interfaces
-
         # ICMPv4
-        ip protocol icmp icmp type { echo-request, destination-unreachable, time-exceeded } limit rate 10/second accept
+        ip protocol icmp icmp type { echo-request, destination-unreachable, time-exceeded } \
+          limit rate 10/second accept
 
-        # ICMPv6
-        ip6 nexthdr icmpv6 accept
+        # ICMPv6 — restricted to required types only
+        ip6 nexthdr icmpv6 icmpv6 type {
+          destination-unreachable, packet-too-big,
+          time-exceeded, parameter-problem,
+          nd-router-solicit, nd-router-advert,
+          nd-neighbor-solicit, nd-neighbor-advert,
+          echo-request, echo-reply,
+          mld-listener-query, mld-listener-report
+        } limit rate 10/second accept
 
         # DHCPv4 server
-        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-ha", "vlan-hosted" } udp dport 67 accept
+        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-ha", "vlan-hosted" } \
+          ip protocol udp udp dport 67 accept
 
         # DHCPv6 server
         iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } udp dport 547 accept
 
-        # DHCPv6 client on WAN
-        # track it; allow the unicast Advertise/Reply back on port 546 explicitly
-        iifname "ppp0" udp dport 546 accept
+        # DHCPv6 client on WAN — only accept replies from link-local relay on port 547
+        iifname "ppp0" ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept
 
         # DNS - HE secondary nameservers (zone transfer / NOTIFY)
         ip  saddr @he_dns4 tcp dport 53 accept
@@ -112,8 +118,12 @@ _: {
         ct state established,related accept
         ct state invalid drop
 
-        # ICMPv6
-        ip6 nexthdr icmpv6 accept
+        # ICMPv6 — transit types only; NDP and MLD are link-local and must not be forwarded
+        ip6 nexthdr icmpv6 icmpv6 type {
+          destination-unreachable, packet-too-big,
+          time-exceeded, parameter-problem,
+          echo-request, echo-reply
+        } limit rate 10/second accept
 
         # Allow DNATs
         ct status dnat accept
@@ -129,10 +139,12 @@ _: {
           oifname { "vlan-private", "vlan-lab", "vlan-ha" } \
           udp dport 5353 accept
 
-        # Private VLAN
+        # Private VLAN — full outbound access including to hosted
         iifname "vlan-private" accept
 
-        # Lab VLAN
+        # Lab VLAN — block lateral movement to private and HA; allow hosted and WAN
+        iifname "vlan-lab" oifname "vlan-private" drop
+        iifname "vlan-lab" oifname "vlan-ha"      drop
         iifname "vlan-lab" accept
 
         # Tailscale
@@ -140,7 +152,8 @@ _: {
 
         # Public VLAN
         iifname "vlan-public" oifname "ppp0"                                    accept
-        iifname "vlan-public" oifname "vlan-hosted"                             accept
+        iifname "vlan-public" oifname "vlan-hosted" tcp dport { 80, 443 }       accept
+        iifname "vlan-public" oifname "vlan-hosted"                             drop
         iifname "vlan-public" ip  daddr 10.101.3.20  tcp dport 443              accept
 
         # Hosted VLAN
