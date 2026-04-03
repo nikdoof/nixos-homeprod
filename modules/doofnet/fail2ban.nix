@@ -3,6 +3,9 @@
   config,
   ...
 }:
+let
+  inherit (import ./const.nix) allNetworks;
+in
 {
   options.doofnet.fail2ban = {
     enable = lib.mkEnableOption "fail2ban intrusion prevention";
@@ -31,9 +34,8 @@
           ignoreIP = [
             "127.0.0.0/8"
             "::1"
-            "10.0.0.0/8"
-            "2001:8b0:bd9::/48"
-          ];
+          ]
+          ++ allNetworks;
 
           jails.sshd.settings = {
             enabled = true;

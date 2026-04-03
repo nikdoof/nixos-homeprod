@@ -6,6 +6,8 @@
   ...
 }:
 let
+  inherit (import ../const.nix) allNetworks;
+
   cfg = config.doofnet.bind;
   # Import all zones from the zones directory
   zones = import ./zones { inherit (inputs) dns; };
@@ -323,13 +325,8 @@ in
       cacheNetworks = [
         "127.0.0.0/8"
         "::1"
-        "10.0.0.0/8"
-        "217.169.25.8/29"
-        "2001:8b0:bd9::/48"
-        "fddd:d00f:dab0::/48"
-        "100.64.0.0/10"
-        "fd7a:115c:a1e0::/48"
-      ];
+      ]
+      ++ allNetworks;
 
       zones = lib.listToAttrs (
         map (zone: {
@@ -368,10 +365,7 @@ in
           responses-per-second 10;
           window 5;
           exempt-clients {
-            10.0.0.0/8;
-            217.169.25.8/29;
-            2001:8b0:bd9::/48;
-            fddd:d00f:dab0::/48;
+            ${lib.concatMapStrings (n: "${n}; ") allNetworks}
           };
         };
         listen-on port 853 tls local-tls { any; };

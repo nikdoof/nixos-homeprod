@@ -5,6 +5,14 @@
   ...
 }:
 let
+  inherit (import ./system.nix config) isPhysical;
+
+  promInternalTarget = "http://svc-02.int.doofnet.uk:9090";
+  # promExternalTarget = "https://prometheus.doofnet.uk";
+
+  lokiInternalTarget = "https://loki.svc.doofnet.uk";
+  # lokiExternalTarget = "https://loki.doofnet.uk";
+
   alloyConfig = pkgs.writeText "alloy-config.alloy" ''
     // Collect system metrics (node_exporter replacement)
     prometheus.exporter.unix "default" {
@@ -23,7 +31,7 @@ let
 
     prometheus.remote_write "default" {
       endpoint {
-        url = "http://svc-02.int.doofnet.uk:9090/api/v1/write"
+        url = "${promInternalTarget}/api/v1/write"
 
         write_relabel_config {
           target_label = "host"
@@ -76,7 +84,7 @@ let
 
     loki.write "default" {
       endpoint {
-        url = "https://loki.svc.doofnet.uk/loki/api/v1/push"
+        url = "${lokiInternalTarget}/loki/api/v1/push"
       }
     }
   '';
@@ -165,8 +173,9 @@ in
           '';
         }
       )
-      # Configure SMART monitoring and LLDP
-      (lib.mkIf (!(config.doofnet ? microvm) || !config.doofnet.microvm.enable) {
+
+      # Hardware related services, skipped on virtual
+      (lib.mkIf isPhysical {
         services.prometheus.exporters.smartctl = {
           enable = true;
           port = 9633;

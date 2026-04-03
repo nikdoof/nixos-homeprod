@@ -4,7 +4,9 @@
   pkgs,
   ...
 }:
-
+let
+  inherit (import ./system.nix config) isMicroVM isPhysical;
+in
 {
   nix = lib.mkMerge [
     {
@@ -16,7 +18,7 @@
     # Disable store maintenance on microvms - they share the host's /nix/store
     # via virtiofs and may remount it rw, so running GC or optimise from a guest
     # would corrupt the host store.
-    (lib.mkIf (!(config.doofnet ? microvm) || !config.doofnet.microvm.enable) {
+    (lib.mkIf (!isMicroVM) {
       settings.auto-optimise-store = true;
       gc = {
         automatic = true;
@@ -119,11 +121,12 @@
         PermitRootLogin = lib.mkForce "no";
       };
     };
-    fstrim.enable = true;
   };
 
   security.acme = {
     acceptTerms = true;
     defaults.email = "certs@doofnet.uk";
   };
+
+  services.fstrim.enable = lib.mkIf isPhysical true;
 }
