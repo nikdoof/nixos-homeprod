@@ -151,7 +151,8 @@ _: {
         iifname "ppp0" oifname "vlan-private" tcp dport 51413 accept  # QBittorrent
         iifname "ppp0" oifname "vlan-private" udp dport 51413 accept  # QBittorrent
 
-        # Log drops
+        # Log drops (suppress ppp0 inbound noise)
+        iifname "ppp0" drop
         log prefix "nft-forward-drop: " flags all
       }
     }
