@@ -439,6 +439,7 @@ in
     services.prometheus.exporters.bind = {
       enable = true;
       openFirewall = false;
+      listenAddress = "127.0.0.1";
     };
 
   };

@@ -503,6 +503,7 @@ in
     enable = true;
     user = "dmarc-exporter";
     group = "dmarc-exporter";
+    listenAddress = "127.0.0.1";
     imap = {
       host = "${config.networking.hostName}.${config.networking.domain}";
       username = "dmarc-reports@doofnet.uk";
