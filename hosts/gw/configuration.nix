@@ -147,8 +147,68 @@
   };
 
   boot.kernel.sysctl = {
+    # IP forwarding — required for router operation
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv6.conf.all.forwarding" = true;
+
+    # Reverse-path filtering — drop packets with spoofed source IPs (CIS 3.2.7)
+    # ppp0 uses loose mode (2) to handle any PPPoE/ISP asymmetric routing
+    "net.ipv4.conf.all.rp_filter" = 1;
+    "net.ipv4.conf.default.rp_filter" = 1;
+    "net.ipv4.conf.ppp0.rp_filter" = 2;
+
+    # Disable IP source routing (CIS 3.2.1)
+    "net.ipv4.conf.all.accept_source_route" = 0;
+    "net.ipv4.conf.default.accept_source_route" = 0;
+    "net.ipv6.conf.all.accept_source_route" = 0;
+    "net.ipv6.conf.default.accept_source_route" = 0;
+
+    # Reject ICMP redirects — router has no need to be redirected (CIS 3.2.2)
+    "net.ipv4.conf.all.accept_redirects" = 0;
+    "net.ipv4.conf.default.accept_redirects" = 0;
+    "net.ipv6.conf.all.accept_redirects" = 0;
+    "net.ipv6.conf.default.accept_redirects" = 0;
+
+    # Do not send ICMP redirects on internal interfaces (CIS 3.1.2)
+    "net.ipv4.conf.all.send_redirects" = 0;
+    "net.ipv4.conf.default.send_redirects" = 0;
+
+    # Log martian packets — spoofed or impossible source addresses (CIS 3.2.4)
+    "net.ipv4.conf.all.log_martians" = 1;
+    "net.ipv4.conf.default.log_martians" = 1;
+
+    # Ignore broadcast pings — Smurf amplification protection (CIS 3.2.5)
+    "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
+
+    # Ignore bogus ICMP error responses (CIS 3.2.6)
+    "net.ipv4.icmp_ignore_bogus_error_responses" = 1;
+
+    # SYN flood protection (CIS 3.2.8)
+    "net.ipv4.tcp_syncookies" = 1;
+
+    # TIME_WAIT assassination protection (RFC 1337)
+    "net.ipv4.tcp_rfc1337" = 1;
+
+    # Kernel hardening — restrict dmesg and kernel pointer exposure
+    "kernel.dmesg_restrict" = 1;
+    "kernel.kptr_restrict" = 2;
+
+    # Full ASLR (CIS 1.5.3)
+    "kernel.randomize_va_space" = 2;
+
+    # Restrict ptrace to parent processes only
+    "kernel.yama.ptrace_scope" = 1;
+
+    # Filesystem hardening — prevent hardlink/symlink privilege escalation
+    "fs.protected_hardlinks" = 1;
+    "fs.protected_symlinks" = 1;
+
+    # No core dumps for SUID programs (CIS 1.5.1)
+    "fs.suid_dumpable" = 0;
+
+    # Disable unprivileged BPF and harden JIT against info leaks
+    "kernel.unprivileged_bpf_disabled" = 1;
+    "net.core.bpf_jit_harden" = 2;
   };
 
   services.auto-cpufreq = {
