@@ -28,6 +28,21 @@ in
     })
   ];
 
+  # Disable risky modules
+  boot.blacklistedKernelModules = [
+    "dccp" # CIS 3.4.1 — unused protocol with exploit history
+    "sctp" # CIS 3.4.2 — unused protocol
+    "rds" # CIS 3.4.3 — unused, had multiple CVEs
+    "tipc" # CIS 3.4.4 — unused protocol
+    "cramfs" # CIS 1.1.1.1 — legacy filesystem
+    "freevxfs"
+    "jffs2"
+    "hfs"
+    "hfsplus"
+    "squashfs" # This may need removing
+    "udf"
+  ];
+
   networking.firewall = {
     logRefusedConnections = false;
   };
@@ -119,6 +134,12 @@ in
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
         PermitRootLogin = lib.mkForce "no";
+        MaxAuthTries = 3;
+        LoginGraceTime = 30;
+        MaxSessions = 5;
+        X11Forwarding = false;
+        ClientAliveInterval = 300;
+        ClientAliveCountMax = 2;
       };
     };
   };
