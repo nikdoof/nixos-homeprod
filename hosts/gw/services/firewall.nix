@@ -54,9 +54,24 @@ _: {
       chain input {
         type filter hook input priority 0; policy drop;
 
+        iif lo accept
+
+        # Drop RFC1918 and other bogon source addresses arriving from WAN (anti-spoofing)
+        # Note: fe80::/10 (link-local) is intentionally permitted for DHCPv6 relay on ppp0
+        iifname "ppp0" ip  saddr { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8, 169.254.0.0/16 } drop
+        iifname "ppp0" ip6 saddr { ::1/128, fc00::/7 } drop
+
         ct state established,related accept
         ct state invalid drop
-        iif lo accept
+
+        # TCP flag validation — drop malformed packets used in scanning/fingerprinting
+        tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 drop
+        tcp flags & (fin|syn) == (fin|syn) drop
+        tcp flags & (syn|rst) == (syn|rst) drop
+        tcp flags & (fin|rst) == (fin|rst) drop
+        tcp flags & (fin|ack) == fin drop
+        tcp flags & (urg|ack) == urg drop
+        tcp flags & (psh|ack) == psh drop
 
         # ICMPv4
         ip protocol icmp icmp type { echo-request, destination-unreachable, time-exceeded } \
@@ -105,9 +120,13 @@ _: {
 
         # NAT-PMP / PCP
         iifname { "vlan-private", "vlan-public" } udp dport 5351 accept
+
+        # WAN input drops
+        iifname "ppp0" counter name fw_wan_input_drop drop
       }
 
       # Named counters — exported to Prometheus via the nftables textfile collector.
+      counter fw_wan_input_drop   { comment "WAN packets dropped in input chain (ppp0 input)" }
       counter fw_wan_forward_drop { comment "WAN inbound packets dropped (ppp0 forward chain)" }
       counter fw_hosted_blocked   { comment "Hosted VLAN outbound packets blocked" }
       counter fw_forward_drop     { comment "All other forward chain drops (logged)" }
@@ -117,6 +136,15 @@ _: {
 
         ct state established,related accept
         ct state invalid drop
+
+        # TCP flag validation — drop malformed packets used in scanning/fingerprinting
+        tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 drop
+        tcp flags & (fin|syn) == (fin|syn) drop
+        tcp flags & (syn|rst) == (syn|rst) drop
+        tcp flags & (fin|rst) == (fin|rst) drop
+        tcp flags & (fin|ack) == fin drop
+        tcp flags & (urg|ack) == urg drop
+        tcp flags & (psh|ack) == psh drop
 
         # ICMPv6 — transit types only; NDP and MLD are link-local and must not be forwarded
         ip6 nexthdr icmpv6 icmpv6 type {
