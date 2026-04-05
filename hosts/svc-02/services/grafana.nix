@@ -92,6 +92,7 @@ in
         (import ./grafana/alert-infrastructure.nix mkPromData)
         (import ./grafana/alert-services.nix mkPromData)
         (import ./grafana/alert-globaltalk.nix)
+        (import ./grafana/alert-homeassistant.nix mkPromData)
       ];
 
       alerting.contactPoints.settings = {
