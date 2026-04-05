@@ -57,13 +57,11 @@
       host sameuser all 127.0.0.1/32 scram-sha-256
       host sameuser all ::1/128 scram-sha-256
 
-      # Remote admin access via PAM
-      host all nikdoof 10.101.0.0/16 pam
-      host all nikdoof 2001:8b0:bd9:101::/64 pam
+      # Remote admin access
+      host all nikdoof 10.101.0.0/16 scram-sha-256
+      host all nikdoof 2001:8b0:bd9:101::/64 scram-sha-256
     '';
   };
-
-  security.pam.services.postgresql = { };
 
   systemd.services.postgresql-stat-statements = {
     description = "Enable pg_stat_statements on all PostgreSQL databases";
