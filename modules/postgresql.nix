@@ -75,8 +75,8 @@
       ExecStart = pkgs.writeShellScript "pg-stat-statements" ''
         ${config.services.postgresql.package}/bin/psql -tc \
           "SELECT datname FROM pg_database WHERE datistemplate = false" \
-          | while IFS= read -r db; do
-              [ -z "''${db// }" ] && continue
+          | while read -r db; do
+              [ -z "$db" ] && continue
               ${config.services.postgresql.package}/bin/psql -d "$db" -c \
                 "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
             done
