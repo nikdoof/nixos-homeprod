@@ -2774,7 +2774,7 @@
   "refresh": "10s",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["postgres", "db", "prometheus"],
+  "tags": ["prometheus", "postgres-exporter", "linux", "infrastructure"],
   "templating": {
     "list": [
       {

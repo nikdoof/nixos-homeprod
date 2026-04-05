@@ -939,7 +939,7 @@
   "preload": false,
   "refresh": "5m",
   "schemaVersion": 42,
-  "tags": ["globaltalk", "appletalk"],
+  "tags": ["prometheus", "globaltalk-exporter", "networking"],
   "templating": {
     "list": []
   },

@@ -738,7 +738,7 @@
   "preload": false,
   "refresh": "1m",
   "schemaVersion": 42,
-  "tags": ["prometheus"],
+  "tags": ["prometheus", "node-exporter", "graphite-exporter", "unifi-poller", "infrastructure"],
   "templating": {
     "list": []
   },

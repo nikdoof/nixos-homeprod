@@ -2955,7 +2955,7 @@
   "refresh": "1m",
   "schemaVersion": 25,
   "style": "dark",
-  "tags": ["unifi", "unifi-poller"],
+  "tags": ["prometheus", "unifi-poller", "unifi", "networking"],
   "templating": {
     "list": [
       {

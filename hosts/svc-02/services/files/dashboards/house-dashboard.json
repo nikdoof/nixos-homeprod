@@ -440,10 +440,7 @@
   ],
   "schemaVersion": 36,
   "style": "dark",
-  "tags": [
-    "homeassistant",
-    "prometheus"
-  ],
+  "tags": ["prometheus", "homeassistant-exporter", "homeassistant", "home"],
   "templating": {
     "list": []
   },

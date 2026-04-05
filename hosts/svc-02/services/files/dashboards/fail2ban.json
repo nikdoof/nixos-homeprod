@@ -378,7 +378,7 @@
   ],
   "refresh": "1m",
   "schemaVersion": 39,
-  "tags": ["security", "fail2ban"],
+  "tags": ["prometheus", "node-exporter", "linux", "security"],
   "templating": { "list": [] },
   "time": { "from": "now-6h", "to": "now" },
   "timepicker": {},

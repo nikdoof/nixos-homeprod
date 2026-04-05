@@ -983,7 +983,7 @@
   "preload": false,
   "refresh": "1m",
   "schemaVersion": 42,
-  "tags": ["jrouter", "prometheus", "networking"],
+  "tags": ["prometheus", "jrouter-exporter", "networking"],
   "templating": {
     "list": [
       {

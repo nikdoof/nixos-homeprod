@@ -1153,7 +1153,7 @@
   "preload": false,
   "refresh": "10s",
   "schemaVersion": 41,
-  "tags": ["truenas", "prometheus", "graphite-exporter", "storage"],
+  "tags": ["prometheus", "graphite-exporter", "truenas", "infrastructure"],
   "templating": {
     "list": [
       {

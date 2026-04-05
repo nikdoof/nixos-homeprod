@@ -5862,7 +5862,7 @@
   "preload": false,
   "refresh": "30s",
   "schemaVersion": 41,
-  "tags": ["truenas", "prometheus", "graphite-exporter", "storage"],
+  "tags": ["prometheus", "graphite-exporter", "truenas", "storage"],
   "templating": {
     "list": [
       {

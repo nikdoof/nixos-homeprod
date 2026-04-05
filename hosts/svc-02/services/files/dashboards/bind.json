@@ -2208,7 +2208,7 @@
   "preload": false,
   "refresh": "5s",
   "schemaVersion": 42,
-  "tags": ["bind", "bind-exporter", "prometheus", "networking"],
+  "tags": ["prometheus", "bind-exporter", "linux", "networking"],
   "templating": {
     "list": [
       {
