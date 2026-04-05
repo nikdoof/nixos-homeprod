@@ -10,6 +10,34 @@
     settings = {
       port = 5432;
       ssl = true;
+
+      # Slow query logging
+      log_min_duration_statement = 1000;
+
+      # Lock/deadlock visibility
+      log_lock_waits = true;
+      deadlock_timeout = "1s";
+
+      # Temp file spill detection
+      log_temp_files = 0;
+
+      # Autovacuum and checkpoint observability
+      log_autovacuum_min_duration = 0;
+      log_checkpoints = true;
+
+      # NVMe-tuned I/O settings
+      random_page_cost = "1.1";
+      effective_io_concurrency = 200;
+
+      # Memory - capped at ~30% of 16GB system RAM
+      shared_buffers = "4GB";
+      effective_cache_size = "8GB";
+      work_mem = "32MB";
+      maintenance_work_mem = "256MB";
+
+      # WAL/checkpoint tuning
+      checkpoint_completion_target = "0.9";
+      max_wal_size = "4GB";
     };
 
     # Allow local auth via scram
