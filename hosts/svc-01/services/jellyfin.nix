@@ -5,7 +5,7 @@ _: {
       "traefik.http.routers.jellyfin.rule" = "Host(`jellyfin.svc.doofnet.uk`)";
       "traefik.http.services.jellyfin.loadbalancer.server.port" = "8096";
     };
-    image = "jellyfin/jellyfin:10.11.7";
+    image = "jellyfin/jellyfin:10.11.8";
     volumes = [
       "/mnt/nas-03/media/:/mnt/media"
       "/srv/data/jellyfin/config:/config:U"
