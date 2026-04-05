@@ -44,13 +44,26 @@
       shared_preload_libraries = "pg_stat_statements";
     };
 
+    ensureUsers = [
+      {
+        name = "nikdoof";
+        ensureDBOwnership = false;
+      }
+    ];
+
     # Allow local auth via scram
     authentication = pkgs.lib.mkAfter ''
       local all all trust
       host sameuser all 127.0.0.1/32 scram-sha-256
       host sameuser all ::1/128 scram-sha-256
+
+      # Remote admin access via PAM
+      host all nikdoof 10.101.0.0/16 pam
+      host all nikdoof 2001:8b0:bd9:101::/64 pam
     '';
   };
+
+  security.pam.services.postgresql = { };
 
   systemd.services.postgresql-stat-statements = {
     description = "Enable pg_stat_statements on all PostgreSQL databases";
