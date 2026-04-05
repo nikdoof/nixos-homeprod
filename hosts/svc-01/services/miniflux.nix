@@ -14,7 +14,7 @@
       "traefik.http.routers.miniflux.rule" = "Host(`rss.doofnet.uk`)";
       "traefik.http.services.miniflux.loadbalancer.server.port" = "8080";
     };
-    image = "miniflux/miniflux:2.2.18";
+    image = "miniflux/miniflux:2.2.19";
     environment = {
       BASE_URL = "https://rss.doofnet.uk/";
       DISABLE_LOCAL_AUTH = "1";
