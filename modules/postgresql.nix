@@ -1,5 +1,6 @@
 {
   pkgs,
+  config,
   ...
 }:
 {
@@ -38,6 +39,9 @@
       # WAL/checkpoint tuning
       checkpoint_completion_target = "0.9";
       max_wal_size = "4GB";
+
+      # Query statistics
+      shared_preload_libraries = "pg_stat_statements";
     };
 
     # Allow local auth via scram
@@ -46,6 +50,27 @@
       host sameuser all 127.0.0.1/32 scram-sha-256
       host sameuser all ::1/128 scram-sha-256
     '';
+  };
+
+  systemd.services.postgresql-stat-statements = {
+    description = "Enable pg_stat_statements on all PostgreSQL databases";
+    after = [ "postgresql.service" ];
+    wants = [ "postgresql.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      User = "postgres";
+      ExecStart = pkgs.writeShellScript "pg-stat-statements" ''
+        ${config.services.postgresql.package}/bin/psql -tc \
+          "SELECT datname FROM pg_database WHERE datistemplate = false" \
+          | while IFS= read -r db; do
+              [ -z "''${db// }" ] && continue
+              ${config.services.postgresql.package}/bin/psql -d "$db" -c \
+                "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+            done
+      '';
+    };
   };
 
   services.prometheus.exporters.postgres = {
