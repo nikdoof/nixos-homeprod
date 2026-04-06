@@ -2,10 +2,18 @@
   lib,
   config,
   pkgs,
+  self,
   ...
 }:
 let
   inherit (import ./system.nix config) isPhysical;
+
+  flakeRevision = self.rev or "dirty";
+  flakeRevisionProm = pkgs.writeText "nixos-flake-revision.prom" ''
+    # HELP nixos_flake_revision Git revision of the deployed NixOS flake
+    # TYPE nixos_flake_revision gauge
+    nixos_flake_revision{revision="${flakeRevision}"} 1
+  '';
 
   promInternalTarget = "http://svc-02.int.doofnet.uk:9090";
   # promExternalTarget = "https://prometheus.doofnet.uk";
@@ -101,6 +109,13 @@ in
         # World-writable so the DynamicUser alloy service (arbitrary UID) and any
         # custom textfile-writing scripts can both write here.
         systemd.tmpfiles.rules = [ "d /var/lib/prometheus/node-exporter/ 0777 root root" ];
+
+        # Write the flake revision as a textfile metric on every activation so
+        # Prometheus can detect hosts running a stale configuration.
+        system.activationScripts.nixos-flake-revision-prom.text = ''
+          mkdir -p /var/lib/prometheus/node-exporter
+          cp ${flakeRevisionProm} /var/lib/prometheus/node-exporter/nixos-flake-revision.prom
+        '';
 
         environment.etc."alloy/conf.d/00-base.alloy".source = alloyConfig;
 
