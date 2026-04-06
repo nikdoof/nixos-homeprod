@@ -7,6 +7,7 @@ _: {
     ./hcloud_exporter.nix
     ./jrouter.nix
     ./loki.nix
+    ./nixos-revision-fetcher.nix
     ./ping.nix
     ./prometheus.nix
     ./tftp.nix
