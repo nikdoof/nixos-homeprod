@@ -1,0 +1,1884 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Andrew Williams">
+      
+      
+        <link rel="canonical" href="https://nikdoof.github.io/nixos-homeprod/gw/">
+      
+      
+        <link rel="prev" href="../base_host/">
+      
+      
+        <link rel="next" href="../hyp-01/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>gw — Gateway - NixOS Homeprod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="blue-grey">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gw-gateway-router" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="NixOS Homeprod" class="md-header__button md-logo" aria-label="NixOS Homeprod" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NixOS Homeprod
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              gw — Gateway
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nikdoof/nixos-homeprod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nikdoof/nixos-homeprod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="NixOS Homeprod" class="md-nav__button md-logo" aria-label="NixOS Homeprod" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    NixOS Homeprod
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nikdoof/nixos-homeprod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nikdoof/nixos-homeprod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Infrastructure
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Infrastructure
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../base_host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Base Host Standards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gw — Gateway
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gw — Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Network">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vlans" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VLANs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#management-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Management interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wan-pppoe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WAN — PPPoE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Services
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Services">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dhcp-kea-dhcpv4-servicesdhcp4nix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DHCP — Kea DHCPv4 (services/dhcp4.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dhcp-kea-dhcpv6-servicesdhcp6nix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DHCP — Kea DHCPv6 (services/dhcp6.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-dns-kea-dhcp-ddns-servicesddnsnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamic DNS — Kea DHCP-DDNS (services/ddns.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-unbound-servicesdnsnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS — Unbound (services/dns.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipv6-router-advertisements-radvd-servicesradvdnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IPv6 Router Advertisements — radvd (services/radvd.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ntp-chrony-servicesntpnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NTP — Chrony (services/ntp.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mdns-reflection-avahi-servicesavahinix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mDNS reflection — Avahi (services/avahi.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upnp-nat-pmp-miniupnpd-servicesupnpnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UPnP / NAT-PMP — miniupnpd (services/upnp.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tailscale-vpn-servicestailscalenix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tailscale VPN (services/tailscale.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#firewall-servicesfirewallnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall (services/firewall.nix)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Firewall (services/firewall.nix)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#named-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named sets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-chain-policy-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input chain (policy: drop)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forward-chain-policy-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward chain (policy: drop)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#named-counters-exported-to-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named counters (exported to Prometheus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nat-table-ip-nat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NAT (table ip nat)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kernel hardening
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hyp-01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hyp-01 — Hypervisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ns-01 / ns-02 — DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mx-01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mx-01 — Mail Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../macos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    macOS Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raspberry_pi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Raspberry Pi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Network">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vlans" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VLANs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#management-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Management interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wan-pppoe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WAN — PPPoE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Services
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Services">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dhcp-kea-dhcpv4-servicesdhcp4nix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DHCP — Kea DHCPv4 (services/dhcp4.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dhcp-kea-dhcpv6-servicesdhcp6nix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DHCP — Kea DHCPv6 (services/dhcp6.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-dns-kea-dhcp-ddns-servicesddnsnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamic DNS — Kea DHCP-DDNS (services/ddns.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-unbound-servicesdnsnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS — Unbound (services/dns.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipv6-router-advertisements-radvd-servicesradvdnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IPv6 Router Advertisements — radvd (services/radvd.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ntp-chrony-servicesntpnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NTP — Chrony (services/ntp.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mdns-reflection-avahi-servicesavahinix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mDNS reflection — Avahi (services/avahi.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upnp-nat-pmp-miniupnpd-servicesupnpnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UPnP / NAT-PMP — miniupnpd (services/upnp.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tailscale-vpn-servicestailscalenix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tailscale VPN (services/tailscale.nix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#firewall-servicesfirewallnix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall (services/firewall.nix)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Firewall (services/firewall.nix)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#named-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named sets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-chain-policy-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input chain (policy: drop)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forward-chain-policy-drop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward chain (policy: drop)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#named-counters-exported-to-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named counters (exported to Prometheus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nat-table-ip-nat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NAT (table ip nat)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kernel hardening
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="gw-gateway-router">gw: Gateway / Router</h1>
+<p><code>gw</code> is the network gateway for the homelab, running NixOS on an HP Prodesk 400 G4 SFF. It
+provides routing, firewalling, DHCP, DNS, NTP, and VPN services for all VLANs.</p>
+<h2 id="hardware">Hardware</h2>
+<p>HP Prodesk 400 G4 SFF (Intel Kaby Lake). Three network interfaces are relevant:</p>
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enp2s0</code></td>
+<td>Management (out-of-band access to gw)</td>
+</tr>
+<tr>
+<td><code>enp3s0f0</code></td>
+<td>Internal trunk (carries all VLANs)</td>
+</tr>
+<tr>
+<td><code>enp3s0f1</code></td>
+<td>WAN (uplink to CityFibre ONT)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="network">Network</h2>
+<h3 id="vlans">VLANs</h3>
+<p>All internal traffic is carried as 802.1Q tagged frames on <code>enp3s0f0</code>. Five VLANs are
+defined:</p>
+<table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>Interface</th>
+<th>IPv4 prefix</th>
+<th>IPv6 prefix</th>
+<th>DNS zone</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td><code>vlan-private</code></td>
+<td>10.101.0.0/16</td>
+<td>2001:8b0:bd9:101::/64</td>
+<td><code>int.doofnet.uk</code></td>
+<td>Internal infrastructure</td>
+</tr>
+<tr>
+<td>102</td>
+<td><code>vlan-public</code></td>
+<td>10.102.0.0/16</td>
+<td>2001:8b0:bd9:102::/64</td>
+<td><code>pub.doofnet.uk</code></td>
+<td>Public-facing services (NATed)</td>
+</tr>
+<tr>
+<td>104</td>
+<td><code>vlan-lab</code></td>
+<td>10.104.0.0/16</td>
+<td>2001:8b0:bd9:104::/64</td>
+<td><code>lab.doofnet.uk</code></td>
+<td>Lab / experimental</td>
+</tr>
+<tr>
+<td>105</td>
+<td><code>vlan-ha</code></td>
+<td>10.105.0.0/16</td>
+<td>—</td>
+<td><code>ha.doofnet.uk</code></td>
+<td>Home automation / IoT</td>
+</tr>
+<tr>
+<td>106</td>
+<td><code>vlan-hosted</code></td>
+<td>217.169.25.8/29</td>
+<td>2001:8b0:bd9:106::/64</td>
+<td>—</td>
+<td>Internet-facing, publicly routed</td>
+</tr>
+</tbody>
+</table>
+<p>The hosted VLAN (106) is <strong>not NATed</strong> — traffic to/from 217.169.25.8/29 is routed directly
+by the ISP. All other VLANs use IPv4 masquerade NAT via the PPPoE interface.</p>
+<p>Private (101) and Lab (104) also receive a ULA prefix for stable internal IPv6 addressing
+independent of the ISP:</p>
+<table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>ULA prefix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td><code>fddd:d00f:dab0:101::/64</code></td>
+</tr>
+<tr>
+<td>104</td>
+<td><code>fddd:d00f:dab0:104::/64</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="management-interface">Management interface</h3>
+<p><code>enp2s0</code> carries a static address (<code>10.101.3.23/16</code>) as a fallback management path if the
+VLAN trunk goes down. Routes for the private subnet are installed with a high metric (2048)
+so the trunk VLAN is preferred under normal operation.</p>
+<h3 id="wan-pppoe">WAN — PPPoE</h3>
+<p>The WAN connection is PPPoE over CityFibre fibre. <code>enp3s0f1</code> carries a single VLAN 911
+(<code>vlan-wan</code>), and <code>pppd</code> runs the <code>aaisp</code> peer on top of it, producing a <code>ppp0</code> interface.</p>
+<p>IPv6 on WAN is obtained via DHCPv6 prefix delegation and RA from the ISP; the router accepts
+the delegated prefix and distributes /64s to internal VLANs via Kea DHCPv6. DNS from the ISP
+is not used (<code>UseDNS = no</code>).</p>
+<p>PPPoE credentials are stored in an age-encrypted secret deployed to <code>/etc/ppp/pap-secrets</code>.</p>
+<h2 id="services">Services</h2>
+<h3 id="dhcp-kea-dhcpv4-servicesdhcp4nix">DHCP — Kea DHCPv4 (<code>services/dhcp4.nix</code>)</h3>
+<p>Kea serves DHCPv4 on VLANs 101, 102, 104, and 105. Lease lifetime is 24 hours. All subnets
+send DNS update requests to the local <code>kea-dhcp-ddns</code> server (port 53001).</p>
+<table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>Pool</th>
+<th>Router</th>
+<th>DNS servers</th>
+<th>DNS suffix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td>10.101.2.1 – 10.101.2.254</td>
+<td>10.101.1.1</td>
+<td>10.101.1.2, 10.101.1.3</td>
+<td>int.doofnet.uk</td>
+</tr>
+<tr>
+<td>102</td>
+<td>10.102.2.1 – 10.102.2.254</td>
+<td>10.102.1.1</td>
+<td>10.101.1.2, 10.101.1.3</td>
+<td>pub.doofnet.uk</td>
+</tr>
+<tr>
+<td>104</td>
+<td>10.104.2.1 – 10.104.2.254</td>
+<td>10.104.1.1</td>
+<td>10.101.1.2, 10.101.1.3</td>
+<td>lab.doofnet.uk</td>
+</tr>
+<tr>
+<td>105</td>
+<td>10.105.2.1 – 10.105.2.254</td>
+<td>10.105.1.1</td>
+<td>10.101.1.2, 10.101.1.3</td>
+<td>ha.doofnet.uk</td>
+</tr>
+</tbody>
+</table>
+<p>Static reservations on VLAN 101:</p>
+<table>
+<thead>
+<tr>
+<th>Hostname</th>
+<th>IP</th>
+<th>MAC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>svc-01</td>
+<td>10.101.3.20</td>
+<td>10:62:e5:14:61:84</td>
+</tr>
+<tr>
+<td>svc-02</td>
+<td>10.101.3.21</td>
+<td>f4:39:09:3a:4d:a4</td>
+</tr>
+<tr>
+<td>hyp-01</td>
+<td>10.101.3.22</td>
+<td>10:e7:c6:03:97:18</td>
+</tr>
+</tbody>
+</table>
+<p><strong>PXE boot</strong> is supported on VLANs 101 and 104. Client architecture option 93 selects the
+boot file:</p>
+<ul>
+<li><code>0x0000</code> (BIOS) → <code>undionly.kpxe</code></li>
+<li><code>0x0007</code> / <code>0x0009</code> (UEFI) → <code>ipxe.efi</code></li>
+</ul>
+<p>The <code>next-server</code> for VLAN 101 is <code>10.101.3.21</code> (svc-02/JRouter); for VLAN 104 it is
+<code>10.101.3.102</code>.</p>
+<h3 id="dhcp-kea-dhcpv6-servicesdhcp6nix">DHCP — Kea DHCPv6 (<code>services/dhcp6.nix</code>)</h3>
+<p>Kea serves DHCPv6 on VLANs 101, 102, and 104 (VLAN 105 and 106 are IPv4-only or SLAAC
+respectively). Leases are coordinated with DDNS.</p>
+<table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>Pool</th>
+<th>DNS servers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td>2001:8b0:bd9:101::2000 – ::2fff</td>
+<td>2001:8b0:bd9:101::2 / ::3</td>
+</tr>
+<tr>
+<td>102</td>
+<td>2001:8b0:bd9:102::2000 – ::2fff</td>
+<td>2001:8b0:bd9:101::2 / ::3</td>
+</tr>
+<tr>
+<td>104</td>
+<td>2001:8b0:bd9:104::2000 – ::2fff</td>
+<td>2001:8b0:bd9:101::2 / ::3</td>
+</tr>
+</tbody>
+</table>
+<p>VLAN 101 also offers <strong>prefix delegation</strong> from <code>2001:8b0:bd9:200::/56</code>, handing out /64s
+for clients that need their own subnet.</p>
+<h3 id="dynamic-dns-kea-dhcp-ddns-servicesddnsnix">Dynamic DNS — Kea DHCP-DDNS (<code>services/ddns.nix</code>)</h3>
+<p><code>kea-dhcp-ddns</code> listens on <code>127.0.0.1:53001</code> and receives name-change requests from both Kea
+servers. It authenticates to the primary DNS server (<code>10.101.1.2</code>) using TSIG
+(<code>HMAC-SHA256</code>, key name <code>doofnet-dhcp-updates</code>).</p>
+<p>Forward zones updated: <code>int.doofnet.uk</code>, <code>pub.doofnet.uk</code>, <code>lab.doofnet.uk</code>, <code>ha.doofnet.uk</code></p>
+<p>Reverse zones updated: <code>101.10.in-addr.arpa</code>, <code>102.10.in-addr.arpa</code>, <code>104.10.in-addr.arpa</code>,
+<code>105.10.in-addr.arpa</code>, and the corresponding IPv6 reverse zones for VLANs 101, 102, 104,
+and 106.</p>
+<p>The TSIG secret is age-encrypted and injected at service start by an <code>ExecStartPre</code> script
+that rewrites the config into <code>/run/kea/dhcp-ddns.conf</code>, keeping the secret out of the Nix
+store.</p>
+<h3 id="dns-unbound-servicesdnsnix">DNS — Unbound (<code>services/dns.nix</code>)</h3>
+<p>Unbound runs as a <strong>resolver for the hosted VLAN only</strong> (<code>vlan-hosted</code>), listening on
+<code>217.169.25.9</code> and <code>2001:8b0:bd9:106::1</code>. Access is refused for all addresses except the
+hosted /29 and /64. All queries are forwarded to the internal recursive resolvers
+(<code>10.101.1.2</code>, <code>10.101.1.3</code>).</p>
+<p>Hosts on other VLANs use the internal resolvers directly (ns-01, ns-02) and do not go via
+this Unbound instance.</p>
+<h3 id="ipv6-router-advertisements-radvd-servicesradvdnix">IPv6 Router Advertisements — radvd (<code>services/radvd.nix</code>)</h3>
+<p><code>radvd</code> sends Router Advertisements on VLANs 101, 102, 104, and 106. <code>AdvManagedFlag on</code>
+directs clients to use DHCPv6 (stateful) on VLANs 101, 102, and 104. VLAN 106 uses SLAAC
+only (<code>AdvManagedFlag off</code>, <code>AdvAutonomous on</code>).</p>
+<p>The ULA prefixes for VLANs 101 and 104 are advertised with <code>AdvAutonomous on</code> so clients
+self-configure stable ULA addresses without needing DHCPv6 for them.</p>
+<p>RDNSS records point clients to the internal resolvers on all VLANs.</p>
+<h3 id="ntp-chrony-servicesntpnix">NTP — Chrony (<code>services/ntp.nix</code>)</h3>
+<p>Chrony synchronises to UK-based stratum-1/2 servers and serves time to:</p>
+<ul>
+<li><code>10.0.0.0/8</code></li>
+<li><code>2001:8b0:bd9::/48</code></li>
+<li><code>fc00::/7</code> (ULA)</li>
+</ul>
+<h3 id="mdns-reflection-avahi-servicesavahinix">mDNS reflection — Avahi (<code>services/avahi.nix</code>)</h3>
+<p>Avahi reflects mDNS/Bonjour announcements between <code>vlan-private</code>, <code>vlan-lab</code>, and <code>vlan-ha</code>,
+allowing service discovery (e.g. AirPlay, HomeKit) to work across those three VLANs.</p>
+<h3 id="upnp-nat-pmp-miniupnpd-servicesupnpnix">UPnP / NAT-PMP — miniupnpd (<code>services/upnp.nix</code>)</h3>
+<p><code>miniupnpd</code> (nftables build) manages dynamic port mappings on behalf of clients on
+<code>vlan-private</code> and <code>vlan-public</code>. The external interface is <code>ppp0</code>.</p>
+<p>Port ranges are restricted: only ports 1024–65535 may be mapped, and only for hosts in
+<code>10.101.0.0/16</code> or <code>10.102.0.0/16</code>. All other mapping requests are denied.</p>
+<p>miniupnpd manages its own <code>miniupnpd</code> nftables table at runtime and does not modify the
+main <code>inet filter</code> or <code>ip nat</code> tables.</p>
+<h3 id="tailscale-vpn-servicestailscalenix">Tailscale VPN (<code>services/tailscale.nix</code>)</h3>
+<p>Tailscale connects to the self-hosted Headscale server at <code>https://hs.doofnet.uk</code>. The node
+advertises:</p>
+<ul>
+<li>All internal routes: <code>10.0.0.0/8</code>, <code>2001:8b0:bd9::/48</code>, <code>fddd:d00f:dab0::/48</code></li>
+<li>Exit node capability</li>
+</ul>
+<p><code>useRoutingFeatures = "server"</code> enables kernel IP forwarding for Tailscale traffic.
+Telemetry is disabled (<code>--no-logs-no-support</code>). The firewall is not opened automatically
+(<code>openFirewall = false</code>); inbound Tailscale traffic is handled by the nftables ruleset.</p>
+<h2 id="firewall-servicesfirewallnix">Firewall (<code>services/firewall.nix</code>)</h2>
+<p>NixOS's legacy <code>iptables</code> firewall is disabled; nftables is used exclusively. The ruleset
+lives in a single <code>table inet filter</code> plus a <code>table ip nat</code>.</p>
+<h3 id="named-sets">Named sets</h3>
+<table>
+<thead>
+<tr>
+<th>Set</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local4</code></td>
+<td><code>10.0.0.0/8</code>, <code>217.169.25.8/29</code></td>
+</tr>
+<tr>
+<td><code>local6</code></td>
+<td><code>2001:8b0:bd9::/48</code>, <code>fc00::/7</code></td>
+</tr>
+<tr>
+<td><code>he_dns4/6</code></td>
+<td>Hurricane Electric secondary nameservers (<code>216.218.133.2</code> / <code>2001:470:600::2</code>)</td>
+</tr>
+<tr>
+<td><code>ns4/6</code></td>
+<td>Internal resolvers (<code>10.101.1.2/3</code>, their IPv6 counterparts)</td>
+</tr>
+<tr>
+<td><code>hosted_out_tcp</code></td>
+<td>TCP ports hosted VLAN may use outbound: 22, 23, 25, 53, 70, 79, 80, 123, 443, 1965</td>
+</tr>
+<tr>
+<td><code>hosted_out_udp</code></td>
+<td>UDP ports hosted VLAN may use outbound: 53, 123</td>
+</tr>
+</tbody>
+</table>
+<h3 id="input-chain-policy-drop">Input chain (policy: drop)</h3>
+<ul>
+<li>Loopback always accepted</li>
+<li>Anti-spoofing: RFC1918 and ULA source addresses dropped on <code>ppp0</code></li>
+<li>Established/related accepted; invalid dropped</li>
+<li>TCP flag validation (drops malformed/scan packets)</li>
+<li>ICMPv4: echo-request, unreachable, time-exceeded at 10/s</li>
+<li>ICMPv6: NDP, MLD, transit types at 10/s</li>
+<li>DHCPv4 (port 67) from all internal VLANs</li>
+<li>DHCPv6 (port 547) from private, public, lab, hosted VLANs</li>
+<li>DHCPv6 client replies from ISP on ppp0 (link-local source, port 547→546)</li>
+<li>DNS (port 53) from Hurricane Electric nameservers (for zone transfers / NOTIFY)</li>
+<li>DNS (port 53) from hosted VLAN (forwarded to Unbound)</li>
+<li>NTP (port 123) from <code>local4</code>/<code>local6</code></li>
+<li>SSH (port 22) from private VLAN, management interface, and Tailscale only</li>
+<li>mDNS (port 5353) from private, lab, HA VLANs</li>
+<li>UPnP SSDP (port 1900) and NAT-PMP/PCP (port 5351) from private and public VLANs</li>
+<li>Everything else from <code>ppp0</code> counted and dropped</li>
+</ul>
+<h3 id="forward-chain-policy-drop">Forward chain (policy: drop)</h3>
+<ul>
+<li>Established/related accepted; invalid dropped</li>
+<li>TCP flag validation</li>
+<li>ICMPv6 transit types forwarded at 10/s (NDP and MLD are link-local and not forwarded)</li>
+<li>DNATed connections accepted (<code>ct status dnat accept</code>)</li>
+<li>DNS forwarded from public, hosted, HA VLANs to internal resolvers</li>
+<li>mDNS forwarded between private, lab, HA VLANs</li>
+<li><strong>Private VLAN</strong>: unrestricted outbound (full access including to hosted)</li>
+<li><strong>Lab VLAN</strong>: blocked from reaching private and HA VLANs; otherwise unrestricted</li>
+<li><strong>Tailscale</strong> (<code>tailscale0</code>): unrestricted outbound</li>
+<li><strong>Public VLAN</strong>: outbound to WAN; HTTP/HTTPS to hosted; specific access to <code>10.101.3.20:443</code></li>
+<li><strong>Hosted VLAN</strong>: restricted outbound to WAN (only <code>hosted_out_tcp/udp</code>); access to svc-01 (<code>10.101.3.20:443</code>) and svc-02 (<code>10.101.3.21:443,9090</code>); Tailscale port 41641</li>
+<li><strong>WAN → hosted</strong>: fully accepted (publicly routed, no NAT)</li>
+<li><strong>WAN → private</strong>: QBittorrent (TCP/UDP 51413) inbound for IPv6</li>
+<li>WAN inbound drops counted silently; all other drops logged with <code>nft-forward-drop:</code> prefix</li>
+</ul>
+<h3 id="named-counters-exported-to-prometheus">Named counters (exported to Prometheus)</h3>
+<table>
+<thead>
+<tr>
+<th>Counter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fw_wan_input_drop</code></td>
+<td>Packets dropped in input chain from ppp0</td>
+</tr>
+<tr>
+<td><code>fw_wan_forward_drop</code></td>
+<td>Inbound WAN packets dropped in forward chain</td>
+</tr>
+<tr>
+<td><code>fw_hosted_blocked</code></td>
+<td>Hosted VLAN outbound blocked packets</td>
+</tr>
+<tr>
+<td><code>fw_forward_drop</code></td>
+<td>All other forward drops (internal traffic)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="nat-table-ip-nat">NAT (<code>table ip nat</code>)</h3>
+<p><strong>Prerouting DNATs</strong> (applied to <code>ppp0</code> ingress, skipped for the hosted /29):</p>
+<table>
+<thead>
+<tr>
+<th>Destination port</th>
+<th>Protocol</th>
+<th>DNAT target</th>
+<th>Service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>443</td>
+<td>TCP+UDP</td>
+<td>10.101.3.20:8443</td>
+<td>HTTPS → svc-01</td>
+</tr>
+<tr>
+<td>53 (HE src only)</td>
+<td>TCP+UDP</td>
+<td>10.101.1.2:53</td>
+<td>DNS → ns-01 (zone transfers)</td>
+</tr>
+<tr>
+<td>51413</td>
+<td>TCP+UDP</td>
+<td>10.101.3.16</td>
+<td>BitTorrent → QBittorrent</td>
+</tr>
+<tr>
+<td>387 (UDP)</td>
+<td>UDP</td>
+<td>10.101.3.21</td>
+<td>AARP/AppleTalk → JRouter</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Postrouting</strong>: all <code>10.0.0.0/8</code> traffic leaving <code>ppp0</code> is masqueraded (the hosted /29 is
+excluded by the prerouting <code>return</code>).</p>
+<h2 id="kernel-hardening">Kernel hardening</h2>
+<p>The following sysctl settings are applied, mostly following CIS benchmarks:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>net.ipv4/6.conf.all.forwarding</code></td>
+<td>1</td>
+<td>Required for router operation</td>
+</tr>
+<tr>
+<td><code>rp_filter</code> (all/default)</td>
+<td>1</td>
+<td>Strict reverse-path filtering (anti-spoofing)</td>
+</tr>
+<tr>
+<td><code>rp_filter</code> (ppp0)</td>
+<td>2</td>
+<td>Loose mode for PPPoE asymmetric routing</td>
+</tr>
+<tr>
+<td><code>accept_source_route</code></td>
+<td>0</td>
+<td>Disable IP source routing (CIS 3.2.1)</td>
+</tr>
+<tr>
+<td><code>accept_redirects</code></td>
+<td>0</td>
+<td>Reject ICMP redirects (CIS 3.2.2)</td>
+</tr>
+<tr>
+<td><code>send_redirects</code></td>
+<td>0</td>
+<td>Do not send ICMP redirects (CIS 3.1.2)</td>
+</tr>
+<tr>
+<td><code>log_martians</code></td>
+<td>1</td>
+<td>Log spoofed/impossible source addresses (CIS 3.2.4)</td>
+</tr>
+<tr>
+<td><code>icmp_echo_ignore_broadcasts</code></td>
+<td>1</td>
+<td>Smurf amplification protection (CIS 3.2.5)</td>
+</tr>
+<tr>
+<td><code>tcp_syncookies</code></td>
+<td>1</td>
+<td>SYN flood protection (CIS 3.2.8)</td>
+</tr>
+<tr>
+<td><code>tcp_rfc1337</code></td>
+<td>1</td>
+<td>TIME_WAIT assassination protection (RFC 1337)</td>
+</tr>
+<tr>
+<td><code>kernel.dmesg_restrict</code></td>
+<td>1</td>
+<td>Restrict dmesg access</td>
+</tr>
+<tr>
+<td><code>kernel.kptr_restrict</code></td>
+<td>2</td>
+<td>Hide kernel pointers</td>
+</tr>
+<tr>
+<td><code>kernel.randomize_va_space</code></td>
+<td>2</td>
+<td>Full ASLR (CIS 1.5.3)</td>
+</tr>
+<tr>
+<td><code>kernel.yama.ptrace_scope</code></td>
+<td>1</td>
+<td>Restrict ptrace to parent processes</td>
+</tr>
+<tr>
+<td><code>fs.protected_hardlinks/symlinks</code></td>
+<td>1</td>
+<td>Prevent privilege escalation via links</td>
+</tr>
+<tr>
+<td><code>fs.suid_dumpable</code></td>
+<td>0</td>
+<td>No core dumps for SUID programs (CIS 1.5.1)</td>
+</tr>
+<tr>
+<td><code>kernel.unprivileged_bpf_disabled</code></td>
+<td>1</td>
+<td>Disable unprivileged BPF</td>
+</tr>
+<tr>
+<td><code>net.core.bpf_jit_harden</code></td>
+<td>2</td>
+<td>Harden BPF JIT against info leaks</td>
+</tr>
+</tbody>
+</table>
+<h2 id="observability">Observability</h2>
+<p>As a <code>doofnet.server</code> host, gw ships metrics to Prometheus via Grafana Alloy and logs to
+Loki. Additional exporters configured in <code>services/alloy.nix</code>:</p>
+<ul>
+<li><strong>kea-exporter</strong> (port 9547) — Kea DHCP lease and server statistics</li>
+<li><strong>chrony-exporter</strong> (port 9123) — NTP sync status and offset</li>
+</ul>
+<p>Firewall counters (<code>fw_wan_input_drop</code>, etc.) are collected via the nftables textfile
+collector and exposed through the node exporter.</p>
+<h2 id="service-summary">Service summary</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Package</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pppd</td>
+<td>ppp</td>
+<td>PPPoE WAN connection to AAISP</td>
+</tr>
+<tr>
+<td>kea-dhcp4</td>
+<td>kea</td>
+<td>DHCPv4 for VLANs 101, 102, 104, 105</td>
+</tr>
+<tr>
+<td>kea-dhcp6</td>
+<td>kea</td>
+<td>DHCPv6 for VLANs 101, 102, 104</td>
+</tr>
+<tr>
+<td>kea-dhcp-ddns</td>
+<td>kea</td>
+<td>Dynamic DNS updates via TSIG</td>
+</tr>
+<tr>
+<td>unbound</td>
+<td>unbound</td>
+<td>DNS resolver for hosted VLAN only</td>
+</tr>
+<tr>
+<td>radvd</td>
+<td>radvd</td>
+<td>IPv6 router advertisements</td>
+</tr>
+<tr>
+<td>chrony</td>
+<td>chrony</td>
+<td>NTP server</td>
+</tr>
+<tr>
+<td>avahi</td>
+<td>avahi</td>
+<td>mDNS reflection across private/lab/HA</td>
+</tr>
+<tr>
+<td>miniupnpd</td>
+<td>miniupnpd</td>
+<td>UPnP / NAT-PMP port mapping</td>
+</tr>
+<tr>
+<td>tailscale</td>
+<td>tailscale</td>
+<td>Mesh VPN via self-hosted Headscale</td>
+</tr>
+<tr>
+<td>lldpd</td>
+<td>lldpd</td>
+<td>LLDP (trunk interface only)</td>
+</tr>
+<tr>
+<td>alloy</td>
+<td>grafana-alloy</td>
+<td>Metrics and log shipping</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
