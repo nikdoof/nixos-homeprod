@@ -9,11 +9,6 @@ let
   inherit (import ./system.nix config) isPhysical;
 
   flakeRevision = self.rev or "dirty";
-  flakeRevisionProm = pkgs.writeText "nixos-flake-revision.prom" ''
-    # HELP nixos_flake_revision Git revision of the deployed NixOS flake
-    # TYPE nixos_flake_revision gauge
-    nixos_flake_revision{revision="${flakeRevision}"} 1
-  '';
 
   promInternalTarget = "http://svc-02.int.doofnet.uk:9090";
   # promExternalTarget = "https://prometheus.doofnet.uk";
@@ -112,9 +107,13 @@ in
 
         # Write the flake revision as a textfile metric on every activation so
         # Prometheus can detect hosts running a stale configuration.
+        # Value is the Unix timestamp of activation so PromQL can deduplicate
+        # by selecting max(value) per host when a revision transition is in flight.
         system.activationScripts.nixos-flake-revision-prom.text = ''
           mkdir -p /var/lib/prometheus/node-exporter
-          cp ${flakeRevisionProm} /var/lib/prometheus/node-exporter/nixos-flake-revision.prom
+          printf '# HELP nixos_flake_revision Unix timestamp of the last NixOS flake activation\n# TYPE nixos_flake_revision gauge\nnixos_flake_revision{revision="${flakeRevision}"} %s\n' \
+            "$(date +%s)" \
+            > /var/lib/prometheus/node-exporter/nixos-flake-revision.prom
         '';
 
         environment.etc."alloy/conf.d/00-base.alloy".source = alloyConfig;

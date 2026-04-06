@@ -59,7 +59,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "count(count by (revision) (nixos_flake_revision))",
+          "expr": "count(count by (revision) (nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)))",
           "instant": true,
           "range": false,
           "legendFormat": "Unique Revisions",
@@ -96,7 +96,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "count(nixos_flake_revision)",
+          "expr": "count(nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision))",
           "instant": true,
           "range": false,
           "legendFormat": "",
@@ -138,7 +138,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "count(nixos_flake_revision) - max(count by (revision) (nixos_flake_revision))",
+          "expr": "count(nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)) - max(count by (revision) (nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)))",
           "instant": true,
           "range": false,
           "legendFormat": "",
@@ -168,8 +168,15 @@
           {
             "matcher": { "id": "byName", "options": "Revision" },
             "properties": [
-              { "id": "custom.width", "value": 340 },
+              { "id": "custom.width", "value": 300 },
               { "id": "custom.displayMode", "value": "color-text" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Activated" },
+            "properties": [
+              { "id": "unit", "value": "dateTimeFromNow" },
+              { "id": "custom.width", "value": 160 }
             ]
           }
         ]
@@ -184,7 +191,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "nixos_flake_revision",
+          "expr": "nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)",
           "format": "table",
           "instant": true,
           "range": false,
@@ -198,15 +205,19 @@
           "options": {
             "excludeByName": {
               "Time": true,
-              "Value": true,
               "__name__": true,
               "instance": true,
               "job": true
             },
-            "indexByName": {},
+            "indexByName": {
+              "host": 0,
+              "revision": 1,
+              "Value": 2
+            },
             "renameByName": {
               "host": "Host",
-              "revision": "Revision"
+              "revision": "Revision",
+              "Value": "Activated"
             }
           }
         }
@@ -239,7 +250,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "count by (revision) (nixos_flake_revision)",
+          "expr": "count by (revision) (nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision))",
           "instant": true,
           "range": false,
           "legendFormat": "{{ revision }}",
@@ -259,6 +270,6 @@
   "timezone": "",
   "title": "NixOS / Configuration Revisions",
   "uid": "nixos-revisions",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
