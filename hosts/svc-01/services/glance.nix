@@ -140,6 +140,40 @@
                     }
                   ];
                 }
+                {
+                  type = "custom-api";
+                  title = "F1 - Next Race";
+                  cache = "2h";
+                  url = "https://f1api.dev/api/current/next";
+                  template = ''
+                    <div class="flex flex-column gap-10">
+                      {{ $session := index (.JSON.Array "race") 0 }}
+                      <p class="size-h5">
+                        Round {{ .JSON.String "round" }}
+                      </p>
+
+                      <div class="margin-block-4">
+                        <p class="color-highlight">{{ $session.String "raceName" }}</p>
+                        <p class="color-primary">
+                          <span>Race</span>
+                          {{ $datetime := concat ($session.String "schedule.race.date") "T" ($session.String "schedule.race.time") }}
+                          <span
+                            class="color-highlight"
+                            title="{{ $session.String "schedule.race.date" }}"
+                            {{ parseRelativeTime "rfc3339" $datetime }}
+                          ></span>
+                        </p>
+                        <p class="size-h5">{{ $session.String "schedule.race.date" }} at {{ $session.String "schedule.race.time" }}</p>
+                      </div>
+
+                      <ul class="size-h5 attachments">
+                        <li>{{ $session.String "circuit.country" }}</li>
+                        <li>{{ $session.String "circuit.city" }}</li>
+                        <li>{{ $session.String "circuit.circuitName" }}</li>
+                      </ul>
+                    </div>
+                  '';
+                }
               ];
             }
           ];
