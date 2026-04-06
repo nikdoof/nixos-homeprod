@@ -1,34 +1,42 @@
-# Base Host configuration
+# Base Host Standards
+
+Common standards that apply to all physical NixOS hosts in the homelab.
 
 ## Hardware
 
-Hardware is being repurposed from the old Kubernetes worker nodes.
+Hardware is being repurposed from old Kubernetes worker nodes.
 
-| Device               | Count | OS disk     | Data disk(s)          | RAM   | OS            | Purpose                          |
-| -------------------- | ----- | ----------- | --------------------- | ----- | ------------- | -------------------------------- |
-| HP Prodesk 600 G3 DM | 1     | 128 GB SATA |                       | 16 GB | NixOS 25.11   |                                  |
+| Device               | RAM   | OS disk     | OS          |
+|----------------------|-------|-------------|-------------|
+| HP Prodesk 600 G3 DM | 16 GB | 128 GB SATA | NixOS 25.11 |
 
 ## Storage
 
-### Local Storage
+### Local storage
 
-All local storage should be provided under `/srv`
+All local storage is provided under `/srv`:
 
-* `/srv/data` - Local SSD storage, mapped to the NVMe/Data Disk
-  * `/srv/data/<application>` - Per application folder
-    * `/srv/data/<application>/<mount>` - Per application mount point, e.g. `/srv/data/sonarr/config`
-* `/srv/cluster` - Clustered storage, e.g. CephFS, GlusterFS, etc. Not mounted directly
+- `/srv/data` — local SSD/NVMe, mapped to the data disk
+    - `/srv/data/<application>` — per-application directory
+    - `/srv/data/<application>/<mount>` — per-mount-point subdirectory (e.g. `/srv/data/sonarr/config`)
+- `/srv/cluster` — clustered storage (CephFS, GlusterFS, etc.), not mounted directly
 
-### Remote Storage
+### Remote storage
 
-Mounts for remote storage should be placed under `/mnt`, ideally using NFSv4 or whatever cluster-native mounting protocol is available.
+Mounts for remote storage are placed under `/mnt`:
 
-* `/mnt/<hostname>/<share>` - Mounted network storage and clustered storage, e.g. `/mnt/nas-03/media`
+- `/mnt/<hostname>/<share>` — network or cluster-native mounts (e.g. `/mnt/nas-03/media`)
 
 ## Backups
 
-Backups are managed by `borgmatic` and stored on a remote server. Only files under `/srv/data` should be backed up.
+Backups are managed by `borgmatic` and stored on a remote Hetzner Storage Box. Only
+directories under `/srv/data` are backed up.
 
 ## Monitoring
 
-* Prometheus node exporter for host metrics
+All hosts run Grafana Alloy as a `doofnet.server` node, which:
+
+- Collects host metrics via `prometheus.exporter.unix` and forwards them to Prometheus
+- Ships systemd journal logs to Loki
+- Writes a `nixos_flake_revision` textfile metric on every activation so the deployed
+  flake revision is visible in Grafana

@@ -1,37 +1,36 @@
-# Raspberry Pi Systems
+# Raspberry Pi
+
+Steps to build and flash a NixOS SD card image for `aarch64-linux` hosts such as
+[ns-01](dns.md).
 
 ## Requirements
 
-* A system capable of emulating `aarch64-linux`
-* Nix
-* A `nixosConfiguration` that imports `"${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"` from Nixpkgs. (see [flake.nix](../flake.nix) and [ns1 host](../hosts/ns-01/))
+- A build system capable of emulating `aarch64-linux` (a NixOS host is recommended)
+- Nix
+- A `nixosConfiguration` that imports `sd-image-aarch64.nix` from Nixpkgs (see
+  [`flake.nix`](../flake.nix) and [`hosts/ns-01/`](../hosts/ns-01/))
 
-## Pre-setup
+## Build system configuration
 
-* A build system is required (suggested a NixOS system) with configuration for emulation:
+Add the following to the build system's NixOS configuration to enable aarch64 emulation:
 
 ```nix
-  # Allows for cross compling for Pis
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-  nix.settings.extra-platforms = [
-    "aarch64-linux"
-    "arm-linux"
-  ];
+boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+nix.settings.extra-platforms = [
+  "aarch64-linux"
+  "arm-linux"
+];
 ```
 
-## Building
+## Building an SD card image
 
-Run `nix-build` targetting the configuration, in this case, the Flake `nixosConfigurations` `sdImage`
+Run `nix build` targeting the `sdImage` output of the relevant flake configuration:
 
-```shell-common
+```console
 nikdoof@svc-02:~/ > nix build --refresh github:nikdoof/nixos-homeprod#nixosConfigurations.ns-01.config.system.build.sdImage
-nikdoof@svc-02:~/ > ls
-result
-nikdoof@svc-02:~/ > ls result
-nix-support  sd-image
 nikdoof@svc-02:~/ > ls result/sd-image
 nixos-image-sd-card-25.11.20260207.23d72da-aarch64-linux.img.zst
-nikdoof@svc-02:~/ >
 ```
 
-This results in a standard `img` file that can be wrote to a SD card.
+This produces a standard `.img.zst` compressed image that can be written to an SD card
+with a tool such as `dd` or [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
