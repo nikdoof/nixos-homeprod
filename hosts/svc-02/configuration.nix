@@ -9,7 +9,6 @@ _: {
   ];
 
   # Networking
-  networking.useDHCP = false;
   networking.hostName = "svc-02";
   networking.nameservers = [
     "10.101.1.2"
@@ -17,8 +16,6 @@ _: {
     "10.101.1.3"
     "2001:8b0:bd9:101::3"
   ];
-  networking.domain = "int.doofnet.uk";
-  networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "eno1";
@@ -40,7 +37,6 @@ _: {
     nrs-ns01 = "nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01 --no-reexec --sudo --ask-sudo-password";
   };
 
-  doofnet.server = true;
   doofnet.cross_compile = true;
   doofnet.nfs.media = true;
 

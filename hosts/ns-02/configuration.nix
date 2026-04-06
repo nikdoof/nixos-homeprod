@@ -1,25 +1,17 @@
-_:
-let
-  hostName = "ns-02";
-  domainName = "int.doofnet.uk";
-in
-{
+_: {
   doofnet.microvm = {
     enable = true;
     cid = 13;
     vlan = "101";
   };
 
-  # Networking
-  networking.useDHCP = false;
-  networking.hostName = hostName;
+  # Networking — nameservers list self first since this host IS a DNS server.
+  networking.hostName = "ns-02";
   networking.nameservers = [
     "127.0.0.1"
     "10.101.1.2"
     "10.101.1.3"
   ];
-  networking.domain = domainName;
-  networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
@@ -35,8 +27,6 @@ in
     };
     dhcpV6Config.UseDelegatedPrefix = false;
   };
-
-  doofnet.server = true;
 
   doofnet.bind = {
     enable = true;

@@ -21,7 +21,6 @@ in
   };
 
   # Networking
-  networking.useDHCP = false;
   networking.hostName = "mx-01";
   networking.nameservers = [
     "217.169.25.9"
@@ -54,7 +53,6 @@ in
     ];
   };
 
-  doofnet.server = true;
   doofnet.fail2ban.enable = true;
   doofnet.fail2ban.jails.dovecot = true;
 

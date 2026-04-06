@@ -1,17 +1,11 @@
 { modulesPath, ... }:
-let
-  hostName = "ns-03";
-  domainName = "doofnet.uk";
-in
 {
   imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
   ec2.efi = true;
 
-  networking.hostName = hostName;
-  networking.domain = domainName;
-  networking.search = [ domainName ];
-
-  doofnet.server = true;
+  networking.hostName = "ns-03";
+  networking.domain = "doofnet.uk";
+  networking.search = [ "doofnet.uk" ];
 
   doofnet.bind = {
     enable = true;

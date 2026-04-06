@@ -4,9 +4,7 @@
   ...
 }:
 let
-  hostName = "afp-01";
   inherit (config.age.secrets) dropboxNotifyToken;
-  domainName = "int.doofnet.uk";
 
   papdConfig = pkgs.writeText "papd.conf" ''
     HP LaserJet 200 M251n:\
@@ -25,16 +23,13 @@ in
   boot.kernelModules = [ "appletalk" ];
 
   # Networking
-  networking.useDHCP = false;
-  networking.hostName = hostName;
+  networking.hostName = "afp-01";
   networking.nameservers = [
     "10.101.1.2"
     "10.101.1.3"
     "2001:8b0:bd9:101::2"
     "2001:8b0:bd9:101::3"
   ];
-  networking.domain = domainName;
-  networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
@@ -50,8 +45,6 @@ in
     };
     dhcpV6Config.UseDelegatedPrefix = false;
   };
-
-  doofnet.server = true;
 
   services.avahi = {
     enable = true;

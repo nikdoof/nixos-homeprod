@@ -23,16 +23,13 @@
     ];
   };
 
-  # Networking
-  networking.useDHCP = false;
+  # Networking — nameservers list self first since this host IS the primary DNS.
   networking.hostName = "ns-01";
   networking.nameservers = [
     "127.0.0.1"
     "10.101.1.2"
     "10.101.1.3"
   ];
-  networking.domain = "int.doofnet.uk";
-  networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
@@ -54,8 +51,6 @@
 
   # Allow wheel users to perform remote rebuilds via nixos-rebuild --use-remote-sudo
   nix.settings.trusted-users = [ "@wheel" ];
-
-  doofnet.server = true;
 
   doofnet.bind = {
     enable = true;

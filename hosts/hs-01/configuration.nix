@@ -81,7 +81,6 @@ in
   };
 
   # Networking
-  networking.useDHCP = false;
   networking.hostName = hostName;
   networking.nameservers = [
     "217.169.25.9"
@@ -121,7 +120,6 @@ in
     };
   };
 
-  doofnet.server = true;
   doofnet.fail2ban.enable = true;
 
   services.headscale = {

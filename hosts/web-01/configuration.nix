@@ -122,7 +122,6 @@ in
   };
 
   # Networking
-  networking.useDHCP = false;
   networking.hostName = hostName;
   networking.nameservers = [
     "217.169.25.9"
@@ -175,7 +174,6 @@ in
       PermitTTY no
   '';
 
-  doofnet.server = true;
   doofnet.fail2ban.enable = true;
 
   environment.etc."alloy/conf.d/01-nginx.alloy".text = ''

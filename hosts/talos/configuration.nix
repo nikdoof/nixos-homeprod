@@ -21,6 +21,8 @@
   networking.hostName = "talos";
   networking.networkmanager.enable = true;
 
+  doofnet.server = false; # laptop — DNS/monitoring managed by NetworkManager + Tailscale
+
   services = {
     tailscale.enable = true;
     fstrim.enable = true;

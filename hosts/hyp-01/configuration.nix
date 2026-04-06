@@ -15,7 +15,6 @@
   };
 
   # Networking
-  networking.useDHCP = false;
   networking.hostName = "hyp-01";
   networking.nameservers = [
     "10.101.1.2"
@@ -23,8 +22,6 @@
     "10.101.1.3"
     "2001:8b0:bd9:101::3"
   ];
-  networking.domain = "int.doofnet.uk";
-  networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
 
   # Create the bridge dev
@@ -128,8 +125,6 @@
     device = "/srv/data/microvm";
     options = [ "bind" ];
   };
-
-  doofnet.server = true;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?

@@ -3,9 +3,6 @@
   ...
 }:
 let
-  hostName = "grf-01";
-  domainName = "int.doofnet.uk";
-
   dashboards = pkgs.stdenv.mkDerivation {
     name = "grafana-dashboards";
     src = ./files/dashboards;
@@ -27,16 +24,13 @@ in
   };
 
   # Networking
-  networking.useDHCP = false;
-  networking.hostName = hostName;
+  networking.hostName = "grf-01";
   networking.nameservers = [
     "10.101.1.2"
     "10.101.1.3"
     "2001:8b0:bd9:101::2"
     "2001:8b0:bd9:101::3"
   ];
-  networking.domain = domainName;
-  networking.search = [ domainName ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
@@ -53,8 +47,6 @@ in
     };
     dhcpV6Config.UseDelegatedPrefix = false;
   };
-
-  doofnet.server = true;
 
   services.grafana = {
     enable = true;

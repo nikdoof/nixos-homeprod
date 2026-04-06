@@ -45,6 +45,18 @@
           inputs
           ;
       };
+
+      mkMicrovm =
+        name: args:
+        mkSystem name (
+          args
+          // {
+            extraModules = (args.extraModules or [ ]) ++ [
+              inputs.microvm.nixosModules.microvm
+              ./modules/doofnet/microvm.nix
+            ];
+          }
+        );
     in
     {
       packages = forAllSystems (
@@ -87,43 +99,12 @@
         svc-02 = mkSystem "svc-02" { extraModules = [ inputs.aaisp-chaos.nixosModules.default ]; };
 
         # VMs
-        afp-01 = mkSystem "afp-01" {
-          extraModules = [
-            inputs.globaltalk.nixosModules.default
-            inputs.microvm.nixosModules.microvm
-            ./modules/doofnet/microvm.nix
-          ];
-        };
-        grf-01 = mkSystem "grf-01" {
-          extraModules = [
-            inputs.microvm.nixosModules.microvm
-            ./modules/doofnet/microvm.nix
-          ];
-        };
-        hs-01 = mkSystem "hs-01" {
-          extraModules = [
-            inputs.microvm.nixosModules.microvm
-            ./modules/doofnet/microvm.nix
-          ];
-        };
-        mx-01 = mkSystem "mx-01" {
-          extraModules = [
-            inputs.microvm.nixosModules.microvm
-            ./modules/doofnet/microvm.nix
-          ];
-        };
-        web-01 = mkSystem "web-01" {
-          extraModules = [
-            inputs.microvm.nixosModules.microvm
-            ./modules/doofnet/microvm.nix
-          ];
-        };
-        ns-02 = mkSystem "ns-02" {
-          extraModules = [
-            inputs.microvm.nixosModules.microvm
-            ./modules/doofnet/microvm.nix
-          ];
-        };
+        afp-01 = mkMicrovm "afp-01" { extraModules = [ inputs.globaltalk.nixosModules.default ]; };
+        grf-01 = mkMicrovm "grf-01" { };
+        hs-01 = mkMicrovm "hs-01" { };
+        mx-01 = mkMicrovm "mx-01" { };
+        web-01 = mkMicrovm "web-01" { };
+        ns-02 = mkMicrovm "ns-02" { };
 
         # AWS
         ns-03 = mkSystem "ns-03" { system = "aarch64-linux"; };

@@ -47,6 +47,11 @@ in
     logRefusedConnections = false;
   };
 
+  # Defaults for all doofnet hosts — override per-host as needed.
+  networking.useDHCP = lib.mkDefault false;
+  networking.domain = lib.mkDefault "int.doofnet.uk";
+  networking.search = lib.mkDefault [ "int.doofnet.uk" ];
+
   users.motdFile = builtins.path {
     path = ./files/motd;
     name = "motd";

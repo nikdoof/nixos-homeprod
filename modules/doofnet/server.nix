@@ -93,7 +93,9 @@ let
   '';
 in
 {
-  options.doofnet.server = lib.mkEnableOption "Server Mode";
+  options.doofnet.server = lib.mkEnableOption "Server Mode" // {
+    default = true;
+  };
 
   config = lib.mkIf config.doofnet.server (
     lib.mkMerge [

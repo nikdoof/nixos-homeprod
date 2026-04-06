@@ -6,7 +6,6 @@ _: {
 
   # Networking
   networking.hostId = "18e8a744";
-  networking.useDHCP = false;
   networking.hostName = "nas-01";
   networking.nameservers = [
     "10.101.1.2"
@@ -14,8 +13,6 @@ _: {
     "10.101.1.3"
     "2001:8b0:bd9:101::3"
   ];
-  networking.domain = "int.doofnet.uk";
-  networking.search = [ "int.doofnet.uk" ];
   systemd.network.enable = true;
   systemd.network.networks."10-lan" = {
     matchConfig.Type = "ether";
@@ -33,8 +30,6 @@ _: {
     };
     dhcpV6Config.UseDelegatedPrefix = false;
   };
-
-  doofnet.server = true;
 
   # NFS
   services.nfs.server = {
