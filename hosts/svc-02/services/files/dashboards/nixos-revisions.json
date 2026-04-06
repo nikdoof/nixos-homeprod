@@ -29,22 +29,36 @@
   "panels": [
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 10,
       "panels": [],
       "title": "Summary",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "Number of distinct flake revisions running across the fleet. 1 means all hosts are in sync.",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [
             {
               "options": {
-                "1": { "color": "green", "index": 0, "text": "In Sync" }
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "In Sync"
+                }
               },
               "type": "value"
             }
@@ -52,15 +66,29 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": 0 },
-              { "color": "orange", "value": 2 },
-              { "color": "red", "value": 3 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 2
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
             ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
       "id": 1,
       "options": {
         "colorMode": "background",
@@ -80,7 +108,10 @@
       "pluginVersion": "12.3.5",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "code",
           "expr": "count(count by (revision) (nixos_flake_revision))",
           "instant": true,
@@ -93,20 +124,35 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "Total number of hosts reporting a flake revision.",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "blue", "value": 0 }]
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              }
+            ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
       "id": 2,
       "options": {
         "colorMode": "value",
@@ -126,7 +172,10 @@
       "pluginVersion": "12.3.5",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "expr": "count(nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision))",
           "instant": true,
           "legendFormat": "",
@@ -138,15 +187,24 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "Hosts not running the most common revision in the fleet.",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [
             {
               "options": {
-                "0": { "color": "green", "index": 0, "text": "All current" }
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "All current"
+                }
               },
               "type": "value"
             }
@@ -154,14 +212,25 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": 0 },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
       "id": 3,
       "options": {
         "colorMode": "background",
@@ -181,9 +250,12 @@
       "pluginVersion": "12.3.5",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "code",
-          "expr": "count(nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)) - max(count by (revision) (nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)))",
+          "expr": "count(\n  nixos_flake_revision\n  unless on(revision) nixos_flake_repo_revision\n) > 1",
           "instant": true,
           "legendFormat": "",
           "range": false,
@@ -194,15 +266,24 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Hosts whose deployed revision does not match the current HEAD of the GitHub repository.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [
             {
               "options": {
-                "0": { "color": "green", "index": 0, "text": "All up to date" }
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "All up to date"
+                }
               },
               "type": "value"
             }
@@ -210,14 +291,21 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": 0 },
-              { "color": "red", "value": 1 }
+              {
+                "color": "transparent",
+                "value": 0
+              }
             ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
       "id": 6,
       "options": {
         "colorMode": "background",
@@ -231,79 +319,153 @@
           "values": false
         },
         "showPercentChange": false,
-        "textMode": "auto",
+        "textMode": "name",
         "wideLayout": true
       },
       "pluginVersion": "12.3.5",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "code",
-          "expr": "count(\n  (nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision))\n  unless on(revision) nixos_flake_repo_revision\n) or vector(0)",
+          "expr": "nixos_flake_repo_revision",
           "instant": true,
-          "legendFormat": "",
+          "legendFormat": "{{ revision }}",
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Hosts Behind Repo",
+      "title": "Repo Revision",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*([a-f0-9]{7})$",
+            "renamePattern": "$1"
+          }
+        }
+      ],
       "type": "stat"
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
       "id": 11,
       "panels": [],
       "title": "Detail",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "Current flake revision deployed on each host.",
       "fieldConfig": {
         "defaults": {
           "custom": {
             "align": "auto",
-            "cellOptions": { "type": "auto" },
-            "footer": { "reducers": [] },
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": 0 }]
+            "steps": [
+              {
+                "color": "text",
+                "value": 0
+              }
+            ]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Revision" },
+            "matcher": {
+              "id": "byName",
+              "options": "Revision"
+            },
             "properties": [
-              { "id": "custom.width", "value": 300 },
-              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+              {
+                "id": "custom.width",
+                "value": 362
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Activated" },
+            "matcher": {
+              "id": "byName",
+              "options": "Activated"
+            },
             "properties": [
-              { "id": "unit", "value": "dateTimeFromNow" },
-              { "id": "custom.width", "value": 160 }
+              {
+                "id": "unit",
+                "value": "dateTimeFromNow"
+              },
+              {
+                "id": "custom.width",
+                "value": 720
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 165
+              }
             ]
           }
         ]
       },
-      "gridPos": { "h": 12, "w": 14, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 12,
+        "w": 14,
+        "x": 0,
+        "y": 6
+      },
       "id": 4,
       "options": {
         "cellHeight": "sm",
         "showHeader": true,
-        "sortBy": [{ "desc": false, "displayName": "Host" }]
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Revision"
+          }
+        ]
       },
       "pluginVersion": "12.3.5",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "code",
-          "expr": "(nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision)) * 1000",
+          "expr": "(label_replace(\n  nixos_flake_revision,\n  \"short_revision\",\n  \"$1\",\n  \"revision\",\n  \".*(.{7})$\"\n)) * 1000\n",
           "format": "table",
           "instant": true,
           "range": false,
@@ -319,13 +481,24 @@
               "Time": true,
               "__name__": true,
               "instance": true,
-              "job": true
+              "job": true,
+              "revision": true
             },
-            "indexByName": { "Value": 2, "host": 0, "revision": 1 },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 4,
+              "Value": 3,
+              "host": 0,
+              "instance": 5,
+              "job": 6,
+              "revision": 2,
+              "short_revision": 1
+            },
             "renameByName": {
               "Value": "Activated",
               "host": "Host",
-              "revision": "Revision"
+              "revision": "",
+              "short_revision": "Revision"
             }
           }
         }
@@ -333,21 +506,36 @@
       "type": "table"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "Number of hosts per revision. A single bar means the fleet is fully in sync.",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "mappings": [],
           "min": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": 0 }]
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 12, "w": 10, "x": 14, "y": 6 },
+      "gridPos": {
+        "h": 12,
+        "w": 10,
+        "x": 14,
+        "y": 6
+      },
       "id": 5,
       "options": {
         "displayMode": "gradient",
@@ -374,7 +562,10 @@
       "pluginVersion": "12.3.5",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "code",
           "expr": "count by (revision) (nixos_flake_revision)",
           "instant": true,
@@ -384,101 +575,32 @@
         }
       ],
       "title": "Hosts per Revision",
-      "type": "bargauge"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
-      "id": 12,
-      "panels": [],
-      "title": "Repository",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Hosts whose deployed revision does not match the current HEAD of the GitHub repository. Empty means all hosts are up to date.",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": { "type": "auto" },
-            "footer": { "reducers": [] },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{ "color": "green", "value": 0 }]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Revision" },
-            "properties": [
-              { "id": "custom.width", "value": 300 },
-              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "Activated" },
-            "properties": [
-              { "id": "unit", "value": "dateTimeFromNow" },
-              { "id": "custom.width", "value": 160 }
-            ]
-          }
-        ]
-      },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 19 },
-      "id": 7,
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": [{ "desc": false, "displayName": "Host" }]
-      },
-      "pluginVersion": "12.3.5",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "editorMode": "code",
-          "expr": "(\n  (nixos_flake_revision == on(host) group_left(revision) max by (host) (nixos_flake_revision))\n  unless on(revision) nixos_flake_repo_revision\n) * 1000",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "Hosts Behind Repo HEAD",
       "transformations": [
         {
-          "id": "organize",
+          "id": "renameByRegex",
           "options": {
-            "excludeByName": {
-              "Time": true,
-              "__name__": true,
-              "instance": true,
-              "job": true
-            },
-            "indexByName": { "Value": 2, "host": 0, "revision": 1 },
-            "renameByName": {
-              "Value": "Activated",
-              "host": "Host",
-              "revision": "Revision"
-            }
+            "regex": ".*([a-f0-9]{7})$",
+            "renamePattern": "$1"
           }
         }
       ],
-      "type": "table"
+      "type": "bargauge"
     }
   ],
   "preload": false,
   "refresh": "",
   "schemaVersion": 42,
   "tags": ["nixos", "prometheus"],
-  "templating": { "list": [] },
-  "time": { "from": "now-1h", "to": "now" },
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "",
   "title": "NixOS / Configuration Revisions",
   "uid": "nixos-revisions",
-  "version": 6
+  "version": 7
 }
