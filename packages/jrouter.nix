@@ -9,7 +9,7 @@ buildGoModule rec {
   version = "0.0.21";
 
   src = fetchzip {
-    url = "https://gitea.drjosh.dev/josh/jrouter/archive/v${version}.tar.gz";
+    url = "https://git.doofnet.uk/nikdoof-stars/jrouter/archive/v${version}.tar.gz";
     hash = "sha256-0TzCljaP7JIZz8nO1E4X6lWoEDecO+jMzCPiBAtN6Ic=";
   };
 
