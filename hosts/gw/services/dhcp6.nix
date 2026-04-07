@@ -1,4 +1,85 @@
 { pkgs, ... }:
+let
+  pdHookScript = pkgs.writeShellScript "kea-pd-hook" ''
+    PD_DIR="/run/radvd-pd-prefixes"
+    RADVD_DYNAMIC_CONF="/run/radvd-dynamic.conf"
+
+    write_radvd_dynamic_conf() {
+      {
+        echo "interface vlan-private {"
+        echo "  AdvSendAdvert on;"
+        echo "  AdvManagedFlag on;"
+        echo "  AdvOtherConfigFlag on;"
+        echo "  AdvDefaultPreference high;"
+        echo ""
+        echo "  prefix 2001:8b0:bd9:101::/64 {"
+        echo "    AdvOnLink on;"
+        echo "    AdvAutonomous off;"
+        echo "    AdvRouterAddr on;"
+        echo "  };"
+        echo ""
+        echo "  prefix fddd:d00f:dab0:101::/64 {"
+        echo "    AdvOnLink on;"
+        echo "    AdvAutonomous on;"
+        echo "  };"
+        echo ""
+        for f in "''${PD_DIR}"/*.conf; do
+          [ -f "''${f}" ] && cat "''${f}"
+        done
+        echo ""
+        echo "  RDNSS 2001:8b0:bd9:101::2 2001:8b0:bd9:101::3 {"
+        echo "    AdvRDNSSLifetime 3600;"
+        echo "  };"
+        echo ""
+        echo "  DNSSL int.doofnet.uk {"
+        echo "    AdvDNSSLLifetime 3600;"
+        echo "  };"
+        echo "};"
+      } > "''${RADVD_DYNAMIC_CONF}"
+    }
+
+    case "$1" in
+      lease6_add|lease6_update)
+        [ "$LEASE6_TYPE" = "IA_PD" ] || exit 0
+
+        PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIXLEN}"
+        NEXTHOP="''${QUERY6_REMOTE_ADDR}"
+        IFACE="''${QUERY6_IFACE_NAME}"
+
+        ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
+          via "''${NEXTHOP}" \
+          dev "''${IFACE}" \
+          metric 1024
+
+        SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
+        mkdir -p "''${PD_DIR}"
+        cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
+    prefix ''${PREFIX} {
+        AdvOnLink off;
+        AdvAutonomous off;
+        AdvRouterAddr off;
+    };
+    EOF
+
+        write_radvd_dynamic_conf
+        ${pkgs.systemd}/bin/systemctl reload radvd.service
+        ;;
+
+      lease6_delete)
+        [ "$LEASE6_TYPE" = "IA_PD" ] || exit 0
+
+        PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIXLEN}"
+        ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
+
+        SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
+        rm -f "''${PD_DIR}/''${SAFE_PREFIX}.conf"
+
+        write_radvd_dynamic_conf
+        ${pkgs.systemd}/bin/systemctl reload radvd.service
+        ;;
+    esac
+  '';
+in
 {
   services.kea.dhcp6 = {
     enable = true;
@@ -26,7 +107,7 @@
         {
           library = "${pkgs.kea}/lib/kea/hooks/libdhcp_run_script.so";
           parameters = {
-            name = "/etc/kea/pd-hook.sh";
+            name = pdHookScript;
             sync = false;
           };
         }
@@ -119,88 +200,5 @@
         }
       ];
     };
-  };
-
-  environment.etc."kea/pd-hook.sh" = {
-    mode = "0755";
-    text = ''
-      #!/bin/sh
-      # Called by Kea run_script hook for all lease6 events
-
-      PD_DIR="/run/radvd-pd-prefixes"
-      PD_CONF="/run/radvd-pd-prefix.conf"
-
-      case "$1" in
-        lease6_add|lease6_update)
-          [ "$LEASE6_TYPE" = "IA_PD" ] || exit 0
-
-          PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIXLEN}"
-          NEXTHOP="''${QUERY6_REMOTE_ADDR}"
-          IFACE="''${QUERY6_IFACE_NAME}"
-
-          # Install/update route for delegated prefix via client's link-local
-          ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
-            via "''${NEXTHOP}" \
-            dev "''${IFACE}" \
-            metric 1024
-
-          # Write a per-prefix file, named by sanitised prefix
-          # e.g. 2001:8b0:bd9:206::/64 -> 20018b0bd9206--64
-          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
-          mkdir -p "''${PD_DIR}"
-          cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
-      prefix ''${PREFIX} {
-          AdvOnLink off;
-          AdvAutonomous off;
-          AdvRouterAddr off;
-      };
-      EOF
-
-          # Rebuild the combined conf from all per-prefix files
-          cat ''${PD_DIR}/*.conf > "''${PD_CONF}"
-
-          # Signal radvd to reload
-          ${pkgs.systemd}/bin/systemctl reload radvd.service
-          ;;
-
-        lease6_delete)
-          [ "$LEASE6_TYPE" = "IA_PD" ] || exit 0
-
-          PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIXLEN}"
-
-          # Remove route
-          ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
-
-          # Remove the per-prefix file
-          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
-          rm -f "''${PD_DIR}/''${SAFE_PREFIX}.conf"
-
-          # Rebuild combined conf, or write empty placeholder if none left
-          if ls "''${PD_DIR}"/*.conf 2>/dev/null | grep -q .; then
-            cat ''${PD_DIR}/*.conf > "''${PD_CONF}"
-          else
-            echo "# No PD prefixes currently assigned" > "''${PD_CONF}"
-          fi
-
-          ${pkgs.systemd}/bin/systemctl reload radvd.service
-          ;;
-      esac
-    '';
-  };
-
-  systemd.services.radvd-pd-init = {
-    description = "Initialise radvd PD prefix state directory";
-    wantedBy = [ "radvd.service" ];
-    before = [ "radvd.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      mkdir -p /run/radvd-pd-prefixes
-      if [ ! -f /run/radvd-pd-prefix.conf ]; then
-        echo "# No PD prefixes currently assigned" > /run/radvd-pd-prefix.conf
-      fi
-    '';
   };
 }

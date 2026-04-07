@@ -1,37 +1,9 @@
-_: {
+{ pkgs, ... }:
+{
   services.radvd = {
     enable = true;
+    # Static interfaces only — vlan-private is handled dynamically
     config = ''
-      # VLAN 101 - Private
-      interface vlan-private {
-        AdvSendAdvert on;
-        AdvManagedFlag on;
-        AdvOtherConfigFlag on;
-        AdvDefaultPreference high;
-
-        prefix 2001:8b0:bd9:101::/64 {
-          AdvOnLink on;
-          AdvAutonomous off;
-          AdvRouterAddr on;
-        };
-
-        prefix fddd:d00f:dab0:101::/64 {
-          AdvOnLink on;
-          AdvAutonomous on;
-        };
-
-        # Dynamically updated by Kea PD hook
-        include /run/radvd-pd-prefix.conf;
-
-        RDNSS 2001:8b0:bd9:101::2 2001:8b0:bd9:101::3 {
-          AdvRDNSSLifetime 3600;
-        };
-
-        DNSSL int.doofnet.uk {
-          AdvDNSSLLifetime 3600;
-        };
-      };
-
       # VLAN 102 - Public
       interface vlan-public {
         AdvSendAdvert on;
@@ -81,7 +53,7 @@ _: {
         };
       };
 
-      # VLAN 106 - Hosted (SLAAC only, no DHCPv6)
+      # VLAN 106 - Hosted
       interface vlan-hosted {
         AdvSendAdvert on;
         AdvManagedFlag off;
@@ -97,9 +69,19 @@ _: {
     '';
   };
 
+  # Override radvd's ExecStart to concatenate static + dynamic configs
   systemd.services.radvd = {
+    after = [ "radvd-pd-init.service" ];
+    requires = [ "radvd-pd-init.service" ];
     serviceConfig = {
-      BindReadOnlyPaths = [ "/run/radvd-pd-prefix.conf" ];
+      ExecStartPre = pkgs.writeShellScript "radvd-merge-conf" ''
+        cat /etc/radvd.conf /run/radvd-dynamic.conf > /run/radvd-merged.conf
+      '';
+      ExecStart = pkgs.lib.mkForce "${pkgs.radvd}/sbin/radvd -n -C /run/radvd-merged.conf";
+      ExecReload = pkgs.writeShellScript "radvd-reload" ''
+        cat /etc/radvd.conf /run/radvd-dynamic.conf > /run/radvd-merged.conf
+        kill -HUP $MAINPID
+      '';
     };
   };
 }
