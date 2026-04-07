@@ -69,6 +69,47 @@
     '';
   };
 
+  systemd.services.radvd-pd-init = {
+    description = "Initialise radvd dynamic PD config";
+    wantedBy = [ "radvd.service" ];
+    before = [ "radvd.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      mkdir -p /run/radvd-pd-prefixes
+      # Write a valid vlan-private block with no PD prefixes yet
+      cat > /run/radvd-dynamic.conf <<'EOF'
+      interface vlan-private {
+        AdvSendAdvert on;
+        AdvManagedFlag on;
+        AdvOtherConfigFlag on;
+        AdvDefaultPreference high;
+
+        prefix 2001:8b0:bd9:101::/64 {
+          AdvOnLink on;
+          AdvAutonomous off;
+          AdvRouterAddr on;
+        };
+
+        prefix fddd:d00f:dab0:101::/64 {
+          AdvOnLink on;
+          AdvAutonomous on;
+        };
+
+        RDNSS 2001:8b0:bd9:101::2 2001:8b0:bd9:101::3 {
+          AdvRDNSSLifetime 3600;
+        };
+
+        DNSSL int.doofnet.uk {
+          AdvDNSSLLifetime 3600;
+        };
+      };
+      EOF
+    '';
+  };
+
   # Override radvd's ExecStart to concatenate static + dynamic configs
   systemd.services.radvd = {
     after = [ "radvd-pd-init.service" ];
