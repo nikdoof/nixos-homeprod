@@ -1,129 +1,4 @@
-{ pkgs, ... }:
-let
-  pdHookScript = pkgs.writeShellScript "kea-pd-hook" ''
-    PD_DIR="/run/radvd-pd-prefixes"
-    RADVD_DYNAMIC_CONF="/run/radvd-dynamic.conf"
-    NEXTHOP_DIR="/var/lib/kea/pd-nexthops"
-
-    write_radvd_dynamic_conf() {
-      {
-        echo "interface vlan-private {"
-        echo "  AdvSendAdvert on;"
-        echo "  AdvManagedFlag on;"
-        echo "  AdvOtherConfigFlag on;"
-        echo "  AdvDefaultPreference high;"
-        echo ""
-        echo "  prefix 2001:8b0:bd9:101::/64 {"
-        echo "    AdvOnLink on;"
-        echo "    AdvAutonomous off;"
-        echo "    AdvRouterAddr on;"
-        echo "  };"
-        echo ""
-        echo "  prefix fddd:d00f:dab0:101::/64 {"
-        echo "    AdvOnLink on;"
-        echo "    AdvAutonomous on;"
-        echo "  };"
-        echo ""
-        for f in "''${PD_DIR}"/*.conf; do
-          [ -f "''${f}" ] && cat "''${f}"
-        done
-        echo ""
-        echo "  RDNSS 2001:8b0:bd9:101::2 2001:8b0:bd9:101::3 {"
-        echo "    AdvRDNSSLifetime 3600;"
-        echo "  };"
-        echo ""
-        echo "  DNSSL int.doofnet.uk {"
-        echo "    AdvDNSSLLifetime 3600;"
-        echo "  };"
-        echo "};"
-      } > "''${RADVD_DYNAMIC_CONF}"
-    }
-
-    case "$1" in
-      hook_load)
-        # On Kea startup, reinstall routes and radvd from persisted nexthop info
-        mkdir -p "''${PD_DIR}"
-        CHANGED=0
-        for f in "''${NEXTHOP_DIR}"/*.nexthop; do
-          [ -f "''${f}" ] || continue
-          read -r PREFIX NEXTHOP IFACE < "''${f}"
-          [ -n "''${PREFIX}" ] && [ -n "''${NEXTHOP}" ] && [ -n "''${IFACE}" ] || continue
-
-          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
-          ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
-            via "''${NEXTHOP}" dev "''${IFACE}" metric 1024 || true
-
-          cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
-      prefix ''${PREFIX} {
-          AdvOnLink off;
-          AdvAutonomous off;
-          AdvRouterAddr off;
-      };
-    EOF
-          CHANGED=1
-        done
-        if [ "''${CHANGED}" = "1" ]; then
-          write_radvd_dynamic_conf
-          ${pkgs.systemd}/bin/systemctl reload radvd.service 2>/dev/null || true
-        fi
-        ;;
-
-      leases6_committed)
-        NEXTHOP="''${QUERY6_REMOTE_ADDR}"
-        IFACE="''${QUERY6_IFACE_NAME}"
-        CHANGED=0
-
-        i=0
-        while [ "''${i}" -lt "''${LEASES6_SIZE:-0}" ]; do
-          eval "TYPE=\$LEASES6_AT''${i}_TYPE"
-          [ "''${TYPE}" = "IA_PD" ] || { i=$((i+1)); continue; }
-
-          eval "ADDR=\$LEASES6_AT''${i}_ADDRESS"
-          eval "PLEN=\$LEASES6_AT''${i}_PREFIX_LEN"
-          PREFIX="''${ADDR}/''${PLEN}"
-          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
-
-          ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
-            via "''${NEXTHOP}" dev "''${IFACE}" metric 1024
-
-          mkdir -p "''${PD_DIR}" "''${NEXTHOP_DIR}"
-          echo "''${PREFIX} ''${NEXTHOP} ''${IFACE}" > "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
-          cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
-      prefix ''${PREFIX} {
-          AdvOnLink off;
-          AdvAutonomous off;
-          AdvRouterAddr off;
-      };
-    EOF
-          CHANGED=1
-          i=$((i+1))
-        done
-
-        i=0
-        while [ "''${i}" -lt "''${DELETED_LEASES6_SIZE:-0}" ]; do
-          eval "TYPE=\$DELETED_LEASES6_AT''${i}_TYPE"
-          [ "''${TYPE}" = "IA_PD" ] || { i=$((i+1)); continue; }
-
-          eval "ADDR=\$DELETED_LEASES6_AT''${i}_ADDRESS"
-          eval "PLEN=\$DELETED_LEASES6_AT''${i}_PREFIX_LEN"
-          PREFIX="''${ADDR}/''${PLEN}"
-          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
-
-          ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
-          rm -f "''${PD_DIR}/''${SAFE_PREFIX}.conf"
-          rm -f "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
-          CHANGED=1
-          i=$((i+1))
-        done
-
-        if [ "''${CHANGED}" = "1" ]; then
-          write_radvd_dynamic_conf
-          ${pkgs.systemd}/bin/systemctl reload radvd.service
-        fi
-        ;;
-    esac
-  '';
-in
+{ pkgs, lib, ... }:
 {
   services.kea.dhcp6 = {
     enable = true;
@@ -154,8 +29,36 @@ in
         {
           library = "${pkgs.kea}/lib/kea/hooks/libdhcp_run_script.so";
           parameters = {
-            name = pdHookScript;
-            sync = true;
+            name = pkgs.writeShellScript "kea-run-hooks" ''
+              export PATH="${
+                lib.strings.makeBinPath [
+                  pkgs.coreutils
+                  pkgs.iproute2
+                ]
+              }"
+              set -euxo pipefail
+              leases6_committed() {
+                for i in $(seq $LEASES6_SIZE); do
+                  idx=$((i-1))
+                  prefix_var="LEASES6_AT''${idx}_ADDRESS"
+                  plen_var="LEASES6_AT''${idx}_PREFIX_LEN"
+                  ip -6 route replace ''${!prefix_var}/''${!plen_var} via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME
+                done
+              }
+              unknown_handler() {
+                echo "Unhandled function call ''${*}"
+                exit 123
+              }
+              case "$1" in
+                "leases6_committed")
+                  leases6_committed
+                ;;
+                *)
+                  unknown_handler "''${@}"
+                ;;
+              esac
+            '';
+            sync = false;
           };
         }
       ];
@@ -247,5 +150,10 @@ in
         }
       ];
     };
+  };
+
+  systemd.services.kea-dhcp6-server.serviceConfig = {
+    AmbientCapabilities = [ "CAP_NET_ADMIN" ];
+    CapabilityBoundingSet = [ "CAP_NET_ADMIN" ];
   };
 }
