@@ -68,41 +68,58 @@ let
         fi
         ;;
 
-      lease6_add|lease6_update)
-        [ "''${LEASE6_TYPE}" = "IA_PD" ] || exit 0
-
-        PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIX_LEN}"
+      leases6_committed)
         NEXTHOP="''${QUERY6_REMOTE_ADDR}"
         IFACE="''${QUERY6_IFACE_NAME}"
-        SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
+        CHANGED=0
 
-        ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
-          via "''${NEXTHOP}" dev "''${IFACE}" metric 1024
+        i=0
+        while [ "''${i}" -lt "''${LEASES6_SIZE:-0}" ]; do
+          eval "TYPE=\$LEASES6_AT''${i}_TYPE"
+          [ "''${TYPE}" = "IA_PD" ] || { i=$((i+1)); continue; }
 
-        mkdir -p "''${PD_DIR}" "''${NEXTHOP_DIR}"
-        echo "''${PREFIX} ''${NEXTHOP} ''${IFACE}" > "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
-        cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
+          eval "ADDR=\$LEASES6_AT''${i}_ADDRESS"
+          eval "PLEN=\$LEASES6_AT''${i}_PREFIX_LEN"
+          PREFIX="''${ADDR}/''${PLEN}"
+          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
+
+          ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
+            via "''${NEXTHOP}" dev "''${IFACE}" metric 1024
+
+          mkdir -p "''${PD_DIR}" "''${NEXTHOP_DIR}"
+          echo "''${PREFIX} ''${NEXTHOP} ''${IFACE}" > "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
+          cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
       prefix ''${PREFIX} {
           AdvOnLink off;
           AdvAutonomous off;
           AdvRouterAddr off;
       };
     EOF
-        write_radvd_dynamic_conf
-        ${pkgs.systemd}/bin/systemctl reload radvd.service
-        ;;
+          CHANGED=1
+          i=$((i+1))
+        done
 
-      lease6_delete)
-        [ "''${LEASE6_TYPE}" = "IA_PD" ] || exit 0
+        i=0
+        while [ "''${i}" -lt "''${DELETED_LEASES6_SIZE:-0}" ]; do
+          eval "TYPE=\$DELETED_LEASES6_AT''${i}_TYPE"
+          [ "''${TYPE}" = "IA_PD" ] || { i=$((i+1)); continue; }
 
-        PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIX_LEN}"
-        SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
+          eval "ADDR=\$DELETED_LEASES6_AT''${i}_ADDRESS"
+          eval "PLEN=\$DELETED_LEASES6_AT''${i}_PREFIX_LEN"
+          PREFIX="''${ADDR}/''${PLEN}"
+          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
 
-        ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
-        rm -f "''${PD_DIR}/''${SAFE_PREFIX}.conf"
-        rm -f "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
-        write_radvd_dynamic_conf
-        ${pkgs.systemd}/bin/systemctl reload radvd.service
+          ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
+          rm -f "''${PD_DIR}/''${SAFE_PREFIX}.conf"
+          rm -f "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
+          CHANGED=1
+          i=$((i+1))
+        done
+
+        if [ "''${CHANGED}" = "1" ]; then
+          write_radvd_dynamic_conf
+          ${pkgs.systemd}/bin/systemctl reload radvd.service
+        fi
         ;;
     esac
   '';
