@@ -40,7 +40,7 @@ let
 
     case "$1" in
       lease6_add|lease6_update)
-        [ "$LEASE6_TYPE" = "IA_PD" ] || exit 0
+        [ "$LEASE6_TYPE" = "2" ] || exit 0
 
         PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIXLEN}"
         NEXTHOP="''${QUERY6_REMOTE_ADDR}"
@@ -66,7 +66,7 @@ let
         ;;
 
       lease6_delete)
-        [ "$LEASE6_TYPE" = "IA_PD" ] || exit 0
+        [ "$LEASE6_TYPE" = "2" ] || exit 0
 
         PREFIX="''${LEASE6_ADDRESS}/''${LEASE6_PREFIXLEN}"
         ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
