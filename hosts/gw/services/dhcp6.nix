@@ -3,6 +3,7 @@ let
   pdHookScript = pkgs.writeShellScript "kea-pd-hook" ''
     PD_DIR="/run/radvd-pd-prefixes"
     RADVD_DYNAMIC_CONF="/run/radvd-dynamic.conf"
+    NEXTHOP_DIR="/var/lib/kea/pd-nexthops"
 
     write_radvd_dynamic_conf() {
       {
@@ -39,6 +40,34 @@ let
     }
 
     case "$1" in
+      hook_load)
+        # On Kea startup, reinstall routes and radvd from persisted nexthop info
+        mkdir -p "''${PD_DIR}"
+        CHANGED=0
+        for f in "''${NEXTHOP_DIR}"/*.nexthop; do
+          [ -f "''${f}" ] || continue
+          read -r PREFIX NEXTHOP IFACE < "''${f}"
+          [ -n "''${PREFIX}" ] && [ -n "''${NEXTHOP}" ] && [ -n "''${IFACE}" ] || continue
+
+          SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
+          ${pkgs.iproute2}/bin/ip -6 route replace "''${PREFIX}" \
+            via "''${NEXTHOP}" dev "''${IFACE}" metric 1024 || true
+
+          cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
+      prefix ''${PREFIX} {
+          AdvOnLink off;
+          AdvAutonomous off;
+          AdvRouterAddr off;
+      };
+    EOF
+          CHANGED=1
+        done
+        if [ "''${CHANGED}" = "1" ]; then
+          write_radvd_dynamic_conf
+          ${pkgs.systemd}/bin/systemctl reload radvd.service 2>/dev/null || true
+        fi
+        ;;
+
       leases6_committed)
         NEXTHOP="''${QUERY6_REMOTE_ADDR}"
         IFACE="''${QUERY6_IFACE_NAME}"
@@ -50,7 +79,7 @@ let
           [ "''${TYPE}" = "IA_PD" ] || { i=$((i+1)); continue; }
 
           eval "ADDR=\$LEASES6_AT''${i}_ADDRESS"
-          eval "PLEN=\$LEASES6_AT''${i}_PREFIXLEN"
+          eval "PLEN=\$LEASES6_AT''${i}_PREFIX_LEN"
           PREFIX="''${ADDR}/''${PLEN}"
           SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
 
@@ -59,7 +88,8 @@ let
             dev "''${IFACE}" \
             metric 1024
 
-          mkdir -p "''${PD_DIR}"
+          mkdir -p "''${PD_DIR}" "''${NEXTHOP_DIR}"
+          echo "''${PREFIX} ''${NEXTHOP} ''${IFACE}" > "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
           cat > "''${PD_DIR}/''${SAFE_PREFIX}.conf" <<EOF
       prefix ''${PREFIX} {
           AdvOnLink off;
@@ -77,12 +107,13 @@ let
           [ "''${TYPE}" = "IA_PD" ] || { i=$((i+1)); continue; }
 
           eval "ADDR=\$DELETED_LEASES6_AT''${i}_ADDRESS"
-          eval "PLEN=\$DELETED_LEASES6_AT''${i}_PREFIXLEN"
+          eval "PLEN=\$DELETED_LEASES6_AT''${i}_PREFIX_LEN"
           PREFIX="''${ADDR}/''${PLEN}"
           SAFE_PREFIX=$(echo "''${PREFIX}" | tr ':/' '-' | tr -s '-')
 
           ${pkgs.iproute2}/bin/ip -6 route del "''${PREFIX}" 2>/dev/null || true
           rm -f "''${PD_DIR}/''${SAFE_PREFIX}.conf"
+          rm -f "''${NEXTHOP_DIR}/''${SAFE_PREFIX}.nexthop"
           CHANGED=1
           i=$((i+1))
         done
