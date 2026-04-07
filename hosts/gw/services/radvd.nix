@@ -20,6 +20,9 @@ _: {
           AdvAutonomous on;
         };
 
+        # Dynamically updated by Kea PD hook
+        include /run/radvd-pd-prefix.conf;
+
         RDNSS 2001:8b0:bd9:101::2 2001:8b0:bd9:101::3 {
           AdvRDNSSLifetime 3600;
         };
@@ -92,5 +95,11 @@ _: {
         };
       };
     '';
+  };
+
+  systemd.services.radvd = {
+    serviceConfig = {
+      BindReadOnlyPaths = [ "/run/radvd-pd-prefix.conf" ];
+    };
   };
 }
