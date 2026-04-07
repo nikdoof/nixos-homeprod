@@ -40,10 +40,18 @@
               leases6_committed() {
                 for i in $(seq $LEASES6_SIZE); do
                   idx=$((i-1))
+                  type_var="LEASES6_AT''${idx}_TYPE"
+                  # Only handle IA_PD leases (type 2)
+                  [ "''${!type_var}" = "2" ] || continue
                   prefix_var="LEASES6_AT''${idx}_ADDRESS"
                   plen_var="LEASES6_AT''${idx}_PREFIX_LEN"
                   ip -6 route replace ''${!prefix_var}/''${!plen_var} via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME
                 done
+              }
+              lease6_release() {
+                # Only handle IA_PD leases (type 2)
+                [ "$LEASE6_TYPE" = "2" ] || return 0
+                ip -6 route del $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME
               }
               unknown_handler() {
                 echo "Unhandled function call ''${*}"
@@ -52,6 +60,9 @@
               case "$1" in
                 "leases6_committed")
                   leases6_committed
+                ;;
+                "lease6_release")
+                  lease6_release
                 ;;
                 *)
                   unknown_handler "''${@}"
