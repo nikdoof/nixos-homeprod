@@ -138,7 +138,7 @@ in
           library = "${pkgs.kea}/lib/kea/hooks/libdhcp_run_script.so";
           parameters = {
             name = pdHookScript;
-            sync = false;
+            sync = true;
           };
         }
       ];
