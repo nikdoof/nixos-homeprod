@@ -36,37 +36,43 @@
                   pkgs.iproute2
                 ]
               }"
-              set -euxo pipefail
+              set -euo pipefail
+
+              log() { echo "[kea-hook] $*"; }
+
+              # Called after a batch of leases are committed.
+              # Adds a route for each delegated prefix (IA_PD, type=2).
               leases6_committed() {
-                for i in $(seq $LEASES6_SIZE); do
-                  idx=$((i-1))
-                  type_var="LEASES6_AT''${idx}_TYPE"
-                  # Only handle IA_PD leases (type 2)
-                  [ "''${!type_var}" = "2" ] || continue
-                  prefix_var="LEASES6_AT''${idx}_ADDRESS"
-                  plen_var="LEASES6_AT''${idx}_PREFIX_LEN"
-                  ip -6 route replace ''${!prefix_var}/''${!plen_var} via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME
+                for i in $(seq "$LEASES6_SIZE"); do
+                  idx=$((i - 1))
+                  type="LEASES6_AT''${idx}_TYPE"
+                  prefix="LEASES6_AT''${idx}_ADDRESS"
+                  plen="LEASES6_AT''${idx}_PREFIX_LEN"
+
+                  [ "''${!type}" = "2" ] || continue
+
+                  log "Adding route ''${!prefix}/''${!plen} via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME"
+                  ip -6 route replace "''${!prefix}/''${!plen}" via "$QUERY6_REMOTE_ADDR" dev "$QUERY6_IFACE_NAME"
                 done
               }
+
+              # Called when a lease is released or expires.
+              # Removes the route for the delegated prefix.
               lease6_release() {
-                # Only handle IA_PD leases (type 2)
-                [ "$LEASE6_TYPE" = "2" ] || return 0
-                ip -6 route del $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME
+                log "Removing route $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN"
+                ip -6 route del "$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN"
               }
+
               unknown_handler() {
-                echo "Unhandled function call ''${*}"
+                log "Unhandled hook call: $*"
                 exit 123
               }
+
               case "$1" in
-                "leases6_committed")
-                  leases6_committed
-                ;;
-                "lease6_release")
-                  lease6_release
-                ;;
-                *)
-                  unknown_handler "''${@}"
-                ;;
+                leases6_committed)       leases6_committed ;;
+                lease6_expire | \
+                lease6_release)          lease6_release ;;
+                *)                       unknown_handler "$@" ;;
               esac
             '';
             sync = false;
