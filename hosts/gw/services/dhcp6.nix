@@ -58,9 +58,20 @@
                 done
               }
 
+              # Called when a single PD lease is renewed.
+              # Uses singular LEASE6_* vars, not LEASES6_*.
+              lease6_renew() {
+                log "lease6_renew: type=$LEASE6_TYPE address=$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN client=$QUERY6_REMOTE_ADDR iface=$QUERY6_IFACE_NAME"
+                [ "$LEASE6_TYPE" = "2" ] || { log "lease6_renew: skipping non-PD lease"; return 0; }
+                log "Refreshing route $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME"
+                ip -6 route replace "$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN" via "$QUERY6_REMOTE_ADDR" dev "$QUERY6_IFACE_NAME"
+              }
+
               # Called when a lease is released or expires.
               # Removes the route for the delegated prefix.
               lease6_release() {
+                log "lease6_release: type=$LEASE6_TYPE address=$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN client=$QUERY6_REMOTE_ADDR iface=$QUERY6_IFACE_NAME"
+                [ "$LEASE6_TYPE" = "2" ] || { log "lease6_release: skipping non-PD lease"; return 0; }
                 log "Removing route $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN"
                 ip -6 route del "$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN"
               }
@@ -71,10 +82,11 @@
               }
 
               case "$1" in
-                lease6_renew | leases6_committed)       leases6_committed ;;
+                leases6_committed)        leases6_committed ;;
+                lease6_renew)             lease6_renew ;;
                 lease6_expire | \
-                lease6_release)          lease6_release ;;
-                *)                       unknown_handler "$@" ;;
+                lease6_release)           lease6_release ;;
+                *)                        unknown_handler "$@" ;;
               esac
             '';
             sync = false;
