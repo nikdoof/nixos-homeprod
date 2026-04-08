@@ -34,14 +34,36 @@
                 lib.strings.makeBinPath [
                   pkgs.coreutils
                   pkgs.iproute2
+                  pkgs.socat
+                  pkgs.jq
                 ]
               }"
               set -euo pipefail
 
               log() { echo "[kea-hook] $*"; }
 
+              KEA_CTRL_SOCKET="/run/kea/kea6-ctrl-socket"
+
+              # Install routes for all PD leases held by a given DUID.
+              # Used by lease6_renew to recover PD routes that Kea 3.0.3
+              # never fires leases6_committed for.
+              install_pd_routes_for_duid() {
+                local duid="$1" nexthop="$2" iface="$3"
+                local response
+                response=$(printf '{"command":"lease6-get-by-duid","arguments":{"duid":"%s"}}' "$duid" \
+                  | socat - "UNIX-CONNECT:$KEA_CTRL_SOCKET" 2>/dev/null || true)
+                local prefix plen
+                while IFS=$'\t' read -r prefix plen; do
+                  [ -n "$prefix" ] || continue
+                  log "Installing PD route $prefix/$plen via $nexthop dev $iface (recovered for duid $duid)"
+                  ip -6 route replace "$prefix/$plen" via "$nexthop" dev "$iface"
+                done < <(echo "$response" | jq -r \
+                  '.arguments.leases[] | select(.type == "IA_PD") | [.["ip-address"], (.["prefix-len"] | tostring)] | @tsv' \
+                  2>/dev/null || true)
+              }
+
               # Called after a batch of leases are committed.
-              # Adds a route for each delegated prefix (IA_PD, type=2).
+              # Adds a route for each delegated prefix.
               leases6_committed() {
                 log "leases6_committed: LEASES6_SIZE=$LEASES6_SIZE"
                 for i in $(seq "$LEASES6_SIZE"); do
@@ -51,27 +73,40 @@
                   plen="LEASES6_AT''${idx}_PREFIX_LEN"
 
                   log "Lease $idx: type=''${!type} prefix=''${!prefix}/''${!plen}"
-                  [ "''${!type}" = "2" ] || continue
+                  [ "''${!type}" = "IA_PD" ] || continue
 
                   log "Adding route ''${!prefix}/''${!plen} via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME"
                   ip -6 route replace "''${!prefix}/''${!plen}" via "$QUERY6_REMOTE_ADDR" dev "$QUERY6_IFACE_NAME"
                 done
               }
 
-              # Called when a single PD lease is renewed.
+              # Called when a single lease is renewed.
               # Uses singular LEASE6_* vars, not LEASES6_*.
+              # For IA_PD: refreshes the route directly.
+              # For IA_NA: queries the control socket for PD leases held by the
+              # same client, working around Kea 3.0.3 not firing leases6_committed
+              # for PD lease alloc/reuse.
               lease6_renew() {
                 log "lease6_renew: type=$LEASE6_TYPE address=$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN client=$QUERY6_REMOTE_ADDR iface=$QUERY6_IFACE_NAME"
-                [ "$LEASE6_TYPE" = "2" ] || { log "lease6_renew: skipping non-PD lease"; return 0; }
-                log "Refreshing route $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME"
-                ip -6 route replace "$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN" via "$QUERY6_REMOTE_ADDR" dev "$QUERY6_IFACE_NAME"
+                case "$LEASE6_TYPE" in
+                  IA_PD)
+                    log "Refreshing route $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME"
+                    ip -6 route replace "$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN" via "$QUERY6_REMOTE_ADDR" dev "$QUERY6_IFACE_NAME"
+                    ;;
+                  IA_NA)
+                    install_pd_routes_for_duid "$LEASE6_DUID" "$QUERY6_REMOTE_ADDR" "$QUERY6_IFACE_NAME"
+                    ;;
+                  *)
+                    log "lease6_renew: skipping type $LEASE6_TYPE"
+                    ;;
+                esac
               }
 
               # Called when a lease is released or expires.
               # Removes the route for the delegated prefix.
               lease6_release() {
                 log "lease6_release: type=$LEASE6_TYPE address=$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN client=$QUERY6_REMOTE_ADDR iface=$QUERY6_IFACE_NAME"
-                [ "$LEASE6_TYPE" = "2" ] || { log "lease6_release: skipping non-PD lease"; return 0; }
+                [ "$LEASE6_TYPE" = "IA_PD" ] || { log "lease6_release: skipping non-PD lease"; return 0; }
                 log "Removing route $LEASE6_ADDRESS/$LEASE6_PREFIX_LEN"
                 ip -6 route del "$LEASE6_ADDRESS/$LEASE6_PREFIX_LEN"
               }
