@@ -43,12 +43,14 @@
               # Called after a batch of leases are committed.
               # Adds a route for each delegated prefix (IA_PD, type=2).
               leases6_committed() {
+                log "leases6_committed: LEASES6_SIZE=$LEASES6_SIZE"
                 for i in $(seq "$LEASES6_SIZE"); do
                   idx=$((i - 1))
                   type="LEASES6_AT''${idx}_TYPE"
                   prefix="LEASES6_AT''${idx}_ADDRESS"
                   plen="LEASES6_AT''${idx}_PREFIX_LEN"
 
+                  log "Lease $idx: type=''${!type} prefix=''${!prefix}/''${!plen}"
                   [ "''${!type}" = "2" ] || continue
 
                   log "Adding route ''${!prefix}/''${!plen} via $QUERY6_REMOTE_ADDR dev $QUERY6_IFACE_NAME"
