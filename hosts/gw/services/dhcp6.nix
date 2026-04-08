@@ -146,7 +146,6 @@
           subnet = "2001:8b0:bd9:101::/64";
           interface = "vlan-private";
           ddns-qualifying-suffix = "int.doofnet.uk";
-          rapid-commit = true;
           pools = [ { pool = "2001:8b0:bd9:101::2000 - 2001:8b0:bd9:101::2fff"; } ];
           # Prefix delegation: hand out /64s from 2001:8b0:bd9:200::/56
           pd-pools = [
