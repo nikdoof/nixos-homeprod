@@ -53,7 +53,7 @@
                 safe=$(printf '%s' "''${prefix}/''${plen}" | tr ':/' '__')
                 frag="$RADVD_PD_DIR/''${safe}.conf"
                 mkdir -p "$RADVD_PD_DIR"
-                printf '  prefix %s/%s {\n    AdvOnLink off;\n    AdvAutonomous on;\n    AdvRouterAddr off;\n  };\n' \
+                printf '  prefix %s/%s {\n    AdvOnLink off;\n    AdvAutonomous off;\n    AdvRouterAddr off;\n  };\n' \
                   "''${prefix}" "''${plen}" > "$frag"
                 log "Wrote PD fragment $frag"
               }
@@ -323,7 +323,7 @@
 
         safe=$(printf '%s' "$prefix/$plen" | tr ':/' '__')
         frag="$RADVD_PD_DIR/$safe.conf"
-        ${pkgs.coreutils}/bin/printf '  prefix %s/%s {\n    AdvOnLink off;\n    AdvAutonomous on;\n    AdvRouterAddr off;\n  };\n' \
+        ${pkgs.coreutils}/bin/printf '  prefix %s/%s {\n    AdvOnLink off;\n    AdvAutonomous off;\n    AdvRouterAddr off;\n  };\n' \
           "$prefix" "$plen" > "$frag"
         echo "Wrote fragment $frag"
         did_pd=1
