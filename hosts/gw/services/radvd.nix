@@ -107,6 +107,8 @@ let
       pd_content="$pd_content$(${pkgs.coreutils}/bin/cat "$f")"
     done
 
+    ${pkgs.coreutils}/bin/chmod 644 "$TMP"
+
     if [ -z "$pd_content" ]; then
       ${pkgs.coreutils}/bin/cp "${staticConf}" "$TMP"
     else
