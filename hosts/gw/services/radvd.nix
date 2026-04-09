@@ -156,7 +156,7 @@ in
       Type = "simple";
       # Creates /run/radvd-pd/ before ExecStartPre runs.
       RuntimeDirectory = "radvd-pd";
-      RuntimeDirectoryMode = "0755";
+      RuntimeDirectoryMode = "0777";
       ExecStartPre = mergeScript;
       ExecStart = "${pkgs.radvd}/bin/radvd -n -u radvd -C /run/radvd.conf";
       ExecReload = reloadScript;
