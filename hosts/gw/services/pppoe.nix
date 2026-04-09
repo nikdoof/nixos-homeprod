@@ -25,7 +25,7 @@ _: {
         noauth
         persist
         maxfail 0
-        mtu 1500
+        mtu 1508
         noaccomp
         default-asyncmap
         +ipv6
