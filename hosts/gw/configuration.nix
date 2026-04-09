@@ -114,7 +114,10 @@
     # WAN intf
     "05-enp3s0f1" = {
       matchConfig.Name = "enp3s0f1";
-      linkConfig.RequiredForOnline = "no";
+      linkConfig = {
+        MTUBytes = 1508;
+        RequiredForOnline = "no";
+      };
       networkConfig.VLAN = [ "vlan-wan" ];
     };
 
@@ -122,6 +125,9 @@
       matchConfig.Name = "vlan-wan";
       linkConfig.RequiredForOnline = "no";
       networkConfig.LinkLocalAddressing = "no";
+      linkConfig = {
+        MTUBytes = 1508;
+      };
     };
 
     # PPP to AAISP
