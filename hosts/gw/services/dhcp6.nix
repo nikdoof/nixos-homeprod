@@ -262,4 +262,81 @@
     AmbientCapabilities = [ "CAP_NET_ADMIN" ];
     CapabilityBoundingSet = [ "CAP_NET_ADMIN" ];
   };
+
+  # Manually restore radvd PD fragments and routes from current Kea leases.
+  # Useful after a reboot before clients have renewed.
+  # Usage: kea-restore-pd
+  environment.systemPackages = [
+    (pkgs.writeShellScriptBin "kea-restore-pd" ''
+      set -euo pipefail
+
+      KEA_CTRL_SOCKET="/run/kea/kea6-ctrl-socket"
+      RADVD_PD_DIR="/run/radvd-pd"
+
+      # Extract MAC address from a DUID string (colon-separated hex bytes).
+      # Supports DUID-LLT (00:01) and DUID-LL (00:03).
+      mac_from_duid() {
+        local duid="$1"
+        local dtype
+        dtype=$(echo "$duid" | cut -d: -f1-2)
+        case "$dtype" in
+          "00:01") echo "$duid" | cut -d: -f9-14 ;;
+          "00:03") echo "$duid" | cut -d: -f5-10 ;;
+          *) echo "" ;;
+        esac
+      }
+
+      # Find the link-local address for a MAC in the NDP table.
+      nexthop_for_mac() {
+        local mac="$1"
+        ip -6 neigh show \
+          | grep -i "$mac" \
+          | awk '/fe80/ {print $1}' \
+          | head -1
+      }
+
+      echo "Querying Kea control socket for PD leases..."
+      response=$(echo '{"command":"lease6-get-all","arguments":{"subnets":[1]}}' \
+        | ${pkgs.socat}/bin/socat - "UNIX-CONNECT:$KEA_CTRL_SOCKET")
+
+      mkdir -p "$RADVD_PD_DIR"
+      did_pd=0
+
+      while IFS=$'\t' read -r prefix plen duid; do
+        [ -n "$prefix" ] || continue
+
+        mac=$(mac_from_duid "$duid")
+        if [ -z "$mac" ]; then
+          echo "WARN: cannot extract MAC from DUID $duid, skipping $prefix/$plen"
+          continue
+        fi
+
+        nexthop=$(nexthop_for_mac "$mac")
+        if [ -z "$nexthop" ]; then
+          echo "WARN: no NDP entry for MAC $mac (duid $duid), skipping route for $prefix/$plen"
+        else
+          # Find which interface this neighbour is on
+          iface=$(ip -6 neigh show | grep -i "$mac" | awk '/fe80/ {print $3}' | head -1)
+          echo "Installing route $prefix/$plen via $nexthop dev $iface"
+          ip -6 route replace "$prefix/$plen" via "$nexthop" dev "$iface"
+        fi
+
+        safe=$(printf '%s' "$prefix/$plen" | tr ':/' '__')
+        frag="$RADVD_PD_DIR/$safe.conf"
+        ${pkgs.coreutils}/bin/printf '  prefix %s/%s {\n    AdvOnLink off;\n    AdvAutonomous on;\n    AdvRouterAddr off;\n  };\n' \
+          "$prefix" "$plen" > "$frag"
+        echo "Wrote fragment $frag"
+        did_pd=1
+      done < <(echo "$response" | ${pkgs.jq}/bin/jq -r \
+        '.arguments.leases[] | select(.type == "IA_PD") | [.["ip-address"], (.["prefix-len"] | tostring), .duid] | @tsv')
+
+      if [ "$did_pd" -eq 0 ]; then
+        echo "No active PD leases found."
+      else
+        echo "Reloading radvd..."
+        systemctl reload radvd.service
+        echo "Done."
+      fi
+    '')
+  ];
 }
