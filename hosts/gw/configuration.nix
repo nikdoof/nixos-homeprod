@@ -214,16 +214,6 @@
     "net.core.bpf_jit_harden" = 2;
   };
 
-  services.auto-cpufreq = {
-    enable = true;
-    settings = {
-      charger = {
-        governor = "powersave";
-        turbo = "auto";
-      };
-    };
-  };
-
   doofnet.network.vlans = true;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
