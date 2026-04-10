@@ -344,7 +344,7 @@ in
         allow-transfer { none; };
 
         dnssec-validation auto;
-        qname-minimization strict;
+        qname-minimization relaxed;
         minimal-responses yes;
 
         // Cache limits
