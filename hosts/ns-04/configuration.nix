@@ -1,7 +1,6 @@
 { modulesPath, ... }:
 {
   imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
-  ec2.efi = true;
 
   networking.hostName = "ns-04";
   networking.domain = "doofnet.uk";
