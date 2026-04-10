@@ -6,6 +6,14 @@
   networking.domain = "doofnet.uk";
   networking.search = [ "doofnet.uk" ];
 
+  systemd.network.enable = true;
+  systemd.network.networks."10-lan" = {
+    matchConfig.Type = "ether";
+    networkConfig = {
+      DHCP = "yes";
+    };
+  };
+
   doofnet.bind = {
     enable = true;
     mode = "secondary";
