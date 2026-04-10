@@ -6,16 +6,16 @@
 }:
 buildGoModule rec {
   pname = "jrouter";
-  version = "0.0.21";
+  version = "0.0.23";
 
   src = fetchzip {
     url = "https://git.doofnet.uk/nikdoof-stars/jrouter/archive/v${version}.tar.gz";
-    hash = "sha256-0TzCljaP7JIZz8nO1E4X6lWoEDecO+jMzCPiBAtN6Ic=";
+    hash = "sha256-E752m9GKB9iAVYUXu9gMO9S/zjjyIVxCkPSPJhkNslU=";
   };
 
   buildInputs = [ libpcap ];
 
-  vendorHash = "sha256-9htMWedvYFq1ZDSPblx/FykQYpf29bM1FVRvR3mU+5Y=";
+  vendorHash = "sha256-68DL2TyUxGGw8H9gzhFjgngyjUN4quH6FT5GvCMKiMA=";
   doCheck = false;
 
   meta = with lib; {
