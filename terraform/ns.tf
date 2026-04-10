@@ -19,7 +19,7 @@ data "aws_ami" "nixos_eu_west_1" {
 
   filter {
     name   = "architecture"
-    values = ["arm64"]
+    values = ["x86_64"]
   }
 }
 
@@ -35,7 +35,7 @@ data "aws_ami" "nixos_eu_west_2" {
 
   filter {
     name   = "architecture"
-    values = ["arm64"]
+    values = ["x86_64"]
   }
 }
 
@@ -176,6 +176,10 @@ resource "aws_instance" "ns_03" {
   iam_instance_profile   = aws_iam_instance_profile.ns.name
   vpc_security_group_ids = [aws_security_group.ns_03.id]
 
+  root_block_device {
+    volume_size = 10
+  }
+
   tags = merge(local.tags, { Name = "ns-03" })
 }
 
@@ -186,6 +190,10 @@ resource "aws_instance" "ns_04" {
   key_name               = aws_key_pair.nikdoof_eu_west_2.key_name
   iam_instance_profile   = aws_iam_instance_profile.ns.name
   vpc_security_group_ids = [aws_security_group.ns_04.id]
+
+  root_block_device {
+    volume_size = 10
+  }
 
   tags = merge(local.tags, { Name = "ns-04" })
 }

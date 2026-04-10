@@ -107,8 +107,8 @@
         ns-02 = mkMicrovm "ns-02" { };
 
         # AWS
-        ns-03 = mkSystem "ns-03" { system = "aarch64-linux"; };
-        ns-04 = mkSystem "ns-04" { system = "aarch64-linux"; };
+        ns-03 = mkSystem "ns-03" { };
+        ns-04 = mkSystem "ns-04" { };
 
         # Mini P8 Laptop
         talos = mkSystem "talos" { };
