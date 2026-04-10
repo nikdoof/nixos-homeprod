@@ -385,8 +385,10 @@ in
           listen-on-v6 port 853 tls local-tls { any; };
         ''}
 
-        // RPZ
-        response-policy { zone "rpz"; } break-dnssec yes;
+        ${lib.optionalString (!cfg.publicOnly) ''
+          // RPZ
+          response-policy { zone "rpz"; } break-dnssec yes;
+        ''}
       '';
 
       extraConfig = ''
