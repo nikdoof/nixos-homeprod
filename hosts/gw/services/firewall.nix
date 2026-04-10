@@ -217,8 +217,8 @@ _: {
         iifname "ppp0" fib daddr . iif type local udp dport 443 dnat to 10.101.3.20:8443
 
         # DNS -> ns-01 (for public secondary nameservers: zone transfer + NOTIFY)
-        iifname "ppp0" fib daddr . iif type local ip saddr @pub_ns4 tcp dport 53 dnat to 10.101.1.2
-        iifname "ppp0" fib daddr . iif type local ip saddr @pub_ns4 udp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" fib daddr . iif type local ip saddr { 52.19.64.4, 16.60.149.205 } tcp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" fib daddr . iif type local ip saddr { 52.19.64.4, 16.60.149.205 } udp dport 53 dnat to 10.101.1.2
 
         # BitTorrent -> QBittorrent
         iifname "ppp0" fib daddr . iif type local tcp dport 51413 dnat to 10.101.3.16
