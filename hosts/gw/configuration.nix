@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
@@ -213,6 +213,12 @@
     "kernel.unprivileged_bpf_disabled" = 1;
     "net.core.bpf_jit_harden" = 2;
   };
+
+  environment.systemPackages = with pkgs; [
+    speedtest-cli
+    bmon
+    iftop
+  ];
 
   doofnet.network.vlans = true;
 
