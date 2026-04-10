@@ -228,6 +228,7 @@
     speedtest-cli
     bmon
     iftop
+    iperf
   ];
 
   doofnet.network.vlans = true;
