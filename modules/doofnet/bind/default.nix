@@ -71,8 +71,11 @@ let
     file = "zones/${zone.name}";
   };
 
+  # Active zone list — public secondaries only serve publicly-delegated zones
+  activeZones = if cfg.publicOnly then builtins.filter isPublicZone zoneList else zoneList;
+
   # Filtered zone lists
-  dynamicZones = builtins.filter hasDynamicUpdates zoneList;
+  dynamicZones = builtins.filter hasDynamicUpdates activeZones;
 
   # Tmpfiles configuration for dynamic zones
   mkDynamicZoneFiles =
@@ -147,6 +150,12 @@ in
       type = lib.types.listOf lib.types.str;
       default = primaryServers;
       description = "Primary server IPs to transfer zones from. Override for external secondaries that reach the primary via NAT.";
+    };
+
+    publicOnly = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Only serve publicly-delegated zones (those with ns-03/ns-04 in NS records). For public-facing secondaries.";
     };
   };
 
@@ -335,7 +344,7 @@ in
         map (zone: {
           inherit (zone) name;
           value = if cfg.mode == "primary" then mkPrimaryZone zone else mkSecondaryZone zone;
-        }) zoneList
+        }) activeZones
       );
 
       extraOptions = ''

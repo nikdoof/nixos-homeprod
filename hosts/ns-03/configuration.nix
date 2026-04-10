@@ -17,6 +17,7 @@
   doofnet.bind = {
     enable = true;
     mode = "secondary";
+    publicOnly = true;
     # Reach ns-01 via the gateway's public NAT IP (81.187.48.147 -> 10.101.1.2)
     masters = [ "81.187.48.147" ];
   };
