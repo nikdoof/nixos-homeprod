@@ -212,6 +212,16 @@
     # Disable unprivileged BPF and harden JIT against info leaks
     "kernel.unprivileged_bpf_disabled" = 1;
     "net.core.bpf_jit_harden" = 2;
+
+    # TCP buffer sizing for 1 Gbps
+    "net.core.rmem_max" = 16777216;
+    "net.core.wmem_max" = 16777216;
+    "net.ipv4.tcp_rmem" = "4096 87380 16777216";
+    "net.ipv4.tcp_wmem" = "4096 65536 16777216";
+    "net.core.netdev_max_backlog" = 5000;
+
+    # Enable MTU probing — handles ICMP-blackhole scenarios on PPPoE
+    "net.ipv4.tcp_mtu_probing" = 1;
   };
 
   environment.systemPackages = with pkgs; [
