@@ -214,6 +214,20 @@ resource "aws_eip" "ns_04" {
   tags = merge(local.tags, { Name = "ns-04-eip" })
 }
 
+# Reverse DNS for EIPs
+#
+resource "aws_eip_domain_name" "ns_03_rdns" {
+  provider      = aws.eu_west_1
+  allocation_id = aws_eip.ns_03.allocation_id
+  domain_name   = digitalocean_record.ns_03.fqdn
+}
+
+resource "aws_eip_domain_name" "ns_04_rdns" {
+  provider      = aws.eu_west_2
+  allocation_id = aws_eip.ns_04.allocation_id
+  domain_name   = digitalocean_record.ns_04.fqdn
+}
+
 # DNS entries
 #
 resource "digitalocean_record" "ns_03" {
