@@ -18,15 +18,10 @@ _: {
         elements = { 2001:8b0:bd9::/48, fc00::/7 }
       }
 
-      # Hurricane Electric secondary nameservers (zone transfer / NOTIFY)
-      set he_dns4 {
+      # Public secondary nameservers (ns-03/ns-04 on AWS, zone transfer / NOTIFY)
+      set pub_ns4 {
         type ipv4_addr
-        elements = { 216.218.133.2 }
-      }
-
-      set he_dns6 {
-        type ipv6_addr
-        elements = { 2001:470:600::2 }
+        elements = { 52.19.64.4, 16.60.149.205 }
       }
 
       # Internal recursive resolvers (ns1 + ns2 on vlan-private)
@@ -97,9 +92,8 @@ _: {
         # DHCPv6 client on WAN — only accept replies from link-local relay on port 547
         iifname "ppp0" ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept
 
-        # DNS - HE secondary nameservers (zone transfer / NOTIFY)
-        ip  saddr @he_dns4 tcp dport 53 accept
-        ip6 saddr @he_dns6 tcp dport 53 accept
+        # DNS - public secondary nameservers inbound (zone transfer / NOTIFY)
+        ip saddr @pub_ns4 tcp dport 53 accept
 
         # DNS - hosted VLAN relay (unbound forwards to ns-01/ns-02)
         iifname "vlan-hosted" udp dport 53 accept
@@ -222,9 +216,9 @@ _: {
         iifname "ppp0" fib daddr . iif type local tcp dport 443 dnat to 10.101.3.20:8443
         iifname "ppp0" fib daddr . iif type local udp dport 443 dnat to 10.101.3.20:8443
 
-        # DNS -> ns1 (for HE secondary nameservers only)
-        iifname "ppp0" fib daddr . iif type local ip saddr 216.218.133.2 tcp dport 53 dnat to 10.101.1.2
-        iifname "ppp0" fib daddr . iif type local ip saddr 216.218.133.2 udp dport 53 dnat to 10.101.1.2
+        # DNS -> ns-01 (for public secondary nameservers: zone transfer + NOTIFY)
+        iifname "ppp0" fib daddr . iif type local ip saddr @pub_ns4 tcp dport 53 dnat to 10.101.1.2
+        iifname "ppp0" fib daddr . iif type local ip saddr @pub_ns4 udp dport 53 dnat to 10.101.1.2
 
         # BitTorrent -> QBittorrent
         iifname "ppp0" fib daddr . iif type local tcp dport 51413 dnat to 10.101.3.16

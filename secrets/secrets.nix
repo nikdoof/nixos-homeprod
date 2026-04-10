@@ -9,6 +9,8 @@ let
   mx-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH2WGGEH1jk+Z0Q7zRMXF/ENZtEk8EtfWY3AYBinNtdr";
   ns-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEP/iQjTNADjLloMaSag8AKcLNbNVznEf9l3IYP5a2Y0";
   ns-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+RugXVoPkhVGjW1UzClCSAHlWscbAXxcFvsxqTNM1f";
+  ns-03 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITU1TFefchS1r0BQyg6Y4Dg6banAMV54BIu3BSuA25o";
+  ns-04 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqLmj2D41hfYHjVdgtZQ8WnoWuEBYiMX5IP7cRYHGwB";
   svc-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILPHbFY5oPMjAinz46BD8qHTuMgjymS3Vo+57h+iKKWu";
   svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
   web-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILBF2Kjr3uDks2Ga1Cm9ItmBuvYthNW0muBccotcIhmZ";
@@ -18,6 +20,8 @@ let
     mx-01
     ns-01
     ns-02
+    ns-03
+    ns-04
     svc-01
     svc-02
     web-01
@@ -54,7 +58,13 @@ in
   "mx01DovecotPasswd.age".publicKeys = users ++ [ mx-01 ];
   "mx01DmarcReportsPassword.age".publicKeys = users ++ [ mx-01 ];
 
-  "doofnetDnsUpdateKey.age".publicKeys = users ++ systems;
+  "doofnetDnsUpdateKey.age".publicKeys = users ++ [ ns-01 ];
+  "doofnetZoneTransferKey.age".publicKeys = users ++ [
+    ns-01
+    ns-02
+    ns-03
+    ns-04
+  ];
 
   "headscaleClientSecret.age".publicKeys = users ++ [ hs-01 ];
 

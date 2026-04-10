@@ -26,13 +26,9 @@ let
     "2001:8b0:bd9:101::2"
   ];
 
-  heNetServers = [
-    "216.218.133.2"
-    "2001:470:600::2"
-  ];
-
-  heNetNotifyServers = [
-    "216.218.130.2"
+  publicSecondaryServers = [
+    "52.19.64.4" # ns-03 (eu-west-1)
+    "16.60.149.205" # ns-04 (eu-west-2)
   ];
 
   # Directory for mutable zone files
@@ -47,9 +43,11 @@ let
       extra = zone.value.extraConfig or "";
     in
     builtins.match ".*allow-update.*" extra != null || builtins.match ".*update-policy.*" extra != null;
-  hasHeNetNameservers =
+  isPublicZone =
     zone:
-    builtins.any (ns: builtins.match ".*he\\.net\\..*" ns != null) (zone.value.zoneData.NS or [ ]);
+    builtins.any (ns: builtins.match ".*ns-0[34]\\.doofnet\\.uk\\..*" ns != null) (
+      zone.value.zoneData.NS or [ ]
+    );
   getZoneSerial = zone: zone.value.zoneData.SOA.serial or 0;
 
   writeZoneFile =
@@ -63,17 +61,13 @@ let
   mkPrimaryZone = zone: {
     master = true;
     file = if hasDynamicUpdates zone then "${zoneDir}/${zone.name}.zone" else writeZoneFile zone;
-    slaves = secondaryServers ++ lib.optionals (hasHeNetNameservers zone) heNetServers;
-    extraConfig =
-      (zone.value.extraConfig or "")
-      + lib.optionalString (hasHeNetNameservers zone) ''
-        also-notify { ${lib.concatMapStringsSep " " (s: "${s};") heNetNotifyServers} };
-      '';
+    slaves = secondaryServers ++ lib.optionals (isPublicZone zone) publicSecondaryServers;
+    extraConfig = zone.value.extraConfig or "";
   };
 
   mkSecondaryZone = zone: {
     master = false;
-    masters = primaryServers;
+    inherit (cfg) masters;
     file = "zones/${zone.name}";
   };
 
@@ -148,15 +142,18 @@ in
       default = "primary";
       description = "Server mode: primary (master) or secondary (slave)";
     };
+
+    masters = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = primaryServers;
+      description = "Primary server IPs to transfer zones from. Override for external secondaries that reach the primary via NAT.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     # Firewall
     networking.firewall = {
-      allowedTCPPorts = [
-        53
-        853
-      ];
+      allowedTCPPorts = [ 53 ] ++ lib.optionals (cfg.mode == "primary") [ 853 ];
       allowedUDPPorts = [ 53 ];
     };
 
@@ -202,6 +199,12 @@ in
     };
 
     age.secrets = {
+      doofnetZoneTransferKey = {
+        file = ../../../secrets/doofnetZoneTransferKey.age;
+        owner = "named";
+      };
+    }
+    // lib.optionalAttrs (cfg.mode == "primary") {
       doofnetDnsUpdateKey = {
         file = ../../../secrets/doofnetDnsUpdateKey.age;
         owner = "named";
@@ -212,8 +215,8 @@ in
       };
     };
 
-    # Get a ACME cert for DNS
-    security.acme = {
+    # Get a ACME cert for DNS (primary only — secondaries don't serve DoT)
+    security.acme = lib.mkIf (cfg.mode == "primary") {
       certs = {
         "${config.networking.hostName}.${config.networking.domain}" = {
           dnsProvider = "digitalocean";
@@ -368,8 +371,10 @@ in
             ${lib.concatMapStrings (n: "${n}; ") allNetworks}
           };
         };
-        listen-on port 853 tls local-tls { any; };
-        listen-on-v6 port 853 tls local-tls { any; };
+        ${lib.optionalString (cfg.mode == "primary") ''
+          listen-on port 853 tls local-tls { any; };
+          listen-on-v6 port 853 tls local-tls { any; };
+        ''}
 
         // RPZ
         response-policy { zone "rpz"; } break-dnssec yes;
@@ -381,17 +386,36 @@ in
           inet 127.0.0.1 port 8053 allow { 127.0.0.1; };
         };
 
-        // DHCP update key
-        include "${config.age.secrets.doofnetDnsUpdateKey.path}";
-        acl "doofnet-dhcp-updates" {
-          key doofnet-dhcp-updates;
-        };
+        // Zone transfer TSIG key
+        include "${config.age.secrets.doofnetZoneTransferKey.path}";
 
-        // DNS-over-TLS certificate
-        tls local-tls {
-          cert-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
-          key-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
-        };
+        ${lib.optionalString (cfg.mode == "primary") ''
+          // Authenticate zone transfers to/from public secondaries with TSIG
+          ${lib.concatMapStrings (ip: ''
+            server ${ip} { keys { doofnet-zone-transfer; }; };
+          '') publicSecondaryServers}
+
+          // DHCP update key
+          include "${config.age.secrets.doofnetDnsUpdateKey.path}";
+          acl "doofnet-dhcp-updates" {
+            key doofnet-dhcp-updates;
+          };
+        ''}
+
+        ${lib.optionalString (cfg.mode == "secondary") ''
+          // Authenticate zone transfers to/from primary with TSIG
+          ${lib.concatMapStrings (ip: ''
+            server ${ip} { keys { doofnet-zone-transfer; }; };
+          '') cfg.masters}
+        ''}
+
+        ${lib.optionalString (cfg.mode == "primary") ''
+          // DNS-over-TLS certificate
+          tls local-tls {
+            cert-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
+            key-file "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
+          };
+        ''}
 
         logging {
           // Security-relevant events: DNSSEC failures, TSIG errors, zone transfers
