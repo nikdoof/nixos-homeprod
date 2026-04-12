@@ -196,14 +196,33 @@ in
 
   services.nginx = {
     enable = true;
-    statusPage = true;
     serverTokens = false;
     recommendedTlsSettings = true;
     recommendedOptimisation = true;
     recommendedGzipSettings = true;
     clientMaxBodySize = "64k";
 
-    virtualHosts = nginx_sites // nginx_sites_redirects;
+    virtualHosts =
+      nginx_sites
+      // nginx_sites_redirects
+      // {
+        # nginx_status exposed only on loopback for the prometheus exporter
+        "localhost" = {
+          listen = [
+            {
+              addr = "127.0.0.1";
+              port = 80;
+            }
+          ];
+          locations."/nginx_status" = {
+            extraConfig = ''
+              stub_status on;
+              allow 127.0.0.1;
+              deny all;
+            '';
+          };
+        };
+      };
   };
 
   services.prometheus.exporters.nginx = {
