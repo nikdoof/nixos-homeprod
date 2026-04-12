@@ -20,14 +20,15 @@ _: {
         noipdefault
         defaultroute
         hide-password
-        lcp-echo-interval 1
-        lcp-echo-failure 10
+        lcp-echo-interval 10
+        lcp-echo-failure 6
         noauth
         persist
         maxfail 0
         mtu 1500
         noaccomp
-        default-asyncmap
+        nopcomp
+        asyncmap 0x00000000
         +ipv6
         ipv6cp-use-ipaddr
       '';

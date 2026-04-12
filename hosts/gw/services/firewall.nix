@@ -46,6 +46,24 @@ _: {
         elements = { 53, 123 }
       }
 
+      # Named counters — exported to Prometheus via the nftables textfile collector.
+      counter fw_wan_input_drop   { comment "WAN packets dropped in input chain (ppp0 input)" }
+      counter fw_wan_forward_drop { comment "WAN inbound packets dropped (ppp0 forward chain)" }
+      counter fw_hosted_blocked   { comment "Hosted VLAN outbound packets blocked" }
+      counter fw_forward_drop     { comment "All other forward chain drops (logged)" }
+
+      # Shared TCP flag validation — drops malformed packets used in scanning/fingerprinting.
+      # Called from both input and forward chains to avoid duplication.
+      chain tcp_flag_check {
+        tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 drop
+        tcp flags & (fin|syn) == (fin|syn) drop
+        tcp flags & (syn|rst) == (syn|rst) drop
+        tcp flags & (fin|rst) == (fin|rst) drop
+        tcp flags & (fin|ack) == fin drop
+        tcp flags & (urg|ack) == urg drop
+        tcp flags & (psh|ack) == psh drop
+      }
+
       chain input {
         type filter hook input priority 0; policy drop;
 
@@ -59,14 +77,7 @@ _: {
         ct state established,related accept
         ct state invalid drop
 
-        # TCP flag validation — drop malformed packets used in scanning/fingerprinting
-        tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 drop
-        tcp flags & (fin|syn) == (fin|syn) drop
-        tcp flags & (syn|rst) == (syn|rst) drop
-        tcp flags & (fin|rst) == (fin|rst) drop
-        tcp flags & (fin|ack) == fin drop
-        tcp flags & (urg|ack) == urg drop
-        tcp flags & (psh|ack) == psh drop
+        jump tcp_flag_check
 
         # ICMPv4
         ip protocol icmp icmp type { echo-request, destination-unreachable, time-exceeded } \
@@ -119,26 +130,16 @@ _: {
         iifname "ppp0" counter name fw_wan_input_drop drop
       }
 
-      # Named counters — exported to Prometheus via the nftables textfile collector.
-      counter fw_wan_input_drop   { comment "WAN packets dropped in input chain (ppp0 input)" }
-      counter fw_wan_forward_drop { comment "WAN inbound packets dropped (ppp0 forward chain)" }
-      counter fw_hosted_blocked   { comment "Hosted VLAN outbound packets blocked" }
-      counter fw_forward_drop     { comment "All other forward chain drops (logged)" }
-
       chain forward {
         type filter hook forward priority 0; policy drop;
 
         ct state established,related accept
         ct state invalid drop
 
-        # TCP flag validation — drop malformed packets used in scanning/fingerprinting
-        tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 drop
-        tcp flags & (fin|syn) == (fin|syn) drop
-        tcp flags & (syn|rst) == (syn|rst) drop
-        tcp flags & (fin|rst) == (fin|rst) drop
-        tcp flags & (fin|ack) == fin drop
-        tcp flags & (urg|ack) == urg drop
-        tcp flags & (psh|ack) == psh drop
+        # MSS clamping — clamp TCP MSS to path MTU to prevent fragmentation on PPPoE
+        tcp flags & syn == syn tcp option maxseg size set rt mtu
+
+        jump tcp_flag_check
 
         # ICMPv6 — transit types only; NDP and MLD are link-local and must not be forwarded
         ip6 nexthdr icmpv6 icmpv6 type {
