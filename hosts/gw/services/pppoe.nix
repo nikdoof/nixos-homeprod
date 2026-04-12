@@ -1,4 +1,5 @@
-_: {
+{ pkgs, ... }:
+{
   # Deploy credentials to the path pppd reads at startup.
   # File format: "username" * "password"
   age.secrets.pppoeCredentials = {
@@ -14,7 +15,7 @@ _: {
       autostart = true;
       enable = true;
       config = ''
-        plugin pppoe.so vlan-wan
+        plugin ${pkgs.rpPPPoE}/lib/rp-pppoe.so vlan-wan
         user "aw143@a.2"
 
         noipdefault
