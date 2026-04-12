@@ -125,8 +125,6 @@ in
   services.headscale = {
     enable = true;
     settings = lib.mkForce {
-      acme_email = "acme@doofnet.uk";
-      acme_url = "https://acme-v02.api.letsencrypt.org/directory";
       database = {
         debug = false;
         gorm = {
@@ -195,7 +193,8 @@ in
       ephemeral_node_inactivity_timeout = "30m";
       grpc_allow_insecure = false;
       grpc_listen_addr = "127.0.0.1:50443";
-      listen_addr = "[::]:443";
+      # nginx terminates TLS; headscale listens on localhost only
+      listen_addr = "127.0.0.1:8080";
       log = {
         format = "text";
         level = "info";
@@ -227,23 +226,29 @@ in
       };
       randomize_client_port = false;
       server_url = "https://hs.doofnet.uk:443";
-      tls_letsencrypt_cache_dir = "/var/lib/headscale/cache";
-      tls_letsencrypt_challenge_type = "HTTP-01";
-      tls_letsencrypt_hostname = "hs.doofnet.uk";
-      tls_letsencrypt_listen = ":http";
       unix_socket = "/var/run/headscale/headscale.sock";
       unix_socket_permission = "0770";
     };
   };
 
-  systemd.services.headscale = {
-    serviceConfig = {
-      AmbientCapabilities = [
-        "CAP_NET_BIND_SERVICE"
-      ];
-      CapabilityBoundingSet = [
-        "CAP_NET_BIND_SERVICE"
-      ];
+  # nginx reverse proxy — filters bad requests before they reach headscale,
+  # terminates TLS, and passes real client IP via standard headers.
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedTlsSettings = true;
+    virtualHosts."hs.doofnet.uk" = {
+      enableACME = true;
+      forceSSL = true;
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8080";
+        proxyWebsockets = true;
+        extraConfig = ''
+          # Tailscale/DERP uses long-lived connections
+          proxy_read_timeout 3600s;
+          proxy_send_timeout 3600s;
+        '';
+      };
     };
   };
 
