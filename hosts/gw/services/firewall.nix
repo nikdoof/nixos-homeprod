@@ -235,9 +235,19 @@ _: {
       chain postrouting {
         type nat hook postrouting priority 100;
 
-        # NAT IPv4 out of WAN
-        # 217.169.25.8/29 (hosted) is excluded.
-        oifname "ppp0" ip saddr 10.0.0.0/8 masquerade
+        # NAT IPv4 out of WAN — LAN clients and Tailscale exit node clients
+        # 217.169.25.8/29 (hosted) is excluded (publicly routed, no NAT).
+        # 100.64.0.0/10 is the Headscale-assigned Tailscale prefix.
+        oifname "ppp0" ip saddr { 10.0.0.0/8, 100.64.0.0/10 } masquerade
+      }
+    }
+
+    # IPv6 NAT for Tailscale exit node clients
+    # fd7a:115c:a1e0::/48 is the Headscale-assigned IPv6 Tailscale prefix.
+    table ip6 nat {
+      chain postrouting {
+        type nat hook postrouting priority 100;
+        oifname "ppp0" ip6 saddr fd7a:115c:a1e0::/48 masquerade
       }
     }
   '';
