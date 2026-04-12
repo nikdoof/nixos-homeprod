@@ -152,7 +152,7 @@ in
           region_code = "sth";
           region_id = 999;
           region_name = "St. Helens";
-          stun_listen_addr = "0.0.0.0:3478";
+          stun_listen_addr = "[::]:3478";
         };
         update_frequency = "24h";
         urls = [

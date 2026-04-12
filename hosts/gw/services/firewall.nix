@@ -126,6 +126,9 @@ _: {
         # NAT-PMP / PCP
         iifname { "vlan-private", "vlan-public" } udp dport 5351 accept
 
+        # Tailscale
+        iifname "ppp0" udp dport 41641 accept
+
         # WAN input drops
         iifname "ppp0" counter name fw_wan_input_drop drop
       }
