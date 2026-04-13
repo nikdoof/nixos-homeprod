@@ -22,6 +22,10 @@ _: {
       # Override svc-prod-ingress-external.doofnet.uk to resolve to 10.101.3.20
       "svc-prod-ingress-external.doofnet.uk".A = [ "10.101.3.20" ];
 
+      # Redirect metrics.doofnet.uk to svc-01 internally so Alloy on internal
+      # hosts hits Traefik directly rather than going via the public IP.
+      "metrics.doofnet.uk".A = [ "10.101.3.20" ];
+
       "tester.mfg.cobaltmicro.com".A = [ "10.101.3.104" ];
       # You can also use CNAME to special RPZ actions:
       # - "." means NXDOMAIN (block the domain)

@@ -38,6 +38,12 @@ in
   "pppoeCredentials.age".publicKeys = users ++ [ gw ];
   "tailscaleAuthKey.age".publicKeys = users ++ [ gw ];
 
+  # Alloy basic-auth credentials for metrics.doofnet.uk
+  # metricsBasicAuthPassword: plaintext password read by Alloy on every host
+  # metricsBasicAuthHtpasswd: htpasswd-format users file read by Traefik on svc-01
+  "metricsBasicAuthPassword.age".publicKeys = users ++ systems;
+  "metricsBasicAuthHtpasswd.age".publicKeys = users ++ [ svc-01 ];
+
   "swarmMirrorConfig.age".publicKeys = users ++ [ svc-01 ];
   "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];
   "pocketIdEncryptionKey.age".publicKeys = users ++ [ svc-01 ];

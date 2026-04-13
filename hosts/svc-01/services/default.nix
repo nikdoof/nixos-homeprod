@@ -9,6 +9,7 @@ _: {
     ./jellyfin.nix
     ./linkding.nix
     ./mastodon.nix
+    ./metrics-proxy.nix
     ./media.nix
     ./miniflux.nix
     ./oauth-proxy.nix

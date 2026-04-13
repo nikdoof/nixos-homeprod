@@ -10,11 +10,7 @@ let
 
   flakeRevision = self.rev or "dirty";
 
-  promInternalTarget = "http://svc-02.int.doofnet.uk:9090";
-  # promExternalTarget = "https://prometheus.doofnet.uk";
-
-  lokiInternalTarget = "https://loki.svc.doofnet.uk";
-  # lokiExternalTarget = "https://loki.doofnet.uk";
+  metricsTarget = "https://metrics.doofnet.uk";
 
   alloyConfig = pkgs.writeText "alloy-config.alloy" ''
     // Collect system metrics (node_exporter replacement)
@@ -34,7 +30,12 @@ let
 
     prometheus.remote_write "default" {
       endpoint {
-        url = "${promInternalTarget}/api/v1/write"
+        url = "${metricsTarget}/prometheus/api/v1/write"
+
+        basic_auth {
+          username      = "alloy"
+          password_file = "${config.age.secrets.metricsBasicAuthPassword.path}"
+        }
 
         write_relabel_config {
           target_label = "host"
@@ -87,7 +88,12 @@ let
 
     loki.write "default" {
       endpoint {
-        url = "${lokiInternalTarget}/loki/api/v1/push"
+        url = "${metricsTarget}/loki/loki/api/v1/push"
+
+        basic_auth {
+          username      = "alloy"
+          password_file = "${config.age.secrets.metricsBasicAuthPassword.path}"
+        }
       }
     }
   '';
@@ -100,6 +106,13 @@ in
   config = lib.mkIf config.doofnet.server (
     lib.mkMerge [
       {
+        age.secrets.metricsBasicAuthPassword = {
+          file = ../../secrets/metricsBasicAuthPassword.age;
+          # mode 0444: alloy runs as DynamicUser (no stable UID), so the
+          # password file must be world-readable.
+          mode = "0444";
+        };
+
         # Use dbus broker for Alloy access
         services.dbus.implementation = "broker";
 
