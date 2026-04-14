@@ -86,7 +86,7 @@ let
     in
     {
       "${zoneDir}/${zone.name}.nix-serial" = {
-        "f+" = {
+        "f" = {
           user = "named";
           group = "named";
           mode = "0640";
@@ -125,6 +125,9 @@ let
           echo "$NIX_SERIAL" > "${serialPath}"
           rm -f "${zonePath}.jnl"
           echo "Zone ${zone.name}: Update complete"
+          if systemctl is-active --quiet bind.service; then
+            rndc reload ${zone.name}
+          fi
         fi
       fi
 
@@ -199,6 +202,7 @@ in
       wantedBy = [ "bind.service" ];
       before = [ "bind.service" ];
       after = [ "systemd-tmpfiles-setup.service" ];
+      path = [ pkgs.bind ];
       serviceConfig = {
         Type = "oneshot";
         User = "named";
