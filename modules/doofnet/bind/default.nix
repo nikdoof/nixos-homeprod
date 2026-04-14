@@ -122,15 +122,24 @@ let
           echo "Zone ${zone.name}: Updating (serial $STORED_SERIAL -> $NIX_SERIAL)"
           if systemctl is-active --quiet bind.service; then
             rndc freeze ${zone.name}
-          fi
-          cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
-          cp -f "${zoneFilePath}" "${zonePath}"
-          echo "$NIX_SERIAL" > "${serialPath}"
-          if systemctl is-active --quiet bind.service; then
+            cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
+            TMPWORK=$(mktemp -d)
+            # Normalise both zone files to fully-qualified one-record-per-line format
+            named-compilezone -f text -F text -o "$TMPWORK/frozen.zone" "${zone.name}" "${zonePath}" 2>/dev/null
+            named-compilezone -f text -F text -o "$TMPWORK/nix.zone"    "${zone.name}" "${zoneFilePath}" 2>/dev/null
+            # Extract records whose owner name is absent from the Nix zone (dynamic DHCP entries)
+            awk 'NR==FNR { names[$1]=1; next } !($1 in names) { print }' \
+              "$TMPWORK/nix.zone" "$TMPWORK/frozen.zone" > "$TMPWORK/dynamic.zone"
+            # Write Nix static records + preserved dynamic records
+            cat "${zoneFilePath}" "$TMPWORK/dynamic.zone" > "${zonePath}"
+            rm -rf "$TMPWORK"
             rndc thaw ${zone.name}
           else
+            cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
+            cp -f "${zoneFilePath}" "${zonePath}"
             rm -f "${zonePath}.jnl"
           fi
+          echo "$NIX_SERIAL" > "${serialPath}"
           echo "Zone ${zone.name}: Update complete"
         fi
       fi
@@ -206,7 +215,7 @@ in
       wantedBy = [ "bind.service" ];
       before = [ "bind.service" ];
       after = [ "systemd-tmpfiles-setup.service" ];
-      path = [ pkgs.bind ];
+      path = [ pkgs.bind pkgs.gawk ];
       serviceConfig = {
         Type = "oneshot";
         User = "named";
