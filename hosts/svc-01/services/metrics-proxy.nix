@@ -19,6 +19,7 @@
             "metrics-strip-prometheus"
           ];
           service = "metrics-prometheus";
+          observability.accessLogs = false;
         };
         metrics-loki = {
           rule = "Host(`metrics.doofnet.uk`) && PathPrefix(`/loki`)";
@@ -31,6 +32,7 @@
             "metrics-strip-loki"
           ];
           service = "metrics-loki";
+          observability.accessLogs = false;
         };
       };
 
