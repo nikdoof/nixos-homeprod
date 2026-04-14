@@ -114,7 +114,7 @@ let
       serialPath = "${zoneDir}/${zone.name}.nix-serial";
     in
     ''
-      if [ -f "${zonePath}" ] && [ -f "${serialPath}" ]; then
+      if [ -f "${zonePath}" ]; then
         STORED_SERIAL=$(cat "${serialPath}" 2>/dev/null || echo "0")
         NIX_SERIAL="${toString serial}"
 
