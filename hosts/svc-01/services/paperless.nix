@@ -31,7 +31,7 @@
         "traefik.http.routers.paperless.rule" = "Host(`paperless.svc.doofnet.uk`)";
         "traefik.http.services.paperless.loadbalancer.server.port" = "8000";
       };
-      image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.13";
+      image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.14";
       volumes = [
         "/mnt/nas-03/paperless/:/data"
         "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt"
