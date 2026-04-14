@@ -65,6 +65,10 @@
     };
   };
 
+  networking.firewall.allowedTCPPorts = [
+    config.services.loki.configuration.server.http_listen_port
+  ];
+
   # Alloy config
   environment.etc."alloy/conf.d/02-loki.alloy".text = ''
     prometheus.scrape "loki" {

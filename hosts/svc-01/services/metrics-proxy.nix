@@ -38,10 +38,10 @@
 
       services = {
         metrics-prometheus.loadBalancer.servers = [
-          { url = "https://prometheus.svc.doofnet.uk"; }
+          { url = "http://svc-02.int.doofnet.uk:9090"; }
         ];
         metrics-loki.loadBalancer.servers = [
-          { url = "https://loki.svc.doofnet.uk"; }
+          { url = "http://svc-02.int.doofnet.uk:3030"; }
         ];
       };
     };
