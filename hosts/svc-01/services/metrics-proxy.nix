@@ -10,7 +10,10 @@
       routers = {
         metrics-prometheus = {
           rule = "Host(`metrics.doofnet.uk`) && PathPrefix(`/prometheus`)";
-          entryPoints = [ "websecure" ];
+          entryPoints = [
+            "websecure"
+            "extwebsecure"
+          ];
           middlewares = [
             "metrics-auth"
             "metrics-strip-prometheus"
@@ -19,7 +22,10 @@
         };
         metrics-loki = {
           rule = "Host(`metrics.doofnet.uk`) && PathPrefix(`/loki`)";
-          entryPoints = [ "websecure" ];
+          entryPoints = [
+            "websecure"
+            "extwebsecure"
+          ];
           middlewares = [
             "metrics-auth"
             "metrics-strip-loki"
