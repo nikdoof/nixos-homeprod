@@ -8,7 +8,7 @@ with dns.lib.combinators;
     SOA = {
       nameServer = "ns-01.int.doofnet.uk.";
       adminEmail = "hostmaster@doofnet.uk";
-      serial = 2026040101;
+      serial = 2026041401;
       refresh = 3600;
       retry = 900;
       expire = 604800;
