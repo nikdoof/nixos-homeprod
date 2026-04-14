@@ -120,14 +120,18 @@ let
 
         if [ "$STORED_SERIAL" != "$NIX_SERIAL" ]; then
           echo "Zone ${zone.name}: Updating (serial $STORED_SERIAL -> $NIX_SERIAL)"
+          if systemctl is-active --quiet bind.service; then
+            rndc freeze ${zone.name}
+          fi
           cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
           cp -f "${zoneFilePath}" "${zonePath}"
           echo "$NIX_SERIAL" > "${serialPath}"
-          rm -f "${zonePath}.jnl"
-          echo "Zone ${zone.name}: Update complete"
           if systemctl is-active --quiet bind.service; then
-            rndc reload ${zone.name}
+            rndc thaw ${zone.name}
+          else
+            rm -f "${zonePath}.jnl"
           fi
+          echo "Zone ${zone.name}: Update complete"
         fi
       fi
 
