@@ -137,6 +137,20 @@ in
   systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "traefik" ];
   systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ logFolder ];
 
+  services.logrotate.settings.traefik = {
+    files = [
+      "${logFolder}/traefik.log"
+      "${logFolder}/access.log"
+    ];
+    frequency = "daily";
+    rotate = 14;
+    compress = true;
+    delaycompress = true;
+    missingok = true;
+    notifempty = true;
+    postrotate = "systemctl kill --kill-who=main -s SIGUSR1 traefik.service || true";
+  };
+
   # Open ports in the firewall.
   networking.firewall = {
     allowedTCPPorts = [
