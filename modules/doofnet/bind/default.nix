@@ -210,10 +210,14 @@ in
       if cfg.mode == "primary" then baseDir // dynamicFiles else baseDir;
 
     # Zone update service (primary only)
+    systemd.services.bind.wants = lib.mkIf (cfg.mode == "primary" && dynamicZones != [ ]) [
+      "bind-update-zones.service"
+    ];
+
     systemd.services.bind-update-zones = lib.mkIf (cfg.mode == "primary" && dynamicZones != [ ]) {
       description = "Update BIND zone files when Nix configuration changes";
-      wantedBy = [ "bind.service" ];
       before = [ "bind.service" ];
+      partOf = [ "bind.service" ];
       after = [ "systemd-tmpfiles-setup.service" ];
       path = [
         pkgs.bind
