@@ -6,9 +6,6 @@
 #
 # Usage: ./scripts/update-ns.sh [ns-01|ns-02|ns-03|ns-04 ...]
 #   With no arguments, all four are updated in sequence.
-#
-# Options:
-#   -p, --ask-password   Prompt for sudo password (passed to nixos-rebuild --ask-sudo-password)
 
 set -euo pipefail
 
@@ -18,15 +15,15 @@ FLAKE="${FLAKE:-github:nikdoof/nixos-homeprod}"
 log() { echo "==> $*"; }
 ok() { echo "    [ok] $*"; }
 
-ASK_PASSWORD=0
-POSITIONAL=()
-for arg in "${@:-}"; do
-    case "$arg" in
-    -p | --ask-password) ASK_PASSWORD=1 ;;
-    *) POSITIONAL+=("$arg") ;;
+target_fqdn() {
+    case "$1" in
+    ns-01) echo "ns-01.int.doofnet.uk" ;;
+    ns-02) echo "ns-02.int.doofnet.uk" ;;
+    ns-03) echo "ns-03.doofnet.uk" ;;
+    ns-04) echo "ns-04.doofnet.uk" ;;
+    *) echo "Unknown host: $1" >&2; exit 1 ;;
     esac
-done
-set -- "${POSITIONAL[@]:-}"
+}
 
 HOSTS=("${@:-}")
 if [[ ${#HOSTS[@]} -eq 0 ]] || [[ -z "${HOSTS[0]}" ]]; then
@@ -34,22 +31,13 @@ if [[ ${#HOSTS[@]} -eq 0 ]] || [[ -z "${HOSTS[0]}" ]]; then
 fi
 
 for host in "${HOSTS[@]}"; do
-    case "$host" in
-    ns-01 | ns-02 | ns-03 | ns-04)
-        log "Deploying ${host} via ${BUILD_HOST}"
-        ssh -t "$BUILD_HOST" \
-            nixos-rebuild switch \
-            --flake "${FLAKE}#${host}" \
-            --target-host "$host" \
-            --sudo \
-            ${ASK_PASSWORD:+--ask-sudo-password}
-        ok "${host} done"
-        ;;
-    *)
-        echo "Unknown host: $host" >&2
-        exit 1
-        ;;
-    esac
+    log "Deploying ${host} via ${BUILD_HOST}"
+    ssh -t "$BUILD_HOST" \
+        nixos-rebuild switch \
+        --flake "${FLAKE}#${host}" \
+        --target-host "$(target_fqdn "$host")" \
+        --sudo
+    ok "${host} done"
 done
 
 log "All done"
