@@ -215,7 +215,10 @@ in
       wantedBy = [ "bind.service" ];
       before = [ "bind.service" ];
       after = [ "systemd-tmpfiles-setup.service" ];
-      path = [ pkgs.bind pkgs.gawk ];
+      path = [
+        pkgs.bind
+        pkgs.gawk
+      ];
       serviceConfig = {
         Type = "oneshot";
         User = "named";
