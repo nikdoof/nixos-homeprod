@@ -1,30 +1,39 @@
-# ns-01 / ns-02: DNS Servers
+# DNS Servers
 
-The homelab runs two authoritative and recursive DNS servers using BIND9, configured via
-a shared `doofnet.bind` NixOS module.
+The homelab runs four BIND9 DNS servers configured via a shared `doofnet.bind` NixOS module:
+two internal servers (ns-01, ns-02) that serve all zones and act as recursive resolvers, and
+two public AWS secondaries (ns-03, ns-04) that serve only externally-delegated zones.
 
-| Host  | Role      | Platform                    | Address (IPv4)  | Address (IPv6)           |
-|-------|-----------|-----------------------------|-----------------|--------------------------|
-| ns-01 | Primary   | Raspberry Pi 3 (aarch64)    | 10.101.1.2      | 2001:8b0:bd9:101::2      |
-| ns-02 | Secondary | microVM on hyp-01 (VLAN 101)| 10.101.1.3      | 2001:8b0:bd9:101::3      |
+| Host  | Role             | Platform                        | Address (IPv4)   | Address (IPv6)           |
+|-------|------------------|---------------------------------|------------------|--------------------------|
+| ns-01 | Primary          | Raspberry Pi 3, aarch64         | 10.101.1.2       | 2001:8b0:bd9:101::2      |
+| ns-02 | Secondary        | microVM on hyp-01 (VLAN 101)    | 10.101.1.3       | 2001:8b0:bd9:101::3      |
+| ns-03 | Public secondary | AWS EC2, eu-west-1 (x86_64)     | 52.19.64.4       | —                        |
+| ns-04 | Public secondary | AWS EC2, eu-west-2 (x86_64)     | 16.60.149.205    | —                        |
 
-Both servers also carry a ULA address on the private VLAN:
+ns-01 and ns-02 also carry a ULA address on the private VLAN:
 
 - ns-01: `fddd:d00f:dab0:101::2`
 - ns-02: `fddd:d00f:dab0:101::3`
 
 ## Architecture
 
-Both servers run the same BIND configuration, toggled between **primary** and **secondary**
-mode by a single option. The primary holds the authoritative copy of every zone; the
-secondary receives zone transfers from the primary and serves as a hot standby.
+All four servers run the same BIND configuration, toggled between **primary** and **secondary**
+mode by a single option. The primary holds the authoritative copy of every zone; secondaries
+receive zone transfers from the primary.
 
-ns-01 is deployed as a Raspberry Pi 3 SD card image. Because it is aarch64, the
+**ns-01** is deployed as a Raspberry Pi 3 SD card image. Because it is aarch64, the
 `nix-community.cachix.org` binary cache is configured to pull pre-built binaries during
 cross-compiled deployments from an x86_64 builder.
 
-ns-02 is a NixOS microVM (CID 13) running on hyp-01. See `docs/hyp-01.md` for details on
-the microVM platform.
+**ns-02** is a NixOS microVM (CID 13) running on hyp-01. It serves all zones and acts as a
+hot standby internal resolver. See `docs/hyp-01.md` for details on the microVM platform.
+
+**ns-03 and ns-04** are AWS EC2 instances (eu-west-1 and eu-west-2 respectively) running in
+secondary mode with `publicOnly = true`. They only serve zones whose NS records include
+`ns-03.doofnet.uk.` or `ns-04.doofnet.uk.`, providing public authoritative DNS with geographic
+redundancy. They do not act as recursive resolvers. Because they cannot reach the internal
+primary directly, zone transfers use the gateway's public NAT IP (`81.187.48.147 → 10.101.1.2`).
 
 ## Module: `doofnet.bind` (`modules/doofnet/bind/`)
 
@@ -36,6 +45,21 @@ doofnet.bind = {
   mode = "primary";   # or "secondary"
 };
 ```
+
+For public-facing secondaries that cannot reach the primary on its internal address:
+
+```nix
+doofnet.bind = {
+  enable = true;
+  mode = "secondary";
+  publicOnly = true;   # serve only externally-delegated zones
+  masters = [ "81.187.48.147" ];  # gateway's public NAT IP → 10.101.1.2
+};
+```
+
+`publicOnly` filters the active zone list to only those zones whose NS records contain
+`ns-03.doofnet.uk.` or `ns-04.doofnet.uk.`. `masters` overrides the default internal
+primary addresses for hosts that reach ns-01 via NAT.
 
 ### Zone rendering
 
@@ -57,11 +81,8 @@ Zones are divided into two categories:
 ### Zone transfer
 
 Primary sends transfers to:
-- `10.101.1.3` / `2001:8b0:bd9:101::3` (ns-02)
-- Hurricane Electric nameservers (`216.218.133.2` / `2001:470:600::2`) for public zones
-  that list HE nameservers in their NS records
-
-NOTIFY messages for zones with HE nameservers are also sent to `216.218.130.2`.
+- `10.101.1.3` / `2001:8b0:bd9:101::3` (ns-02) — all zones
+- `52.19.64.4` (ns-03) and `16.60.149.205` (ns-04) — public zones only (those with ns-03/04 in NS records)
 
 Zone transfers are denied by default (`allow-transfer { none; }`); each zone's
 `slaves` list (derived by the module) provides the per-zone exception.
@@ -95,7 +116,7 @@ BIND's `tls local-tls` block referencing the certificate at:
 
 ### Recursion and caching
 
-Both servers act as recursive resolvers for internal clients. Recursion is permitted for:
+ns-01 and ns-02 act as recursive resolvers for internal clients (ns-03/04 do not). Recursion is permitted for:
 
 - `127.0.0.0/8` and `::1` (loopback)
 - All internal networks (defined in `modules/doofnet/const.nix` as `allNetworks`)
@@ -163,6 +184,32 @@ A `prometheus-bind-exporter` instance runs on `127.0.0.1:9119`, scraping BIND's 
 channel at `127.0.0.1:8053`. The exporter is not exposed externally; Alloy scrapes it
 locally and ships metrics to Prometheus.
 
+## Deployment
+
+Use `scripts/update-ns.sh` to deploy DNS servers in the correct order (primary first, then
+public secondaries). The script SSHes to `svc-02` and runs `nixos-rebuild switch` there
+against the published GitHub flake, so **changes must be pushed before running**.
+
+```bash
+# Deploy all servers (ns-01, ns-03, ns-04) in order
+./scripts/update-ns.sh
+
+# Deploy specific servers only
+./scripts/update-ns.sh ns-01
+./scripts/update-ns.sh ns-03 ns-04
+```
+
+Environment variables to override defaults:
+
+| Variable     | Default                          | Purpose                              |
+|--------------|----------------------------------|--------------------------------------|
+| `BUILD_HOST` | `svc-02.int.doofnet.uk`          | Host that runs `nixos-rebuild`       |
+| `FLAKE`      | `github:nikdoof/nixos-homeprod`  | Flake reference to deploy from       |
+
+The script resolves each host to its FQDN for `--target-host` (ns-01/02 use
+`.int.doofnet.uk`; ns-03/04 use `.doofnet.uk`) while using the short name as the flake
+config key.
+
 ## Zones
 
 ### Forward zones
@@ -182,27 +229,24 @@ specific overrides for `grafana`, `unifi`, `loki`, and `prometheus` pointing to 
 
 ### Reverse zones (IPv4)
 
-| Zone                             | Covers               | Also served by HE | DDNS |
-|----------------------------------|----------------------|-------------------|------|
-| `101.10.in-addr.arpa`            | VLAN 101 (private)   | no                | yes  |
-| `102.10.in-addr.arpa`            | VLAN 102 (public)    | no                | yes  |
-| `104.10.in-addr.arpa`            | VLAN 104 (lab)       | no                | yes  |
-| `105.10.in-addr.arpa`            | VLAN 105 (HA)        | no                | yes  |
-| `8-15.25.169.217.in-addr.arpa`   | Hosted /29           | yes               | no   |
-| `147.48.187.81.in-addr.arpa`     | PPPoE WAN address    | yes               | no   |
+| Zone                             | Covers               | Also on ns-03/04 | DDNS |
+|----------------------------------|----------------------|------------------|------|
+| `101.10.in-addr.arpa`            | VLAN 101 (private)   | no               | yes  |
+| `102.10.in-addr.arpa`            | VLAN 102 (public)    | no               | yes  |
+| `104.10.in-addr.arpa`            | VLAN 104 (lab)       | no               | yes  |
+| `105.10.in-addr.arpa`            | VLAN 105 (HA)        | no               | yes  |
+| `8-15.25.169.217.in-addr.arpa`   | Hosted /29           | yes              | no   |
+| `147.48.187.81.in-addr.arpa`     | PPPoE WAN address    | yes              | no   |
 
 ### Reverse zones (IPv6)
 
-| Zone                                         | Covers                       | Also served by HE | DDNS |
-|----------------------------------------------|------------------------------|-------------------|------|
-| `1.0.1.0.9.d.b…ip6.arpa`                    | VLAN 101 `2001:8b0:bd9:101:` | yes               | yes  |
-| `2.0.1.0.9.d.b…ip6.arpa`                    | VLAN 102 `2001:8b0:bd9:102:` | yes               | yes  |
-| `4.0.1.0.9.d.b…ip6.arpa`                    | VLAN 104 `2001:8b0:bd9:104:` | yes               | yes  |
-| `6.0.1.0.9.d.b…ip6.arpa`                    | VLAN 106 `2001:8b0:bd9:106:` | yes               | yes  |
-| `0.b.a.d.f.0.0.d.d.d.d.f.ip6.arpa`          | ULA `fddd:d00f:dab0::/48`    | no                | no   |
-
-The HE-backed zones (publicly routed address space) are also served by Hurricane Electric's
-secondary nameservers (`ns1–ns4.he.net`).
+| Zone                                         | Covers                       | Also on ns-03/04 | DDNS |
+|----------------------------------------------|------------------------------|------------------|------|
+| `1.0.1.0.9.d.b…ip6.arpa`                    | VLAN 101 `2001:8b0:bd9:101:` | yes              | yes  |
+| `2.0.1.0.9.d.b…ip6.arpa`                    | VLAN 102 `2001:8b0:bd9:102:` | yes              | yes  |
+| `4.0.1.0.9.d.b…ip6.arpa`                    | VLAN 104 `2001:8b0:bd9:104:` | yes              | yes  |
+| `6.0.1.0.9.d.b…ip6.arpa`                    | VLAN 106 `2001:8b0:bd9:106:` | yes              | yes  |
+| `0.b.a.d.f.0.0.d.d.d.d.f.ip6.arpa`          | ULA `fddd:d00f:dab0::/48`    | no               | no   |
 
 ### Static records in `int.doofnet.uk`
 

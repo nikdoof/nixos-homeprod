@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-NixOS flake-based homelab managing 15 hosts: 5 physical machines, 6 microvms, 2 Hetzner cloud instances, and 1 laptop. Uses `agenix` for secrets, `microvm.nix` for VMs, and `dns.nix` for BIND zone generation.
+NixOS flake-based homelab managing 14 hosts: 5 physical machines, 6 microvms, 2 AWS cloud instances, and 1 laptop. Uses `agenix` for secrets, `microvm.nix` for VMs, and `dns.nix` for BIND zone generation.
 
 ## Common Commands
 
@@ -39,7 +39,7 @@ prek run --all-files
 
 ### Flake Structure
 
-- **`flake.nix`** — Defines inputs, `nixosConfigurations` for all 15 hosts, custom packages, and `checks` (deadnix, statix, nixfmt)
+- **`flake.nix`** — Defines inputs, `nixosConfigurations` for all 14 hosts, custom packages, and `checks` (deadnix, statix, nixfmt)
 - **`lib/mksystem.nix`** — Central system builder applied to all hosts; automatically includes agenix and the `doofnet` base module; accepts `extraModules`
 - **`lib/mkmac.nix`** — Generates deterministic MACs from hostname SHA1 (for microvm networking)
 - **`lib/firewall.nix`** — Shared firewall configuration helpers
@@ -57,10 +57,15 @@ The `doofnet` module is automatically applied to every host via `lib/mksystem.ni
 
 - **`common.nix`** — Nix experimental features, CIS kernel hardening (blacklisted modules), firewall, timezone (`Europe/London`)
 - **`server.nix`** — Server-wide defaults
+- **`system.nix`** — System-level settings
 - **`network.nix`** — VLAN definitions (101–106) via systemd-networkd
 - **`bind/`** — BIND DNS configuration; zone files use `dns.nix` DSL
 - **`users/`** — User account management (nikdoof)
 - **`nfs/`** — NFS mount definitions
+- **`fail2ban.nix`** — fail2ban configuration
+- **`cross_compile.nix`** — Cross-compilation support (for aarch64 builds)
+- **`microvm.nix`** — Common microvm guest configuration
+- **`files/`** — Managed file definitions
 
 Top-level modules (opt-in):
 - **`jrouter.nix`** — Custom routing tool integration
@@ -77,8 +82,8 @@ Top-level modules (opt-in):
 | `ns-01` | Primary DNS (Raspberry Pi 3) | aarch64 |
 | `svc-01` | Services (Jellyfin, Gitea, Mastodon, Traefik, etc.) | x86_64 |
 | `svc-02` | Monitoring (Grafana, Prometheus, Loki, Unifi) | x86_64 |
-| `ns-03/04` | Cloud DNS (AWS) | aarch64 |
-| Microvms | Grafana, Home Assistant, Mail, Web, Globaltalk | — |
+| `ns-03/04` | Cloud DNS (AWS) | x86_64 |
+| Microvms (`ns-02`, `grf-01`, `hs-01`, `mx-01`, `web-01`, `afp-01`) | Secondary DNS, Grafana, Home Assistant, Mail, Web, Globaltalk | — |
 
 ### Networking
 

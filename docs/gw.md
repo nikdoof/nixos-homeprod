@@ -185,7 +185,7 @@ lives in a single `table inet filter` plus a `table ip nat`.
 |------------------|-----------------------------------------------------------|
 | `local4`         | `10.0.0.0/8`, `217.169.25.8/29`                          |
 | `local6`         | `2001:8b0:bd9::/48`, `fc00::/7`                          |
-| `he_dns4/6`      | Hurricane Electric secondary nameservers (`216.218.133.2` / `2001:470:600::2`) |
+| `pub_ns4`        | Public secondary nameservers — ns-03 (`52.19.64.4`) and ns-04 (`16.60.149.205`) |
 | `ns4/6`          | Internal resolvers (`10.101.1.2/3`, their IPv6 counterparts) |
 | `hosted_out_tcp` | TCP ports hosted VLAN may use outbound: 22, 23, 25, 53, 70, 79, 80, 123, 443, 1965 |
 | `hosted_out_udp` | UDP ports hosted VLAN may use outbound: 53, 123           |
@@ -201,7 +201,7 @@ lives in a single `table inet filter` plus a `table ip nat`.
 - DHCPv4 (port 67) from all internal VLANs
 - DHCPv6 (port 547) from private, public, lab, hosted VLANs
 - DHCPv6 client replies from ISP on ppp0 (link-local source, port 547→546)
-- DNS (port 53) from Hurricane Electric nameservers (for zone transfers / NOTIFY)
+- DNS (port 53) from public secondary nameservers (`pub_ns4`: ns-03/04) for zone transfers / NOTIFY
 - DNS (port 53) from hosted VLAN (forwarded to Unbound)
 - NTP (port 123) from `local4`/`local6`
 - SSH (port 22) from private VLAN, management interface, and Tailscale only
@@ -242,7 +242,7 @@ lives in a single `table inet filter` plus a `table ip nat`.
 | Destination port | Protocol | DNAT target          | Service                          |
 |------------------|----------|----------------------|----------------------------------|
 | 443              | TCP+UDP  | 10.101.3.20:8443     | HTTPS → svc-01                   |
-| 53 (HE src only) | TCP+UDP  | 10.101.1.2:53        | DNS → ns-01 (zone transfers)     |
+| 53 (ns-03/04 src)| TCP+UDP  | 10.101.1.2:53        | DNS → ns-01 (zone transfers)     |
 | 51413            | TCP+UDP  | 10.101.3.16          | BitTorrent → QBittorrent         |
 | 387 (UDP)        | UDP      | 10.101.3.21          | AARP/AppleTalk → JRouter         |
 

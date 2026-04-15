@@ -167,8 +167,12 @@ The `qemu-vm` system user and group own all VM processes. The service applies:
 
 1. Create `hosts/<name>/configuration.nix` with `doofnet.microvm.enable = true`, setting a
    unique `cid`, the desired `vlan`, and resource options.
-2. Declare the guest in `flake.nix` using the same `mkSystem` pattern as existing microVMs
-   (importing `inputs.microvm.nixosModules.microvm` and `modules/doofnet/microvm.nix`).
+2. Declare the guest in `flake.nix` using `mkMicrovm`:
+   ```nix
+   <name> = mkMicrovm "<name>" { };
+   ```
+   The `mkMicrovm` helper automatically adds `inputs.microvm.nixosModules.microvm` and
+   `modules/doofnet/microvm.nix`. Pass `extraModules` if the guest needs additional modules.
 3. Add `<name> = { flake = inputs.self; restartIfChanged = true; }` to `microvm.vms` in
    `hosts/hyp-01/microvms.nix`. The CID uniqueness assertion will catch any conflicts at
    `nix flake check` time.

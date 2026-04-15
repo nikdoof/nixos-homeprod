@@ -7,6 +7,6 @@ installation and LSP tooling for editor support.
 
 - Install Deterministic Nix from <https://nix.deterministic.systems/> and follow the
   instructions to set it up.
-- Run `nix profile add github:/nix-community/nixd` to install the `nixd` LSP server.
+- Run `nix profile add github:nix-community/nixd` to install the `nixd` LSP server.
 - Run `nix profile add github:oxalica/nil` to install the `nil` LSP client.
 - Restart your terminal and editor.
