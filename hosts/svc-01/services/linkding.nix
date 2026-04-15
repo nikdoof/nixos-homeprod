@@ -38,6 +38,7 @@
       LD_DB_USER = "linkding";
       LD_DB_DATABASE = "linkding";
       LD_ENABLE_OIDC = "True";
+      LD_DISABLE_LOGIN_FORM = "True";
       OIDC_OP_AUTHORIZATION_ENDPOINT = "https://id.doofnet.uk/authorize";
       OIDC_OP_TOKEN_ENDPOINT = "https://id.doofnet.uk/api/oidc/token";
       OIDC_OP_USER_ENDPOINT = "https://id.doofnet.uk/api/oidc/userinfo";
