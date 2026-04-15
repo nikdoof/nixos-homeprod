@@ -4,6 +4,18 @@
 }:
 
 {
+  security.sudo.extraRules = [
+    {
+      users = [ "nikdoof" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
   users = {
     defaultUserShell = pkgs.zsh;
     users.nikdoof = {
