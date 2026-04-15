@@ -16,7 +16,7 @@
 #
 # Detection signals:
 #   isMicroVM   — doofnet microvm.nix guest (QEMU/KVM via microvm.nix)
-#   isEC2       — Amazon EC2 instance (amazon-image.nix + ec2.efi = true)
+#   isEC2       — Amazon EC2 instance (amazon-image.nix sets amazon-ssm-agent.enable)
 #   isKVM       — generic QEMU/KVM guest; requires importing
 #                 nixos/modules/profiles/qemu-guest.nix or setting
 #                 services.qemuGuest.enable = true explicitly
@@ -26,7 +26,7 @@
 config:
 let
   isMicroVM = (config.doofnet ? microvm) && config.doofnet.microvm.enable;
-  isEC2 = (config ? ec2) && config.ec2.efi;
+  isEC2 = config.services.amazon-ssm-agent.enable;
   isKVM = config.services.qemuGuest.enable;
   inherit (config.boot) isContainer;
 in
