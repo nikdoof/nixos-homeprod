@@ -38,6 +38,7 @@ af-packet:
     cluster-type: cluster_flow
     defrag: yes
     use-mmap: yes
+    tpacket-v3: yes
 
 # ---------------------------------------------------------------------------
 # Rules — suricata-update-rules.service writes ET Open rules here
