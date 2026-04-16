@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let
-  rulesUrl = "https://rules.emergingthreats.net/open/snort-3.0/emerging.rules.tar.gz";
+  rulesUrl = "https://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz";
 
   updateScript = pkgs.writeShellApplication {
     name = "snort-update-rules";
