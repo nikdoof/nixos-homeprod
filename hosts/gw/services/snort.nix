@@ -24,7 +24,7 @@ let
       mv "$TMP"/rules/*.rules "$RULES_DIR"/
 
       # Generate master include file consumed by snort.lua
-      > "$RULES_DIR/snort.rules"
+      true > "$RULES_DIR/snort.rules"
       for f in "$RULES_DIR"/emerging-*.rules; do
         echo "include $f"
       done >> "$RULES_DIR/snort.rules"
