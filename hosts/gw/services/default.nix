@@ -12,7 +12,7 @@ _: {
     ./ntp.nix
     ./pppoe.nix
     ./radvd.nix
-    ./snort.nix
+    ./suricata.nix
     ./tailscale.nix
     ./upnp.nix
   ];

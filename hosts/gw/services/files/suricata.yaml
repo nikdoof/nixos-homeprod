@@ -1,0 +1,80 @@
+%YAML 1.1
+---
+# Suricata configuration — gw / vlan-hosted (passive AF_PACKET)
+#
+# HOME_NET  : 217.169.25.8/29 + 2001:8b0:bd9:106::/64
+# Interface : vlan-hosted (set in af-packet section below)
+# Rules     : ET Open, managed by suricata-update-rules.service
+
+vars:
+  address-groups:
+    HOME_NET: "[217.169.25.8/29, 2001:8b0:bd9:106::/64]"
+    EXTERNAL_NET: "!$HOME_NET"
+    HTTP_SERVERS: "$HOME_NET"
+    SMTP_SERVERS: "$HOME_NET"
+    SQL_SERVERS: "$HOME_NET"
+    DNS_SERVERS: "$HOME_NET"
+    TELNET_SERVERS: "$HOME_NET"
+    SSH_SERVERS: "$HOME_NET"
+    FTP_SERVERS: "$HOME_NET"
+    SIP_SERVERS: "$HOME_NET"
+
+  port-groups:
+    HTTP_PORTS: "80,443,8080,8443"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: 1521
+    SSH_PORTS: 22
+    FTP_PORTS: "21,2100,3535"
+    SIP_PORTS: "5060,5061,5600"
+    FILE_DATA_PORTS: "$HTTP_PORTS"
+    GTP_PORTS: "2123,2152,3386"
+
+# ---------------------------------------------------------------------------
+# Capture — passive AF_PACKET on vlan-hosted
+# ---------------------------------------------------------------------------
+af-packet:
+  - interface: vlan-hosted
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    use-mmap: yes
+
+# ---------------------------------------------------------------------------
+# Rules — suricata-update-rules.service writes ET Open rules here
+# ---------------------------------------------------------------------------
+default-rule-path: /var/lib/suricata/rules
+
+rule-files:
+  - suricata.rules
+
+classification-file: /var/lib/suricata/rules/classification.config
+
+# ---------------------------------------------------------------------------
+# Outputs
+# eve.json is tailed by Alloy and shipped to Loki
+# ---------------------------------------------------------------------------
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+      types:
+        - alert:
+            tagged-packets: no
+        - stats:
+            totals: yes
+            threads: no
+            deltas: no
+
+  - stats:
+      enabled: no
+
+logging:
+  default-log-level: notice
+  outputs:
+    - console:
+        enabled: no
+    - file:
+        enabled: yes
+        level: notice
+        filename: /var/log/suricata/suricata.log
