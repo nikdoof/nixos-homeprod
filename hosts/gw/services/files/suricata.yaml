@@ -61,10 +61,6 @@ outputs:
       types:
         - alert:
             tagged-packets: no
-        - stats:
-            totals: yes
-            threads: no
-            deltas: no
 
   - stats:
       enabled: no
