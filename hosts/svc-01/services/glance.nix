@@ -304,7 +304,7 @@
                   '';
                 }
                 {
-                  type = "github-releases";
+                  type = "releases";
                   repositories = [
                     "jellyfin/jellyfin"
                     "paperless-ngx/paperless-ngx"
