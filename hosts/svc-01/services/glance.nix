@@ -152,6 +152,10 @@
                           title = "bluecalx.co.uk";
                           url = "https://bluecalx.co.uk";
                         }
+                      ];
+                    }
+                    {
+                      links = [
                         {
                           title = "dimension.sh";
                           url = "https://dimension.sh";
