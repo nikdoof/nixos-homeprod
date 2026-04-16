@@ -65,6 +65,9 @@
               trustForwardHeader = true;
               authResponseHeaders = [
                 "X-Auth-Request-Access-Token"
+                "X-Auth-Request-User"
+                "X-Auth-Request-Email"
+                "X-Auth-Request-Preferred-Username"
                 "Authorization"
               ];
             };
@@ -77,6 +80,9 @@
               trustForwardHeader = true;
               authResponseHeaders = [
                 "X-Auth-Request-Access-Token"
+                "X-Auth-Request-User"
+                "X-Auth-Request-Email"
+                "X-Auth-Request-Preferred-Username"
                 "Authorization"
               ];
             };

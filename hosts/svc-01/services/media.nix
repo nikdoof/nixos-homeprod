@@ -47,6 +47,7 @@ _: {
         "traefik.enable" = "true";
         "traefik.http.routers.openbooks.rule" = "Host(`openbooks.svc.doofnet.uk`)";
         "traefik.http.services.openbooks.loadbalancer.server.port" = "8080";
+        "traefik.http.routers.openbooks.middlewares" = "oauth-auth-redirect@file";
       };
       image = "ghcr.io/evan-buss/openbooks:edge";
       volumes = [
@@ -70,6 +71,7 @@ _: {
         "traefik.enable" = "true";
         "traefik.http.routers.calibre-web.rule" = "Host(`calibre-web.svc.doofnet.uk`)";
         "traefik.http.services.calibre-web.loadbalancer.server.port" = "8083";
+        "traefik.http.routers.calibre-web.middlewares" = "oauth-auth-redirect@file";
       };
       image = "ghcr.io/cdloh/calibre-web:0.6.26";
       volumes = [
