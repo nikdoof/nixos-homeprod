@@ -104,6 +104,26 @@
                       url = "https://grafana.svc.doofnet.uk";
                       icon = "auto-invert sh:grafana-dark";
                     }
+                    {
+                      title = "Gitea";
+                      url = "https://git.doofnet.uk";
+                      icon = "si:gitea";
+                    }
+                    {
+                      title = "GoToSocial";
+                      url = "https://social.doofnet.uk";
+                      icon = "si:activitypub";
+                    }
+                    {
+                      title = "Mastodon";
+                      url = "https://mastodon.incognitus.net";
+                      icon = "si:mastodon";
+                    }
+                    {
+                      title = "Rustical";
+                      url = "https://cal.doofnet.uk";
+                      icon = "mdi:calendar-sync";
+                    }
                   ];
                 }
               ];
