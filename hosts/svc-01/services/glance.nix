@@ -126,6 +126,56 @@
                     }
                   ];
                 }
+                {
+                  type = "bookmarks";
+                  title = "Hosted Sites";
+                  groups = [
+                    {
+                      links = [
+                        {
+                          title = "doofnet.uk";
+                          url = "https://doofnet.uk";
+                        }
+                        {
+                          title = "nikdoof.com";
+                          url = "https://nikdoof.com";
+                        }
+                        {
+                          title = "incognitus.net";
+                          url = "https://incognitus.net";
+                        }
+                        {
+                          title = "2315media.com";
+                          url = "https://2315media.com";
+                        }
+                        {
+                          title = "bluecalx.co.uk";
+                          url = "https://bluecalx.co.uk";
+                        }
+                        {
+                          title = "dimension.sh";
+                          url = "https://dimension.sh";
+                        }
+                        {
+                          title = "hereforthis.uk";
+                          url = "https://hereforthis.uk";
+                        }
+                        {
+                          title = "intellectops.com";
+                          url = "https://intellectops.com";
+                        }
+                        {
+                          title = "oojamaflip.wtf";
+                          url = "https://oojamaflip.wtf";
+                        }
+                        {
+                          title = "parkpioneer.com";
+                          url = "https://parkpioneer.com";
+                        }
+                      ];
+                    }
+                  ];
+                }
               ];
             }
             {
