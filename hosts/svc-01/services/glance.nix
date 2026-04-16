@@ -19,7 +19,6 @@
           name = "Startpage";
           width = "slim";
           hide-desktop-navigation = true;
-          center-vertically = true;
           columns = [
             {
               size = "full";
@@ -32,62 +31,74 @@
                 {
                   type = "monitor";
                   cache = "1m";
-                  title = "Services";
+                  title = "Media";
                   sites = [
-                    {
-                      title = "Pocket ID";
-                      url = "https://id.doofnet.uk";
-                      icon = "auto-invert sh:pocket-id";
-                    }
-                    {
-                      title = "OpenBooks";
-                      url = "https://openbooks.svc.doofnet.uk";
-                      icon = "auto-invert sh:openbooks-dark";
-                    }
                     {
                       title = "Jellyfin";
                       url = "https://jellyfin.svc.doofnet.uk";
                       icon = "si:jellyfin";
-                    }
-                    {
-                      title = "Prowlarr";
-                      url = "https://prowlarr.svc.doofnet.uk";
-                      icon = "auto-invert sh:prowlarr-dark";
-                    }
-                    {
-                      title = "Sonarr";
-                      url = "https://sonarr.svc.doofnet.uk";
-                      icon = "si:sonarr";
+                      check-url = "https://jellyfin.svc.doofnet.uk/health";
                     }
                     {
                       title = "Radarr";
                       url = "https://radarr.svc.doofnet.uk";
                       icon = "si:radarr";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
+                    {
+                      title = "Sonarr";
+                      url = "https://sonarr.svc.doofnet.uk";
+                      icon = "si:sonarr";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
+                    {
+                      title = "Prowlarr";
+                      url = "https://prowlarr.svc.doofnet.uk";
+                      icon = "auto-invert sh:prowlarr-dark";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
                     }
                     {
                       title = "Calibre Web";
                       url = "https://calibre-web.svc.doofnet.uk";
                       icon = "auto-invert sh:calibre-web-dark";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
                     }
                     {
-                      title = "Miniflux";
-                      url = "https://rss.doofnet.uk";
-                      icon = "auto-invert sh:miniflux-dark";
+                      title = "OpenBooks";
+                      url = "https://openbooks.svc.doofnet.uk";
+                      icon = "auto-invert sh:openbooks-dark";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
                     }
-                    {
-                      title = "Linkding";
-                      url = "https://link.doofnet.uk";
-                      icon = "auto-invert sh:linkding-dark";
-                    }
-                    {
-                      title = "CopyParty";
-                      url = "https://files.doofnet.uk";
-                      icon = "auto-invert sh:copyparty-dark";
-                    }
+                  ];
+                }
+                {
+                  type = "monitor";
+                  cache = "1m";
+                  title = "Tools";
+                  sites = [
                     {
                       title = "Paperless";
                       url = "https://paperless.svc.doofnet.uk";
                       icon = "si:paperlessngx";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
                     }
                     {
                       title = "ScanServJS";
@@ -95,20 +106,69 @@
                       icon = "auto-invert mdi:scanner";
                     }
                     {
-                      title = "UniFi";
-                      url = "https://unifi.svc.doofnet.uk";
-                      icon = "si:ubiquiti";
+                      title = "Linkding";
+                      url = "https://link.doofnet.uk";
+                      icon = "auto-invert sh:linkding-dark";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
+                    {
+                      title = "Miniflux";
+                      url = "https://rss.doofnet.uk";
+                      icon = "auto-invert sh:miniflux-dark";
+                      check-url = "https://rss.doofnet.uk/healthcheck";
+                    }
+                    {
+                      title = "CopyParty";
+                      url = "https://files.doofnet.uk";
+                      icon = "auto-invert sh:copyparty-dark";
+                    }
+                    {
+                      title = "Rustical";
+                      url = "https://cal.doofnet.uk";
+                      icon = "mdi:calendar-sync";
+                    }
+                  ];
+                }
+                {
+                  type = "monitor";
+                  cache = "1m";
+                  title = "Infrastructure";
+                  sites = [
+                    {
+                      title = "Pocket ID";
+                      url = "https://id.doofnet.uk";
+                      icon = "auto-invert sh:pocket-id";
                     }
                     {
                       title = "Grafana";
                       url = "https://grafana.svc.doofnet.uk";
                       icon = "auto-invert sh:grafana-dark";
+                      check-url = "https://grafana.svc.doofnet.uk/api/health";
+                    }
+                    {
+                      title = "UniFi";
+                      url = "https://unifi.svc.doofnet.uk";
+                      icon = "si:ubiquiti";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
                     }
                     {
                       title = "Gitea";
                       url = "https://git.doofnet.uk";
                       icon = "si:gitea";
                     }
+                  ];
+                }
+                {
+                  type = "monitor";
+                  cache = "1m";
+                  title = "Social";
+                  sites = [
                     {
                       title = "GoToSocial";
                       url = "https://social.doofnet.uk";
@@ -118,11 +178,6 @@
                       title = "Mastodon";
                       url = "https://mastodon.incognitus.net";
                       icon = "si:mastodon";
-                    }
-                    {
-                      title = "Rustical";
-                      url = "https://cal.doofnet.uk";
-                      icon = "mdi:calendar-sync";
                     }
                   ];
                 }
@@ -247,6 +302,28 @@
                       </ul>
                     </div>
                   '';
+                }
+                {
+                  type = "github-releases";
+                  repositories = [
+                    "jellyfin/jellyfin"
+                    "paperless-ngx/paperless-ngx"
+                    "Radarr/Radarr"
+                    "Sonarr/Sonarr"
+                    "Prowlarr/Prowlarr"
+                    "miniflux/v2"
+                    "sissbruecker/linkding"
+                    "go-gitea/gitea"
+                    "superseriousbusiness/gotosocial"
+                    "mastodon/mastodon"
+                    "oauth2-proxy/oauth2-proxy"
+                    "9001/copyparty"
+                  ];
+                }
+                {
+                  type = "lobsters";
+                  limit = 15;
+                  sort-by = "hot";
                 }
               ];
             }
