@@ -128,6 +128,10 @@ in
     };
   };
 
+  # Allow Alloy (DynamicUser) to read Suricata logs
+  systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "suricata" ];
+  systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/var/log/suricata" ];
+
   # -------------------------------------------------------------------------
   # Alloy: tail eve.json → Loki
   # -------------------------------------------------------------------------
