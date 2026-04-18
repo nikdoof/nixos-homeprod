@@ -90,9 +90,9 @@ let
           "tap,id=net0,ifname=${tapIface},script=no,downscript=no,vhost=on"
           "-device"
           "virtio-net-pci,netdev=net0,mac=${normVm.mac}"
-          # Serial console on a Unix socket; logfile mirrors output to stderr → journald
+          # Serial console on a Unix socket; output also logged to console.log
           "-chardev"
-          "socket,id=con,path=${vmDir}/console.sock,server=on,wait=off,logfile=/dev/stderr"
+          "socket,id=con,path=${vmDir}/console.sock,server=on,wait=off,logfile=${vmDir}/console.log"
           "-serial"
           "chardev:con"
           # QEMU monitor on a Unix socket
