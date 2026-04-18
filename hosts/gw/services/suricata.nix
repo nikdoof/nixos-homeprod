@@ -45,8 +45,10 @@ in
   users.groups.suricata = { };
 
   environment.etc."suricata/suricata.yaml".source = ./files/suricata.yaml;
-  environment.etc."suricata/reference.config".source = "${pkgs.suricata}/etc/suricata/reference.config";
-  environment.etc."suricata/threshold.config".source = "${pkgs.suricata}/etc/suricata/threshold.config";
+  environment.etc."suricata/reference.config".source =
+    "${pkgs.suricata}/etc/suricata/reference.config";
+  environment.etc."suricata/threshold.config".source =
+    "${pkgs.suricata}/etc/suricata/threshold.config";
 
   systemd.tmpfiles.rules = [
     "d /var/lib/suricata       0750 suricata suricata -"

@@ -35,6 +35,7 @@ _: {
       ddns-override-no-update = true;
       ddns-replace-client-name = "when-not-present";
       ddns-generated-prefix = "dynamic";
+      ddns-update-on-renew = true;
 
       # PXE boot: serve different files for BIOS vs UEFI clients based on
       # PXE client architecture option (93). next-server is set per-subnet.
