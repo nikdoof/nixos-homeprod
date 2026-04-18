@@ -1,7 +1,11 @@
-_: {
+{ config, ... }: {
   services.kea.dhcp4 = {
     enable = true;
     settings = {
+      hooks-libraries = [
+        { library = "${config.services.kea.package}/lib/kea/hooks/libdhcp_lease_cmds.so"; }
+      ];
+
       interfaces-config.interfaces = [
         "vlan-private"
         "vlan-public"
