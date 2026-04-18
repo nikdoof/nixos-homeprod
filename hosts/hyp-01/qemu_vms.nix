@@ -90,13 +90,16 @@ let
           "tap,id=net0,ifname=${tapIface},script=no,downscript=no,vhost=on"
           "-device"
           "virtio-net-pci,netdev=net0,mac=${normVm.mac}"
-          # Serial console → journald via stdio
+          # Serial console on a Unix socket; logfile mirrors output to stderr → journald
           "-chardev"
-          "stdio,id=con,mux=on,signal=off"
+          "socket,id=con,path=${vmDir}/console.sock,server=on,wait=off,logfile=/dev/stderr"
           "-serial"
           "chardev:con"
+          # QEMU monitor on a Unix socket
+          "-chardev"
+          "socket,id=mon,path=${vmDir}/monitor.sock,server=on,wait=off"
           "-mon"
-          "chardev=con"
+          "chardev=mon,mode=readline"
           "-nographic"
           "-nodefaults"
         ];
@@ -113,6 +116,63 @@ let
         ];
       };
     };
+  vmNames = builtins.attrNames vms;
+
+  qemuConsole = pkgs.writeShellApplication {
+    name = "qemu-console";
+    runtimeInputs = [
+      pkgs.socat
+      pkgs.systemd
+    ];
+    text = ''
+      valid_vms=(${lib.concatStringsSep " " vmNames})
+
+      usage() {
+        echo "Usage: qemu-console <vm-name>"
+        echo ""
+        echo "Available VMs: ''${valid_vms[*]}"
+      }
+
+      if [ $# -eq 0 ]; then
+        echo "QEMU VMs:"
+        for vm in "''${valid_vms[@]}"; do
+          if systemctl is-active --quiet "qemu-vm-$vm" 2>/dev/null; then
+            status="running"
+          else
+            status="stopped"
+          fi
+          printf "  %-20s %s\n" "$vm" "$status"
+        done
+        exit 0
+      fi
+
+      vm="$1"
+
+      valid=0
+      for v in "''${valid_vms[@]}"; do
+        if [ "$v" = "$vm" ]; then
+          valid=1
+          break
+        fi
+      done
+
+      if [ "$valid" -eq 0 ]; then
+        echo "error: unknown VM '$vm'" >&2
+        usage >&2
+        exit 1
+      fi
+
+      sock="${dataDir}/$vm/console.sock"
+
+      if [ ! -S "$sock" ]; then
+        echo "error: '$vm' is not running (console socket not found)" >&2
+        exit 1
+      fi
+
+      echo "Connecting to $vm console... (press Ctrl-] to disconnect)"
+      exec socat -,raw,echo=0,escape=0x1d "UNIX-CONNECT:$sock"
+    '';
+  };
 in
 {
   users.users.qemu-vm = {
@@ -123,9 +183,14 @@ in
   };
   users.groups.qemu-vm = { };
 
+  # Allow nikdoof to access VM sockets without sudo
+  users.users.nikdoof.extraGroups = [ "qemu-vm" ];
+
   systemd.tmpfiles.rules = lib.concatMap (name: [
     "d ${dataDir}/${name} 0750 qemu-vm qemu-vm -"
   ]) (builtins.attrNames vms);
+
+  environment.systemPackages = [ qemuConsole ];
 
   systemd.services = lib.mapAttrs' (
     name: vm: lib.nameValuePair "qemu-vm-${name}" (mkQemuService name vm)
