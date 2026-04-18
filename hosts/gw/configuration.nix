@@ -229,6 +229,7 @@
     bmon
     iftop
     iperf
+    socat
   ];
 
   doofnet.network.vlans = true;
