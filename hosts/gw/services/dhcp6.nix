@@ -36,7 +36,9 @@
       };
       ddns-send-updates = true;
       ddns-override-client-update = true;
-      ddns-replace-client-name = "never";
+      ddns-override-no-update = true;
+      ddns-replace-client-name = "when-not-present";
+      ddns-generated-prefix = "dynamic";
 
       subnet6 = [
         {
