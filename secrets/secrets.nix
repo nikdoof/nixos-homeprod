@@ -15,7 +15,9 @@ let
   svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
   web-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILBF2Kjr3uDks2Ga1Cm9ItmBuvYthNW0muBccotcIhmZ";
   systems = [
+    afp-01
     gw
+    hs-01
     hyp-01
     mx-01
     ns-01
