@@ -176,6 +176,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Make named globally available on PATH
+    environment.systemPackages = [ config.services.bind.package ];
+
     # Firewall
     networking.firewall = {
       allowedTCPPorts = [ 53 ] ++ lib.optionals (cfg.mode == "primary") [ 853 ];

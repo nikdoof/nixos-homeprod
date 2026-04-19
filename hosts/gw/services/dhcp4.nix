@@ -1,4 +1,5 @@
-{ config, ... }: {
+{ config, ... }:
+{
   services.kea.dhcp4 = {
     enable = true;
     settings = {
