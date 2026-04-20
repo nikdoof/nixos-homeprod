@@ -62,16 +62,13 @@
               type = "loki";
               uid = "loki";
             };
-            # Match lines that contain both:
-            #   "tag":["Exploit"]  — ET Open Exploit-category rule
-            #   "signature_severity":["Major"] or ["Critical"]
-            # This avoids false positives from rule names containing "Major".
+            # Use the sig_severity stream label extracted by Alloy for fast
+            # indexed filtering, then confirm the Exploit tag in the body.
             expr = ''
               sum(
                 count_over_time(
-                  {job="suricata", host="gw"}
+                  {job="suricata", host="gw", sig_severity=~"Major|Critical"}
                     |= `"tag":["Exploit"]`
-                    |~ `"signature_severity":\["(Major|Critical)"\]`
                   [5m]
                 )
               )
@@ -235,7 +232,7 @@
       for = "0s";
       noDataState = "OK";
       execErrState = "Error";
-      labels.severity = "critical";
+      labels.severity = "warning";
       annotations = {
         summary = "Suricata is seeing a high volume of exploit alerts — possible active campaign";
         description = ''

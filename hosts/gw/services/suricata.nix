@@ -143,9 +143,30 @@ in
       sync_period  = "5s"
     }
 
+    loki.process "suricata_alerts" {
+      forward_to = [loki.write.default.receiver]
+
+      // Drop all non-alert event types (flow, dns, http, stats, tls, etc.)
+      stage.match {
+        selector            = "{job=\"suricata\"} != \"\\\"event_type\\\":\\\"alert\\\"\""
+        action              = "drop"
+        drop_counter_reason = "non_alert"
+      }
+
+      // Extract signature_severity from alert metadata as a stream label so
+      // queries can use {sig_severity="Major"} as a fast indexed filter.
+      stage.json {
+        expressions = { sig_severity = "alert.metadata.signature_severity.0" }
+      }
+
+      stage.labels {
+        values = { sig_severity = "" }
+      }
+    }
+
     loki.source.file "suricata_alerts" {
       targets    = local.file_match.suricata_alerts.targets
-      forward_to = [loki.write.default.receiver]
+      forward_to = [loki.process.suricata_alerts.receiver]
     }
   '';
 }

@@ -66,16 +66,14 @@
               type = "loki";
               uid = "loki";
             };
-            # Parse src_ip from EVE JSON and check it against the hosted-VLAN
-            # prefixes. The |= pre-filter on "Exploit" narrows the log set
-            # before the more expensive JSON parse runs.
+            # Use sig_severity stream label for indexed pre-filter, then parse
+            # src_ip from JSON to check against hosted-VLAN prefixes.
             # IPv4: 217.169.25.8/29 = .8–.15
             # IPv6: 2001:8b0:bd9:106::/64 prefix
             expr = ''
               sum(
                 count_over_time(
-                  {job="suricata", host="gw"}
-                    |= `"tag":["Exploit"]`
+                  {job="suricata", host="gw", sig_severity=~"Major|Critical"}
                     | json
                     | src_ip =~ `(217\.169\.25\.(8|9|1[0-5])|2001:8b0:bd9:106:)`
                   [5m]
@@ -249,7 +247,7 @@
       for = "0s";
       noDataState = "OK";
       execErrState = "Error";
-      labels.severity = "critical";
+      labels.severity = "warning";
       annotations = {
         summary = "Multiple alerts with a hosted-VLAN host as source — possible lateral movement";
         description = ''
