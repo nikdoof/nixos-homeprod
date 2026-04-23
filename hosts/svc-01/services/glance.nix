@@ -76,7 +76,7 @@
                       ];
                     }
                     {
-                      title = "iplayarr";
+                      title = "iPlayarr";
                       url = "https://iplayarr.svc.doofnet.uk";
                       icon = "mdi:play-box";
                       expected-status-codes = [
