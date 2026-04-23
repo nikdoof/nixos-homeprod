@@ -102,6 +102,24 @@
                         302
                       ];
                     }
+                    {
+                      title = "Qbittorrent";
+                      url = "https://qbittorrent.svc.doofnet.uk";
+                      icon = "si:qbittorrent";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
+                    {
+                      title = "NzbGet";
+                      url = "https://nzbget.svc.doofnet.uk";
+                      icon = "mdi:download";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
                   ];
                 }
                 {

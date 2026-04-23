@@ -11,6 +11,7 @@ _: {
     ./mastodon.nix
     ./metrics-proxy.nix
     ./media.nix
+    ./nas-services.nix
     ./miniflux.nix
     ./oauth-proxy.nix
     ./paperless.nix
