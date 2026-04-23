@@ -181,6 +181,10 @@ resource "aws_instance" "ns_03" {
   }
 
   tags = merge(local.tags, { Name = "ns-03" })
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 resource "aws_instance" "ns_04" {
@@ -196,6 +200,10 @@ resource "aws_instance" "ns_04" {
   }
 
   tags = merge(local.tags, { Name = "ns-04" })
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 resource "aws_eip" "ns_03" {
