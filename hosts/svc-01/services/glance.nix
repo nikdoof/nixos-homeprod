@@ -67,6 +67,24 @@
                       ];
                     }
                     {
+                      title = "Lidarr";
+                      url = "https://lidarr.svc.doofnet.uk";
+                      icon = "si:lidarr";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
+                    {
+                      title = "iplayarr";
+                      url = "https://iplayarr.svc.doofnet.uk";
+                      icon = "mdi:play-box";
+                      expected-status-codes = [
+                        200
+                        302
+                      ];
+                    }
+                    {
                       title = "Calibre Web";
                       url = "https://calibre-web.svc.doofnet.uk";
                       icon = "auto-invert sh:calibre-web-dark";

@@ -41,6 +41,31 @@ _: {
       ];
     };
 
+    lidarr = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.lidarr.rule" = "Host(`lidarr.svc.doofnet.uk`)";
+        "traefik.http.services.lidarr.loadbalancer.server.port" = "8686";
+        "traefik.http.routers.lidarr.middlewares" = "oauth-auth-redirect@file";
+      };
+      image = "ghcr.io/home-operations/lidarr:3.1.0.4875";
+      volumes = [
+        "/srv/data/lidarr/config:/config:U"
+        "/mnt/nas-03/media/:/data"
+      ];
+    };
+
+    iplayarr = {
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.iplayarr.rule" = "Host(`iplayarr.svc.doofnet.uk`)";
+        "traefik.http.services.iplayarr.loadbalancer.server.port" = "4404";
+        "traefik.http.routers.iplayarr.middlewares" = "oauth-auth-redirect@file";
+      };
+      image = "nikorag/iplayarr:latest";
+      volumes = [ "/srv/data/iplayarr/config:/config:U" ];
+    };
+
     # Openbooks and Calibre-Web
     openbooks = {
       labels = {
