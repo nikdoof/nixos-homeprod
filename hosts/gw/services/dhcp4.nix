@@ -11,7 +11,7 @@
         "vlan-private"
         "vlan-public"
         "vlan-lab"
-        "vlan-ha"
+        # "vlan-ha" removed - VLAN 105 is now IPv6 only
       ];
 
       lease-database = {
@@ -156,32 +156,6 @@
             {
               name = "domain-search";
               data = "lab.doofnet.uk, int.doofnet.uk, dmz.doofnet.uk, doofnet.uk";
-            }
-            {
-              name = "domain-name-servers";
-              data = "10.101.1.2, 10.101.1.3";
-            }
-            {
-              name = "ntp-servers";
-              data = "10.101.1.1, 217.169.20.20, 217.169.20.21";
-            }
-          ];
-        }
-        {
-          # VLAN 105 - HA
-          id = 4;
-          subnet = "10.105.0.0/16";
-          interface = "vlan-ha";
-          ddns-qualifying-suffix = "ha.doofnet.uk";
-          pools = [ { pool = "10.105.2.1 - 10.105.2.254"; } ];
-          option-data = [
-            {
-              name = "routers";
-              data = "10.105.1.1";
-            }
-            {
-              name = "domain-name";
-              data = "ha.doofnet.uk";
             }
             {
               name = "domain-name-servers";

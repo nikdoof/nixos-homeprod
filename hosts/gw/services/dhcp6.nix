@@ -7,6 +7,7 @@
         "vlan-private"
         "vlan-public"
         "vlan-lab"
+        "vlan-ha"
       ];
 
       "control-socket" = {
@@ -105,6 +106,28 @@
             {
               name = "sntp-servers";
               data = "2001:8b0:bd9:104::1";
+            }
+          ];
+        }
+        {
+          # VLAN 105 - HA/IoT (IPv6 only)
+          id = 4;
+          subnet = "2001:8b0:bd9:105::/64";
+          interface = "vlan-ha";
+          ddns-qualifying-suffix = "ha.doofnet.uk";
+          pools = [ { pool = "2001:8b0:bd9:105::2000 - 2001:8b0:bd9:105::2fff"; } ];
+          option-data = [
+            {
+              name = "dns-servers";
+              data = "2001:8b0:bd9:101::2, 2001:8b0:bd9:101::3";
+            }
+            {
+              name = "domain-search";
+              data = "ha.doofnet.uk";
+            }
+            {
+              name = "sntp-servers";
+              data = "2001:8b0:bd9:105::1";
             }
           ];
         }

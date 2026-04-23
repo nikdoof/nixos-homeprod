@@ -22,8 +22,8 @@ with dns.lib.combinators;
     TTL = 3600;
 
     subdomains = {
-      # Gateway
-      gw = host "10.105.1.1" "2001:8b0:bd9:105::1";
+      # Gateway (IPv6 only)
+      gw.AAAA = [ "2001:8b0:bd9:105::1" ];
     };
   };
   extraConfig = ''

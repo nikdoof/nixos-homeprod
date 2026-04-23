@@ -94,11 +94,11 @@ _: {
         } limit rate 10/second accept
 
         # DHCPv4 server
-        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-ha", "vlan-hosted" } \
+        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } \
           ip protocol udp udp dport 67 accept
 
         # DHCPv6 server
-        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted" } udp dport 547 accept
+        iifname { "vlan-private", "vlan-public", "vlan-lab", "vlan-hosted", "vlan-ha" } udp dport 547 accept
 
         # DHCPv6 client on WAN — only accept replies from link-local relay on port 547
         iifname "ppp0" ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept
@@ -157,8 +157,11 @@ _: {
         # DNS
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip  daddr @ns4 udp dport 53 accept
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip  daddr @ns4 tcp dport 53 accept
-        iifname { "vlan-public", "vlan-hosted" }            ip6 daddr @ns6 udp dport 53 accept
-        iifname { "vlan-public", "vlan-hosted" }            ip6 daddr @ns6 tcp dport 53 accept
+        iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip6 daddr @ns6 udp dport 53 accept
+        iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip6 daddr @ns6 tcp dport 53 accept
+
+        # HA/IoT VLAN (IPv6 only) - block all internet-bound IPv6 traffic
+        iifname "vlan-ha" oifname "ppp0" ip6 drop
 
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \

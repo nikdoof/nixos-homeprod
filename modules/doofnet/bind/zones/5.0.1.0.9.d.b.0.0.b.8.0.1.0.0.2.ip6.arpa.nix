@@ -15,14 +15,14 @@ with dns.lib.combinators;
       minimum = 300;
     };
     NS = [
-      "ns-01.int.doofnet.uk."
-      "ns-02.int.doofnet.uk."
+      "ns-03.doofnet.uk."
+      "ns-04.doofnet.uk."
     ];
 
     TTL = 3600;
 
     # Gateway
-    subdomains."1.1".PTR = [ "gw.ha.doofnet.uk." ];
+    subdomains."1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0".PTR = [ "gw.ha.doofnet.uk." ];
   };
   extraConfig = ''
     allow-update { doofnet-dhcp-updates; };

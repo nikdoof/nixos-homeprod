@@ -91,6 +91,28 @@ _: {
           AdvRouterAddr on;
         };
       };
+
+      # VLAN 105 - HA/IoT (IPv6 only)
+      interface vlan-ha {
+        AdvSendAdvert on;
+        AdvManagedFlag off;
+        AdvOtherConfigFlag off;
+        AdvDefaultPreference high;
+
+        prefix 2001:8b0:bd9:105::/64 {
+          AdvOnLink on;
+          AdvAutonomous on;
+          AdvRouterAddr off;
+        };
+
+        RDNSS 2001:8b0:bd9:101::2 2001:8b0:bd9:101::3 {
+          AdvRDNSSLifetime 3600;
+        };
+
+        DNSSL ha.doofnet.uk {
+          AdvDNSSLLifetime 3600;
+        };
+      };
     '';
   };
 }

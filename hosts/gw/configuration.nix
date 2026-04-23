@@ -96,10 +96,10 @@
       ];
     };
 
-    # VLAN 105 - HA/IoT
+    # VLAN 105 - HA/IoT (IPv6 only)
     "10-vlan-ha" = {
       matchConfig.Name = config.systemd.network.netdevs."10-vlan-ha".netdevConfig.Name;
-      networkConfig.Address = [ "10.105.1.1/16" ];
+      networkConfig.Address = [ "2001:8b0:bd9:105::1/64" ];
     };
 
     # Hosted VLAN uses a publicly routable /29 block (not NATed)
