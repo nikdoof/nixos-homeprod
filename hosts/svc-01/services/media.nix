@@ -63,7 +63,10 @@ _: {
         "traefik.http.routers.iplayarr.middlewares" = "oauth-auth-redirect@file";
       };
       image = "nikorag/iplayarr:latest";
-      volumes = [ "/srv/data/iplayarr/config:/config:U" ];
+      volumes = [
+        "/srv/data/iplayarr/config:/config:U"
+        "/mnt/nas-03/media/:/data"
+      ];
     };
 
     # Openbooks and Calibre-Web
