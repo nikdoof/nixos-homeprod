@@ -14,15 +14,6 @@
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
   ];
 
-  # nix-community cache is needed to pull pre-built aarch64 binaries
-  # (e.g. dns.nix) when deploying to this host from an x86_64 builder.
-  nix.settings = {
-    substituters = [ "https://nix-community.cachix.org" ];
-    trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    ];
-  };
-
   # Networking — nameservers list self first since this host IS the primary DNS.
   networking.hostName = "ns-01";
   networking.nameservers = [
@@ -49,8 +40,14 @@
     enable = lib.mkForce false;
   };
 
-  # Allow wheel users to perform remote rebuilds via nixos-rebuild --use-remote-sudo
-  nix.settings.trusted-users = [ "@wheel" ];
+  # Trust nix-community cache for pre-built packages
+  nix.settings = {
+    substituters = [ "https://nix-community.cachix.org" ];
+    trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+    trusted-users = [ "@wheel" ];
+  };
 
   doofnet.bind = {
     enable = true;
