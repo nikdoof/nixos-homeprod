@@ -160,8 +160,8 @@ _: {
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip6 daddr @ns6 udp dport 53 accept
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip6 daddr @ns6 tcp dport 53 accept
 
-        # HA/IoT VLAN (IPv6 only) - block all internet-bound IPv6 traffic
-        iifname "vlan-ha" oifname "ppp0" ip6 drop
+        # HA/IoT VLAN (IPv6 only) - block all internet-bound traffic
+        iifname "vlan-ha" oifname "ppp0" drop
 
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
