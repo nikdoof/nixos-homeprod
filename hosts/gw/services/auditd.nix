@@ -27,6 +27,10 @@ _: {
 
   # CIS 4.1 — minimal ruleset appropriate for a border router.
   # Keys (-k ...) surface in audit events as key=<value> for later filtering.
+  # Note: -w watches fail at load time if the path doesn't exist, so CIS
+  # entries that target paths absent on NixOS (/etc/security/opasswd,
+  # /var/log/faillog, /var/log/tallylog, /etc/sudoers.d, /var/log/btmp)
+  # are omitted here.
   security.audit.rules = [
     # 4.1.3 Time / clock changes
     "-a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k time-change"
@@ -37,7 +41,6 @@ _: {
     "-w /etc/passwd -p wa -k identity"
     "-w /etc/shadow -p wa -k identity"
     "-w /etc/gshadow -p wa -k identity"
-    "-w /etc/security/opasswd -p wa -k identity"
 
     # 4.1.5 Network environment
     "-a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale"
@@ -45,15 +48,12 @@ _: {
 
     # 4.1.10 Privileged scope / sshd config
     "-w /etc/sudoers -p wa -k scope"
-    "-w /etc/sudoers.d -p wa -k scope"
     "-w /etc/ssh/sshd_config -p wa -k sshd_config"
 
     # 4.1.7 / 4.1.8 Login, logout, session records
-    "-w /var/log/faillog -p wa -k logins"
     "-w /var/log/lastlog -p wa -k logins"
     "-w /var/run/utmp -p wa -k session"
     "-w /var/log/wtmp -p wa -k logins"
-    "-w /var/log/btmp -p wa -k logins"
 
     # 4.1.12 DAC permission changes by interactive users (auid>=1000)
     "-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=-1 -k perm_mod"
