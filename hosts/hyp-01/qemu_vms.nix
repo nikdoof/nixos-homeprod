@@ -111,9 +111,12 @@ let
             "if=pflash,format=raw,readonly=on,file=${ovmf}/FV/OVMF_CODE.fd"
             "-drive"
             "if=pflash,format=raw,file=${varsFile}"
-            # Primary disk
+            # Primary disk — explicit device wiring so we can pin bootindex=0
+            # and stop OVMF preferring PXE on the NICs.
             "-drive"
-            "file=${diskFile},format=${normVm.diskFormat},if=virtio,cache=writeback"
+            "file=${diskFile},format=${normVm.diskFormat},if=none,id=hd0,cache=writeback"
+            "-device"
+            "virtio-blk-pci,drive=hd0,bootindex=0"
           ]
           ++ netArgs
           ++ [
