@@ -203,14 +203,18 @@ _: {
         # WAN -> Hosted VLAN (inbound to publicly routed /29, no NAT)
         iifname "ppp0" oifname "vlan-hosted" accept
 
-        # WAN Inbound IPv6
-        iifname "ppp0" oifname "vlan-private" tcp dport 51413 accept  # QBittorrent
-        iifname "ppp0" oifname "vlan-private" udp dport 51413 accept  # QBittorrent
+        # Note: inbound BitTorrent to nas-03 (port 51413) is IPv4 only and
+        # flows through the prerouting DNAT + `ct status dnat accept` path
+        # above. No explicit IPv6 forward rule — nas-03 has no static IPv6.
 
         # WAN inbound drops - count without logging (suppress noise)
         iifname "ppp0" counter name fw_wan_forward_drop drop
-        # Log and count all remaining (internal) drops
-        log prefix "nft-forward-drop: " flags all counter name fw_forward_drop
+
+        # Count every remaining (internal) drop so Prometheus sees the true
+        # rate, then log a rate-limited sample for debugging so a compromised
+        # internal host can't flood journald.
+        counter name fw_forward_drop
+        limit rate 10/second burst 20 packets log prefix "nft-forward-drop: " flags all
       }
     }
 

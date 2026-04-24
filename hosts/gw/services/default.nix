@@ -1,6 +1,7 @@
 _: {
   imports = [
     ./alloy.nix
+    ./auditd.nix
     ./collectors.nix
     ./dns.nix
     ./avahi.nix

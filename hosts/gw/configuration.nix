@@ -213,6 +213,32 @@
     "kernel.unprivileged_bpf_disabled" = 1;
     "net.core.bpf_jit_harden" = 2;
 
+    # Disallow loading an alternative kernel at runtime
+    "kernel.kexec_load_disabled" = 1;
+
+    # Disable magic SysRq — prevents console-triggered reboots / memory dumps
+    "kernel.sysrq" = 0;
+
+    # Restrict perf_event_open to root
+    "kernel.perf_event_paranoid" = 3;
+
+    # Disable gateway-sourced ICMP redirects too (belt-and-braces with
+    # accept_redirects=0 above). A router does not need to be redirected.
+    "net.ipv4.conf.all.secure_redirects" = 0;
+    "net.ipv4.conf.default.secure_redirects" = 0;
+
+    # Only answer ARP for IPs configured on the incoming interface, and
+    # always source ARP with the best-matching local IP. Prevents cross-
+    # interface ARP leakage between enp2s0 and vlan-private (both on
+    # 10.101.0.0/16) and tightens multi-homed behaviour.
+    "net.ipv4.conf.all.arp_ignore" = 1;
+    "net.ipv4.conf.all.arp_announce" = 2;
+
+    # A router should not install default routes from downstream RAs.
+    # Applies to interfaces created after boot; ppp0 is managed by
+    # systemd-networkd (IPv6AcceptRA=true) and is unaffected.
+    "net.ipv6.conf.default.accept_ra" = 0;
+
     # TCP buffer sizing for 1 Gbps
     "net.core.rmem_max" = 16777216;
     "net.core.wmem_max" = 16777216;
@@ -233,6 +259,32 @@
   ];
 
   doofnet.network.vlans = true;
+
+  # CIS 1.5 — disable core dump collection. fs.suid_dumpable=0 above blocks
+  # SUID dumps; this disables systemd-coredump entirely and sets a PAM hard
+  # limit so no user process can leave a core file. Kernel panic backtraces
+  # still land in journald.
+  systemd.coredump.enable = false;
+  security.pam.loginLimits = [
+    {
+      domain = "*";
+      type = "hard";
+      item = "core";
+      value = "0";
+    }
+  ];
+
+  # CIS 1.1.2 — wipe /tmp on boot.
+  boot.tmp.cleanOnBoot = true;
+
+  # Only users declared in Nix exist on the system; passwords and keys are
+  # managed by the flake. Requires console access + rebuild for recovery if
+  # SSH keys are lost.
+  users.mutableUsers = false;
+
+  # Freeze kernel state after boot: no further module loads, no kexec,
+  # no hibernation image loading. New modules require a reboot to load.
+  security.protectKernelImage = true;
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?

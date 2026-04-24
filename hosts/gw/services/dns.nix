@@ -14,7 +14,31 @@ _: {
           "217.169.25.8/29 allow"
           "2001:8b0:bd9:106::/64 allow"
         ];
-        do-not-query-localhost = false;
+
+        # Don't leak version / hostname via CHAOS queries.
+        hide-identity = true;
+        hide-version = true;
+
+        # Reject malformed / DNSSEC-stripped / inconsistent-referral responses.
+        harden-glue = true;
+        harden-dnssec-stripped = true;
+        harden-referral-path = true;
+        harden-below-nxdomain = true;
+
+        # Send only the minimum qname to each upstream authority.
+        qname-minimisation = true;
+
+        # 0x20-bit case randomisation to harden against cache poisoning.
+        use-caps-for-id = true;
+
+        # Refresh popular records before TTL expiry.
+        prefetch = true;
+
+        # Belt-and-braces caps: the ACL already scopes queries to the hosted
+        # ranges, but if a firewall rule ever leaks these bound the
+        # amplification potential.
+        ratelimit = 1000;
+        ip-ratelimit = 200;
       };
       forward-zone = [
         {
