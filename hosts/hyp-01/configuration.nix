@@ -85,6 +85,7 @@
 
       bridgeVLANs = [
         { VLAN = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id; }
+        { VLAN = config.systemd.network.netdevs."10-vlan-ha".vlanConfig.Id; }
         { VLAN = config.systemd.network.netdevs."10-vlan-hosted".vlanConfig.Id; }
       ];
     };
@@ -99,6 +100,20 @@
         {
           EgressUntagged = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id;
           PVID = config.systemd.network.netdevs."10-vlan-private".vlanConfig.Id;
+        }
+      ];
+    };
+
+    # HA/IoT VLAN VMs (no host L3 on vlan-ha; transit-only)
+    "10-vm-105" = {
+      matchConfig.Name = "vm-105-*";
+
+      networkConfig.Bridge = "br0";
+
+      bridgeVLANs = [
+        {
+          EgressUntagged = config.systemd.network.netdevs."10-vlan-ha".vlanConfig.Id;
+          PVID = config.systemd.network.netdevs."10-vlan-ha".vlanConfig.Id;
         }
       ];
     };
