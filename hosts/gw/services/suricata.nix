@@ -1,40 +1,21 @@
 { pkgs, ... }:
 let
-  rulesUrl = "https://rules.emergingthreats.net/open/suricata-${pkgs.suricata.version}/emerging.rules.tar.gz";
+  # suricata-update ships inside pkgs.suricata. It fetches ET Open by default,
+  # verifies the published MD5 sidecar, merges category files into
+  # suricata.rules, and refreshes classification.config — matching the layout
+  # our suricata.yaml already expects.
+  updateScript = pkgs.writeShellScript "suricata-update-rules" ''
+    set -euo pipefail
+    ${pkgs.suricata}/bin/suricata-update \
+      --data-dir /var/lib/suricata \
+      --suricata-conf /etc/suricata/suricata.yaml \
+      --no-reload
 
-  updateScript = pkgs.writeShellApplication {
-    name = "suricata-update-rules";
-    runtimeInputs = with pkgs; [
-      curl
-      gnutar
-      gzip
-    ];
-    text = ''
-      set -euo pipefail
-
-      RULES_DIR=/var/lib/suricata/rules
-      TMP=$(mktemp -d)
-      trap 'rm -rf "$TMP"' EXIT
-
-      echo "Fetching ET Open rules for Suricata ${pkgs.suricata.version}..."
-      curl -sL "${rulesUrl}" | tar -xz -C "$TMP"
-
-      # Merge all category rule files into a single file (mirrors suricata-update output)
-      cat "$TMP"/rules/emerging-*.rules > "$RULES_DIR/suricata.rules"
-
-      # Pull in the classification config shipped with the ruleset
-      cp "$TMP/rules/classification.config" "$RULES_DIR/"
-
-      COUNT=$(wc -l < "$RULES_DIR/suricata.rules")
-      echo "Rules updated: $COUNT lines."
-
-      # Signal Suricata to live-reload rules without restarting
-      if systemctl is-active --quiet suricata.service; then
-        echo "Sending SIGUSR2 to reload rules..."
-        systemctl kill --signal=SIGUSR2 suricata.service
-      fi
-    '';
-  };
+    # Live-reload running suricata without restarting
+    if ${pkgs.systemd}/bin/systemctl is-active --quiet suricata.service; then
+      ${pkgs.systemd}/bin/systemctl kill --signal=SIGUSR2 suricata.service
+    fi
+  '';
 in
 {
   users.users.suricata = {
@@ -51,9 +32,10 @@ in
     "${pkgs.suricata}/etc/suricata/threshold.config";
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/suricata       0750 suricata suricata -"
-    "d /var/lib/suricata/rules 0750 suricata suricata -"
-    "d /var/log/suricata       0750 suricata suricata -"
+    "d /var/lib/suricata        0750 suricata suricata -"
+    "d /var/lib/suricata/rules  0750 suricata suricata -"
+    "d /var/lib/suricata/update 0750 suricata suricata -"
+    "d /var/log/suricata        0750 suricata suricata -"
   ];
 
   # -------------------------------------------------------------------------
@@ -100,16 +82,16 @@ in
   };
 
   # -------------------------------------------------------------------------
-  # ET Open rule updater
+  # ET Open rule updater (suricata-update)
   # -------------------------------------------------------------------------
   systemd.services.suricata-update-rules = {
-    description = "Suricata ET Open rules updater";
+    description = "Suricata rule updater (suricata-update, verifies MD5 sidecar)";
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
 
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${updateScript}/bin/suricata-update-rules";
+      ExecStart = toString updateScript;
       User = "suricata";
       Group = "suricata";
       NoNewPrivileges = true;
