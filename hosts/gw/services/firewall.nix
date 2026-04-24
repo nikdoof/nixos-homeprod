@@ -114,8 +114,14 @@ _: {
         ip  saddr @local4 udp dport 123 accept
         ip6 saddr @local6 udp dport 123 accept
 
-        # SSH
-        iifname { "vlan-private", "enp2s0", "tailscale0" } tcp dport 22 accept
+        # SSH — vlan-private and tailscale0 are trusted networks.
+        # enp2s0 is the fallback management port (same L3 as vlan-private);
+        # require the source to be on the management subnet as defense in depth
+        # in case the port is ever patched into an untagged network by mistake.
+        iifname { "vlan-private", "tailscale0" }            tcp dport 22 accept
+        iifname "enp2s0" ip  saddr 10.101.0.0/16            tcp dport 22 accept
+        iifname "enp2s0" ip6 saddr 2001:8b0:bd9:101::/64    tcp dport 22 accept
+        iifname "enp2s0" ip6 saddr fe80::/10                tcp dport 22 accept
 
         # mDNS
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } udp dport 5353 accept
