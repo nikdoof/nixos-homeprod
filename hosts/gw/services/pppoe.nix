@@ -35,7 +35,8 @@ _: {
     };
   };
 
-  # pppd must start after vlan-wan exists
+  # pppd is tied to the vlan-wan device lifecycle: bindsTo stops pppd when the
+  # device disappears and restarts it when the device returns.
   systemd.services."ppp-aaisp".after = [ "sys-subsystem-net-devices-vlan\\x2dwan.device" ];
-  systemd.services."ppp-aaisp".requires = [ "sys-subsystem-net-devices-vlan\\x2dwan.device" ];
+  systemd.services."ppp-aaisp".bindsTo = [ "sys-subsystem-net-devices-vlan\\x2dwan.device" ];
 }
