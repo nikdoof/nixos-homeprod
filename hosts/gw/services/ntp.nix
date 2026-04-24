@@ -18,6 +18,13 @@ _: {
       # Step the clock on the first 3 updates if off by more than 1 second
       # (fast correction on boot before ntpd has enough samples to slew)
       makestep 1.0 3
+
+      # Cap amplification risk from a compromised internal client: drop
+      # requests arriving faster than ~8/s per source (interval 3 = 2^3).
+      ratelimit interval 3 burst 8
+
+      # Bound per-client log memory
+      clientloglimit 1048576
     '';
   };
 }
