@@ -1,5 +1,6 @@
 {
   inputs,
+  pkgs,
   ...
 }:
 {
@@ -18,5 +19,21 @@
     systemd-boot.enable = true;
     systemd-boot.configurationLimit = 2;
     efi.canTouchEfiVariables = true;
+  };
+
+  # Intel thermal management — compact Mini DM form factor benefits from thermald
+  services.thermald.enable = true;
+
+  # The Intel Wireless 7265 card is present but unused on all server deployments
+  boot.blacklistedKernelModules = [
+    "iwlwifi"
+    "bluetooth"
+  ];
+
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+    ];
   };
 }

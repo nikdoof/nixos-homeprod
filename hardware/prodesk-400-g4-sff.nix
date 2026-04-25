@@ -9,7 +9,7 @@
   # https://support.hp.com/gb-en/product/details/model/15292381
 
   imports = [
-    inputs.nixos-hardware.nixosModules.common-gpu-intel-kaby-lake
+    "${inputs.nixos-hardware}/common/cpu/intel/kaby-lake"
     "${inputs.nixos-hardware}/common/pc/ssd"
   ];
 
@@ -19,4 +19,13 @@
     systemd-boot.configurationLimit = 2;
     efi.canTouchEfiVariables = true;
   };
+
+  # Intel thermal management for compact SFF form factor
+  services.thermald.enable = true;
+
+  # No Bluetooth or WiFi hardware present; prevent the kernel loading these
+  boot.blacklistedKernelModules = [
+    "bluetooth"
+    "cfg80211"
+  ];
 }
