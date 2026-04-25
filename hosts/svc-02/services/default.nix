@@ -5,6 +5,7 @@ _: {
     ./grafana.nix
     ./graphite_exporter.nix
     ./hcloud_exporter.nix
+    ./homeassistant.nix
     ./jrouter.nix
     ./loki.nix
     ./nixos-revision-fetcher.nix
