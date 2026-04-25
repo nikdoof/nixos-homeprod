@@ -58,6 +58,8 @@ in
   "gitSecrets.age".publicKeys = users ++ [ svc-01 ];
   "mastodonEnvironment.age".publicKeys = users ++ [ svc-01 ];
 
+  "svc02NixSigningKey.age".publicKeys = users ++ [ svc-02 ];
+
   "unpollerPassword.age".publicKeys = users ++ [ svc-02 ];
   "alertManagerTelegramToken.age".publicKeys = users ++ [ svc-02 ];
   "hcloudExporterEnvironment.age".publicKeys = users ++ [ svc-02 ];

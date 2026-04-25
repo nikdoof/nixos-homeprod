@@ -1,4 +1,5 @@
-_: {
+{ config, ... }:
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -39,6 +40,14 @@ _: {
 
   doofnet.cross_compile = true;
   doofnet.nfs.media = true;
+
+  age.secrets.svc02NixSigningKey = {
+    file = ../../secrets/svc02NixSigningKey.age;
+    owner = "root";
+    mode = "0400";
+  };
+
+  nix.settings.secret-key-files = [ config.age.secrets.svc02NixSigningKey.path ];
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?

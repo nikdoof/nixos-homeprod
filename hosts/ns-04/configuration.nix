@@ -6,11 +6,11 @@
   networking.domain = "doofnet.uk";
   networking.search = [ "doofnet.uk" ];
 
-  # Trust nix-community cache for pre-built packages
   nix.settings = {
     substituters = [ "https://nix-community.cachix.org" ];
     trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "svc-02.int.doofnet.uk:7Q/KnURGp8h6kNbBle+StQNX/CST3mH9et5QqD4Lzs4="
     ];
     trusted-users = [ "@wheel" ];
   };
