@@ -37,6 +37,11 @@ let
   # One NIC descriptor per VLAN. The first NIC keeps the VM-level MAC so
   # single-VLAN VMs preserve their existing DHCP lease on migration;
   # additional NICs derive a per-VLAN MAC from name+vlan.
+  #
+  # pciSlot pins each NIC's address on the dedicated NIC bridge bus (see
+  # ExecStart). Decoupling from pcie.0 means adding disks or other devices
+  # never shifts a NIC's PCI address, which would otherwise rename interfaces
+  # inside the guest (predictable names are derived from bus+slot).
   mkNics =
     name: normVm:
     lib.imap0 (i: vlan: {
@@ -44,6 +49,7 @@ let
       tap = "vm-${vlan}-${normVm.tapId}";
       mac = if i == 0 then normVm.mac else lib.mkMAC "${name}-${vlan}";
       netId = "net${toString i}";
+      pciSlot = "0x${lib.toLower (lib.toHexString i)}";
     }) normVm.vlans;
 
   mkQemuService =
@@ -68,7 +74,7 @@ let
         "-netdev"
         "tap,id=${n.netId},ifname=${n.tap},script=no,downscript=no,vhost=on"
         "-device"
-        "virtio-net-pci,netdev=${n.netId},mac=${n.mac}"
+        "virtio-net-pci,netdev=${n.netId},mac=${n.mac},bus=netbus,addr=${n.pciSlot}"
       ]) nics;
     in
     {
@@ -112,11 +118,17 @@ let
             "-drive"
             "if=pflash,format=raw,file=${varsFile}"
             # Primary disk — explicit device wiring so we can pin bootindex=0
-            # and stop OVMF preferring PXE on the NICs.
+            # and stop OVMF preferring PXE on the NICs. Pinned to a fixed slot
+            # on pcie.0 so future PCIe additions don't renumber it.
             "-drive"
             "file=${diskFile},format=${normVm.diskFormat},if=none,id=hd0,cache=writeback"
             "-device"
-            "virtio-blk-pci,drive=hd0,bootindex=0"
+            "virtio-blk-pci,drive=hd0,bootindex=0,bus=pcie.0,addr=0x4"
+            # Dedicated PCI bridge for NICs. Each NIC pins its own slot on this
+            # bus (see mkNics.pciSlot), so adding disks/controllers on pcie.0
+            # never shifts NIC addresses and guest interface names stay stable.
+            "-device"
+            "pcie-pci-bridge,id=netbus,bus=pcie.0,addr=0x3"
           ]
           ++ netArgs
           ++ [
