@@ -1,4 +1,13 @@
 _: {
+  services.borgmatic.settings.source_directories = [
+    "/srv/data/prowlarr/config"
+    "/srv/data/radarr/config"
+    "/srv/data/sonarr/config"
+    "/srv/data/lidarr/config"
+    "/srv/data/iplayarr/config"
+    "/srv/data/calibre-web/config"
+  ];
+
   virtualisation.oci-containers.containers = {
 
     # Prowlarr, Radarr, Sonarr

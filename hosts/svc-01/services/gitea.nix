@@ -69,5 +69,5 @@
     };
   };
 
-  services.borgmatic.settings.source_directories = [ "/srv/data/gitea/data/repositories" ];
+  services.borgmatic.settings.source_directories = [ "/srv/data/gitea/data" ];
 }
