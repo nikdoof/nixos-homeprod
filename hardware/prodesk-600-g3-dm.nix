@@ -24,10 +24,13 @@
   # Intel thermal management — compact Mini DM form factor benefits from thermald
   services.thermald.enable = true;
 
-  # The Intel Wireless 7265 card is present but unused on all server deployments
+  # The Intel Wireless 7265 card is present but unused on all server deployments.
+  # btusb is the USB BT root module; blacklisting it prevents the whole BT stack
+  # from loading. iwlwifi covers the WiFi side. cfg80211 still autoloads otherwise.
   boot.blacklistedKernelModules = [
     "iwlwifi"
-    "bluetooth"
+    "btusb"
+    "cfg80211"
   ];
 
   hardware.graphics = {
