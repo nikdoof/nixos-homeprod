@@ -10,7 +10,7 @@
     substituters = [ "https://nix-community.cachix.org" ];
     trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "svc-02.int.doofnet.uk:7Q/KnURGp8h6kNbBle+StQNX/CST3mH9et5QqD4Lzs4="
+      "svc-02.int.doofnet.uk:/eg00u95V1vGARHyfLT2JoTa5yFG0vg8W/Xl15ESbF0="
     ];
     trusted-users = [ "@wheel" ];
   };
