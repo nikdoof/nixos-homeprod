@@ -83,7 +83,6 @@ in
       "c792e9"
       "8addff"
       "88ddff"
-      "ffffff"
     ];
   };
 
