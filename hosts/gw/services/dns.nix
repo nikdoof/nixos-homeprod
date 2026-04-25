@@ -1,6 +1,8 @@
 _: {
   services.unbound = {
     enable = true;
+    # Unix-socket control interface used by prometheus-unbound-exporter (see alloy.nix)
+    localControlSocketPath = "/run/unbound/unbound.socket";
     settings = {
       server = {
         # Listen only on the hosted VLAN interface

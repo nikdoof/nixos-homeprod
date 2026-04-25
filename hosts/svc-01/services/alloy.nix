@@ -49,6 +49,16 @@
     }
   '';
 
+  # Gitea built-in metrics endpoint (enabled via [metrics] in gitea config)
+  environment.etc."alloy/conf.d/02-gitea-metrics.alloy".text = ''
+    prometheus.scrape "gitea" {
+      targets    = [{"__address__" = "127.0.0.1:${toString config.services.gitea.settings.server.HTTP_PORT}"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "gitea"
+      metrics_path = "/metrics"
+    }
+  '';
+
   # Allow Alloy to read gitea logs
   systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "gitea" ];
   systemd.services.alloy.serviceConfig.ReadOnlyPaths = [ "/srv/data/gitea/data/log" ];

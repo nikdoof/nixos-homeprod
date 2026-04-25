@@ -127,6 +127,14 @@ in
   systemd.services.grafana.serviceConfig.ExecStartPre =
     "${pkgs.grafana}/bin/grafana-cli plugins install marcusolsson-treemap-panel";
 
+  environment.etc."alloy/conf.d/02-grafana.alloy".text = ''
+    prometheus.scrape "grafana" {
+      targets    = [{"__address__" = "127.0.0.1:3000"}]
+      forward_to = [prometheus.remote_write.default.receiver]
+      job_name   = "grafana"
+    }
+  '';
+
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
 }
