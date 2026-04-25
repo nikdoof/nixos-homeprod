@@ -46,6 +46,7 @@ in
   "metricsBasicAuthPassword.age".publicKeys = users ++ systems;
   "metricsBasicAuthHtpasswd.age".publicKeys = users ++ [ svc-01 ];
 
+  "copypartyMetricsPassword.age".publicKeys = users ++ [ svc-01 ];
   "swarmMirrorConfig.age".publicKeys = users ++ [ svc-01 ];
   "oauth2ClientSecret.age".publicKeys = users ++ [ svc-01 ];
   "pocketIdEncryptionKey.age".publicKeys = users ++ [ svc-01 ];
