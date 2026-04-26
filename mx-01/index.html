@@ -1,0 +1,2060 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Andrew Williams">
+      
+      
+        <link rel="canonical" href="https://nikdoof.github.io/nixos-homeprod/mx-01/">
+      
+      
+        <link rel="prev" href="../dns/">
+      
+      
+        <link rel="next" href="../macos/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>mx-01 — Mail Server - NixOS Homeprod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="blue-grey">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mx-01-mail-server" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="NixOS Homeprod" class="md-header__button md-logo" aria-label="NixOS Homeprod" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NixOS Homeprod
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              mx-01 — Mail Server
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nikdoof/nixos-homeprod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nikdoof/nixos-homeprod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="NixOS Homeprod" class="md-nav__button md-logo" aria-label="NixOS Homeprod" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    NixOS Homeprod
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nikdoof/nixos-homeprod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nikdoof/nixos-homeprod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Infrastructure
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Infrastructure
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../base_host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Base Host Standards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gw/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gw — Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hyp-01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hyp-01 — Hypervisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ns-01 / ns-02 — DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mx-01 — Mail Server
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mx-01 — Mail Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hosted-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hosted domains
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tls-acme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TLS / ACME
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postfix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Postfix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Postfix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#listeners" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listeners
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relay-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relay policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inbound-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbound TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outbound-tls-dane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outbound TLS (DANE)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Postscreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helo-sender-and-recipient-restrictions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HELO, sender, and recipient restrictions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cve-2023-51764-smtp-request-smuggling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CVE-2023-51764 (SMTP request smuggling)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate limiting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bounce-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bounce / error handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#milters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Milters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aliases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spf-policyd-spf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPF — policyd-spf
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dkim-opendkim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DKIM — OpenDKIM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dmarc-opendmarc-modulesdoofnetopendmarc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DMARC — OpenDMARC (modules/doofnet/opendmarc/)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dovecot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dovecot
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dovecot">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#virtual-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mailboxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mailboxes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lmtp-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LMTP socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fail2ban" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fail2ban
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Persistence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-records-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS records required
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../macos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    macOS Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raspberry_pi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Raspberry Pi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hosted-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hosted domains
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tls-acme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TLS / ACME
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postfix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Postfix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Postfix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#listeners" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listeners
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relay-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relay policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inbound-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbound TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outbound-tls-dane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outbound TLS (DANE)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Postscreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helo-sender-and-recipient-restrictions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HELO, sender, and recipient restrictions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cve-2023-51764-smtp-request-smuggling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CVE-2023-51764 (SMTP request smuggling)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate limiting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bounce-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bounce / error handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#milters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Milters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aliases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spf-policyd-spf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPF — policyd-spf
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dkim-opendkim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DKIM — OpenDKIM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dmarc-opendmarc-modulesdoofnetopendmarc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DMARC — OpenDMARC (modules/doofnet/opendmarc/)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dovecot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dovecot
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dovecot">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#virtual-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Virtual users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mailboxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mailboxes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lmtp-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LMTP socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fail2ban" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fail2ban
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Persistence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-records-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS records required
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="mx-01-mail-server">mx-01: Mail Server</h1>
+<p>mx-01 is a NixOS microVM (CID 12) on hyp-01, running on VLAN 106 with a publicly routed
+IP address. It handles inbound and outbound email for two domains using Postfix (MTA) and
+Dovecot (IMAP/LMTP), with DKIM signing, DMARC policy enforcement, and SPF validation.</p>
+<h2 id="network">Network</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform</td>
+<td>microVM, CID 12, VLAN 106</td>
+</tr>
+<tr>
+<td>IPv4</td>
+<td>217.169.25.11/29</td>
+</tr>
+<tr>
+<td>IPv6</td>
+<td>2001:8b0:bd9:106::3/64</td>
+</tr>
+<tr>
+<td>Gateway</td>
+<td>217.169.25.9 (gw hosted VLAN)</td>
+</tr>
+<tr>
+<td>DNS</td>
+<td>217.169.25.9, 2001:8b0:bd9:106::1 (Unbound on gw)</td>
+</tr>
+</tbody>
+</table>
+<p>Open TCP ports: <strong>25</strong> (SMTP/postscreen), <strong>465</strong> (SMTPS submission), <strong>587</strong> (submission),
+<strong>993</strong> (IMAPS).</p>
+<h2 id="hosted-domains">Hosted domains</h2>
+<p>Virtual mailboxes are served for two domains:</p>
+<ul>
+<li><code>doofnet.uk</code></li>
+<li><code>dimension.sh</code></li>
+</ul>
+<p>The host's own FQDN (<code>mx-01.doofnet.uk</code>) is the only entry in <code>mydestination</code>. All mail for
+the virtual domains is delivered via LMTP to Dovecot.</p>
+<h2 id="tls-acme">TLS / ACME</h2>
+<p>A single TLS certificate covers <code>mx-01.doofnet.uk</code>, obtained via ACME DNS-01 challenge
+using the DigitalOcean API. After renewal, ACLs are applied so that <code>dovecot2</code> and
+<code>postfix</code> can read the certificate files without running as <code>acme</code>, and both services plus
+<code>opendmarc</code> are reloaded. The certificate is used by both Postfix (inbound and outbound)
+and Dovecot (IMAP).</p>
+<h2 id="postfix">Postfix</h2>
+<h3 id="listeners">Listeners</h3>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Auth required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25</td>
+<td>postscreen</td>
+<td>No</td>
+<td>Pre-screens before reaching smtpd</td>
+</tr>
+<tr>
+<td>587</td>
+<td>submission</td>
+<td>Yes (SASL)</td>
+<td>TLS enforced (<code>encrypt</code>)</td>
+</tr>
+<tr>
+<td>465</td>
+<td>submissions</td>
+<td>Yes (SASL)</td>
+<td>TLS wrapper mode</td>
+</tr>
+</tbody>
+</table>
+<p>Port 25 is handled by <strong>postscreen</strong> (not smtpd directly). The <code>smtp_inet</code> master.cf entry
+is overridden to run <code>postscreen</code>, which passes clean connections to a <code>smtpd</code> pass service.
+The <code>dnsblog</code> and <code>tlsproxy</code> helper processes are declared to support postscreen DNSBL
+lookups.</p>
+<h3 id="relay-policy">Relay policy</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>permit_mynetworks → permit_sasl_authenticated → reject_unauth_destination
+</code></pre></div>
+<p><code>mynetworks</code> covers loopback, the private VLAN (<code>10.101.0.0/16</code>), and the hosted /29 and
+/64, meaning infrastructure hosts can relay without authentication.</p>
+<h3 id="inbound-tls">Inbound TLS</h3>
+<ul>
+<li>Security level: <code>may</code> (opportunistic; enforced for submission ports)</li>
+<li>Minimum protocol: TLSv1.2</li>
+<li>Session cache: <code>btree:/var/lib/postfix/data/smtpd_scache</code></li>
+<li><code>smtpd_tls_received_header = yes</code> — adds <code>Received:</code> trace with TLS info</li>
+</ul>
+<h3 id="outbound-tls-dane">Outbound TLS (DANE)</h3>
+<p>Outbound delivery uses <code>smtp_tls_security_level = dane</code> with
+<code>smtp_dns_support_level = dnssec</code>. For receiving servers that publish TLSA records, Postfix
+performs DANE-verified TLS; for those that don't, it falls back to opportunistic TLS.
+The DNSSEC-validating resolvers on mx-01 (Unbound on gw) are essential for this to work.</p>
+<h3 id="postscreen">Postscreen</h3>
+<p>Postscreen pre-screens inbound SMTP connections before they consume smtpd resources:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Action</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DNSBL threshold ≥ 2</td>
+<td>enforce</td>
+<td><code>zen.spamhaus.org*2</code>, <code>dnsbl.dronebl.org*2</code>, <code>bl.spamcop.net*1</code></td>
+</tr>
+<tr>
+<td>Bare newline</td>
+<td>enforce</td>
+<td>Guards against request smuggling</td>
+</tr>
+<tr>
+<td>Greeting banner timing</td>
+<td>enforce</td>
+<td>Rejects clients that pipeline before banner</td>
+</tr>
+<tr>
+<td>Blacklist action</td>
+<td>drop</td>
+<td>Silent drop for blacklisted IPs</td>
+</tr>
+<tr>
+<td><code>permit_mynetworks</code></td>
+<td>pass</td>
+<td>Skips all postscreen checks for trusted networks</td>
+</tr>
+</tbody>
+</table>
+<p>Passed connections are cached in <code>btree:/var/lib/postfix/data/postscreen_cache</code>.</p>
+<h3 id="helo-sender-and-recipient-restrictions">HELO, sender, and recipient restrictions</h3>
+<p><strong>HELO restrictions</strong> (in order):</p>
+<ol>
+<li><code>permit_mynetworks</code></li>
+<li><code>reject_non_fqdn_helo_hostname</code></li>
+<li><code>reject_invalid_helo_hostname</code></li>
+<li><code>reject_rhsbl_helo dbl.spamhaus.org</code></li>
+<li><code>permit</code></li>
+</ol>
+<p><strong>Sender restrictions</strong> (in order):</p>
+<ol>
+<li><code>permit_mynetworks</code>, <code>permit_sasl_authenticated</code></li>
+<li><code>reject_non_fqdn_sender</code>, <code>reject_unknown_sender_domain</code></li>
+<li><code>reject_rhsbl_sender dbl.spamhaus.org</code></li>
+<li><code>permit</code></li>
+</ol>
+<p><strong>Recipient restrictions</strong> (in order):</p>
+<ol>
+<li><code>reject_invalid_hostname</code>, <code>reject_unknown_recipient_domain</code></li>
+<li><code>reject_unauth_pipelining</code>, <code>reject_multi_recipient_bounce</code></li>
+<li><code>permit_mynetworks</code></li>
+<li><code>reject_non_fqdn_recipient</code>, <code>reject_unauth_destination</code></li>
+<li>RBL checks: <code>dnsbl.dronebl.org</code>, <code>zen.spamhaus.org</code>, <code>bl.spamcop.net</code>, <code>b.barracudacentral.org</code>, <code>dnsbl-1.uceprotect.net</code></li>
+<li><code>check_policy_service unix:private/policyd-spf</code> (SPF)</li>
+<li><code>permit</code></li>
+</ol>
+<h3 id="cve-2023-51764-smtp-request-smuggling">CVE-2023-51764 (SMTP request smuggling)</h3>
+<p><code>smtpd_forbid_bare_newline = yes</code> is set globally. <code>mynetworks</code> hosts are exempted via
+<code>smtpd_forbid_bare_newline_exclusions</code>.</p>
+<h3 id="rate-limiting">Rate limiting</h3>
+<p>Per-client limits measured over a 60-second window:</p>
+<table>
+<thead>
+<tr>
+<th>Limit</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection rate</td>
+<td>10/min</td>
+</tr>
+<tr>
+<td>Message rate</td>
+<td>100/min</td>
+</tr>
+<tr>
+<td>Recipient rate</td>
+<td>100/min</td>
+</tr>
+<tr>
+<td>Auth attempt rate</td>
+<td>10/min</td>
+</tr>
+</tbody>
+</table>
+<h3 id="bounce-error-handling">Bounce / error handling</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bounce_queue_lifetime</code></td>
+<td>1d</td>
+<td>Short bounce window reduces backscatter risk</td>
+</tr>
+<tr>
+<td><code>smtpd_soft_error_limit</code></td>
+<td>3</td>
+<td>Delay after 3 soft errors</td>
+</tr>
+<tr>
+<td><code>smtpd_hard_error_limit</code></td>
+<td>10</td>
+<td>Drop after 10 hard errors</td>
+</tr>
+<tr>
+<td><code>smtpd_error_sleep_time</code></td>
+<td>1s</td>
+<td>Slow-down delay per error</td>
+</tr>
+</tbody>
+</table>
+<h3 id="milters">Milters</h3>
+<p>Two milters are applied to both <code>smtpd_milters</code> and <code>non_smtpd_milters</code>:</p>
+<ol>
+<li><strong>OpenDKIM</strong> — DKIM signing (outbound) and verification (inbound)</li>
+<li><strong>OpenDMARC</strong> — DMARC policy enforcement</li>
+</ol>
+<p><code>milter_macro_daemon_name = ORIGINATING</code> is set on submission ports so milters can
+distinguish outbound authenticated mail from inbound.</p>
+<p><code>milter_default_action = accept</code> means a milter failure does not block delivery.</p>
+<h3 id="aliases">Aliases</h3>
+<p>Local system aliases:</p>
+<table>
+<thead>
+<tr>
+<th>Alias</th>
+<th>Destination</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>root</code></td>
+<td><code>root-mail@m.tensixtyone.com</code></td>
+</tr>
+<tr>
+<td><code>inbox</code></td>
+<td><code>paperless</code>, <code>household@williams.id</code></td>
+</tr>
+<tr>
+<td><code>nikdoof</code></td>
+<td><code>andy@williams.id</code></td>
+</tr>
+<tr>
+<td><code>salkunh</code></td>
+<td><code>jo@williams.id</code></td>
+</tr>
+</tbody>
+</table>
+<p>Virtual aliases forward <code>root@</code> for internal subdomains to <code>root-mail@m.tensixtyone.com</code>.</p>
+<h2 id="spf-policyd-spf">SPF — policyd-spf</h2>
+<p>SPF checking is performed by <code>python-policyd-spf</code>, spawned as a Postfix policy service on
+<code>unix:private/policyd-spf</code>. Policy:</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HELO: SPF not pass</td>
+<td>Reject</td>
+</tr>
+<tr>
+<td>Mail From: SPF fail (hard)</td>
+<td>Reject</td>
+</tr>
+<tr>
+<td>SPF PermError</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>SPF TempError</td>
+<td>Defer</td>
+</tr>
+</tbody>
+</table>
+<p>Softfails are logged but not rejected.</p>
+<h2 id="dkim-opendkim">DKIM — OpenDKIM</h2>
+<p>OpenDKIM runs in <code>sv</code> mode (sign outbound + verify inbound). Configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Key path</td>
+<td><code>/persist/opendkim/keys</code></td>
+</tr>
+<tr>
+<td>Selector</td>
+<td>SHA1 hash of <code>mx-01.doofnet.uk</code> (deterministic)</td>
+</tr>
+<tr>
+<td>Domains</td>
+<td><code>doofnet.uk,dimension.sh</code></td>
+</tr>
+<tr>
+<td>InternalHosts</td>
+<td>Same as <code>mynetworks</code></td>
+</tr>
+</tbody>
+</table>
+<p>Keys are stored on the <code>/persist</code> virtiofs share so they survive NixOS rebuilds. The DKIM
+public key for the generated selector needs to be published as a DNS TXT record at
+<code>&lt;selector&gt;._domainkey.&lt;domain&gt;</code> for each virtual domain.</p>
+<h2 id="dmarc-opendmarc-modulesdoofnetopendmarc">DMARC — OpenDMARC (<code>modules/doofnet/opendmarc/</code>)</h2>
+<p>OpenDMARC is implemented as a custom NixOS module (<code>doofnet.opendmarc</code>) since there is no
+upstream NixOS module. It manages the <code>opendmarc</code> systemd service, user/group creation, and
+config file generation.</p>
+<p>Current settings on mx-01:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AuthservID</code></td>
+<td><code>mx-01.doofnet.uk</code></td>
+<td>Identity added to Authentication-Results</td>
+</tr>
+<tr>
+<td><code>TrustedAuthservIDs</code></td>
+<td><code>mx-01.doofnet.uk</code></td>
+<td>Only trust results from self</td>
+</tr>
+<tr>
+<td><code>RejectFailures</code></td>
+<td><code>false</code></td>
+<td><strong>Monitoring mode</strong> — logs but does not reject</td>
+</tr>
+<tr>
+<td><code>IgnoreAuthenticatedClients</code></td>
+<td><code>true</code></td>
+<td>Skip DMARC checks on authenticated submissions</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>RejectFailures = false</code> setting means mx-01 is currently in DMARC <strong>monitoring mode</strong>.
+When SPF and DKIM are confirmed working correctly it should be set to <code>true</code>.</p>
+<p>The module runs OpenDMARC as the <code>postfix</code> user/group (shared with the Postfix process) so
+the milter socket is accessible.</p>
+<h2 id="dovecot">Dovecot</h2>
+<p>Dovecot provides IMAP access and LMTP delivery for Postfix. POP3 is disabled. PAM
+authentication is disabled.</p>
+<h3 id="virtual-users">Virtual users</h3>
+<p>All mailboxes are virtual users authenticated against an <code>passwd-file</code> stored in an
+age-encrypted secret (<code>secrets/mx01DovecotPasswd.age</code>). Usernames are normalised to
+lowercase full email addresses (<code>auth_username_format = %Lu</code>).</p>
+<p>Mail is stored under:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/persist/vmail/&lt;domain&gt;/&lt;user&gt;/Maildir/
+</code></pre></div></p>
+<p>The <code>vmail</code> system user owns all mailbox files. On service start, an <code>ExecStartPre</code> step
+<code>chown</code>s the entire mail store to <code>vmail:vmail</code>.</p>
+<h3 id="mailboxes">Mailboxes</h3>
+<p>The following IMAP special-use folders are auto-created for all users:</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>RFC role</th>
+<th>Auto-expunge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All</td>
+<td><code>\All</code></td>
+<td>Never</td>
+</tr>
+<tr>
+<td>Archive</td>
+<td><code>\Archive</code></td>
+<td>Never</td>
+</tr>
+<tr>
+<td>Drafts</td>
+<td><code>\Drafts</code></td>
+<td>Never</td>
+</tr>
+<tr>
+<td>Flagged</td>
+<td><code>\Flagged</code></td>
+<td>Never</td>
+</tr>
+<tr>
+<td>Junk</td>
+<td><code>\Junk</code></td>
+<td>60 days</td>
+</tr>
+<tr>
+<td>Sent</td>
+<td><code>\Sent</code></td>
+<td>Never</td>
+</tr>
+<tr>
+<td>Trash</td>
+<td><code>\Trash</code></td>
+<td>60 days</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lmtp-socket">LMTP socket</h3>
+<p>Dovecot exposes an LMTP listener at <code>/var/spool/postfix/dovecot-lmtp</code> (inside the Postfix
+chroot), owned <code>postfix:postfix</code>. Postfix delivers via <code>lmtp:unix:/var/spool/postfix/dovecot-lmtp</code>.</p>
+<h3 id="authentication-socket">Authentication socket</h3>
+<p>The SASL auth socket is at <code>/var/spool/postfix/auth</code>, owned <code>postfix:postfix</code>. Postfix uses
+this for both submission port SASL and inbound smtpd SASL.</p>
+<h3 id="tls">TLS</h3>
+<p>Minimum TLS version: TLSv1.2. Server cipher preference is enabled.</p>
+<h3 id="metrics-endpoint">Metrics endpoint</h3>
+<p>Dovecot exposes an HTTP stats endpoint on port 9166 (<code>service stats</code>). The following
+metrics are collected:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Filter</th>
+<th>Grouped by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth_success</code></td>
+<td>auth_request_finished, success=yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>imap_command</code></td>
+<td>imap_command_finished</td>
+<td>cmd_name, tagged_reply_state</td>
+</tr>
+<tr>
+<td><code>smtp_command</code></td>
+<td>smtp_server_command_finished</td>
+<td>cmd_name, status_code, duration histogram</td>
+</tr>
+<tr>
+<td><code>mail_delivery</code></td>
+<td>mail_delivery_finished</td>
+<td>duration histogram</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fail2ban">Fail2ban</h2>
+<p>The <code>dovecot</code> jail is enabled via <code>doofnet.fail2ban.jails.dovecot = true</code>, banning IPs that
+exceed failed IMAP authentication thresholds.</p>
+<h2 id="persistence">Persistence</h2>
+<p>mx-01 uses the standard microVM <code>/persist</code> virtiofs share for state that must survive
+rebuilds:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/persist/vmail/</code></td>
+<td>All user mailboxes (Maildir)</td>
+</tr>
+<tr>
+<td><code>/persist/opendkim/keys/</code></td>
+<td>DKIM private keys</td>
+</tr>
+<tr>
+<td><code>/persist/ssh_host_*</code></td>
+<td>SSH host keys (standard microVM)</td>
+</tr>
+<tr>
+<td><code>/persist/acme/</code></td>
+<td>ACME certificates</td>
+</tr>
+</tbody>
+</table>
+<h2 id="observability">Observability</h2>
+<p>Three exporters run locally and are scraped by Alloy:</p>
+<table>
+<thead>
+<tr>
+<th>Exporter</th>
+<th>Port</th>
+<th>Job</th>
+<th>Metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prometheus-postfix-exporter</code></td>
+<td>9154</td>
+<td><code>postfix</code></td>
+<td>Queue lengths, delivery rates, error counts (systemd journal)</td>
+</tr>
+<tr>
+<td>Dovecot stats HTTP</td>
+<td>9166</td>
+<td><code>dovecot</code></td>
+<td>Auth, IMAP command, SMTP command, delivery metrics</td>
+</tr>
+<tr>
+<td><code>prometheus-dmarc-exporter</code></td>
+<td>auto</td>
+<td><code>dmarc</code></td>
+<td>DMARC report pass/fail counts (reads IMAP mailbox <code>dmarc-reports@doofnet.uk</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>The DMARC exporter connects to Dovecot via IMAP using credentials loaded as a systemd
+credential file (compatible with <code>DynamicUser</code>), reading aggregate DMARC reports delivered
+to the <code>dmarc-reports@doofnet.uk</code> mailbox.</p>
+<h2 id="dns-records-required">DNS records required</h2>
+<p>The following DNS records must be published for correct mail operation:</p>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>Name</th>
+<th>Type</th>
+<th>Value / Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>doofnet.uk</code></td>
+<td><code>@</code></td>
+<td>MX</td>
+<td><code>mx-01.doofnet.uk</code></td>
+</tr>
+<tr>
+<td><code>dimension.sh</code></td>
+<td><code>@</code></td>
+<td>MX</td>
+<td><code>mx-01.doofnet.uk</code></td>
+</tr>
+<tr>
+<td><code>doofnet.uk</code></td>
+<td><code>@</code></td>
+<td>TXT</td>
+<td>SPF record (<code>v=spf1 mx ~all</code> or similar)</td>
+</tr>
+<tr>
+<td><code>dimension.sh</code></td>
+<td><code>@</code></td>
+<td>TXT</td>
+<td>SPF record</td>
+</tr>
+<tr>
+<td><code>doofnet.uk</code></td>
+<td><code>&lt;selector&gt;._domainkey</code></td>
+<td>TXT</td>
+<td>DKIM public key (selector = SHA1 of <code>mx-01.doofnet.uk</code>)</td>
+</tr>
+<tr>
+<td><code>dimension.sh</code></td>
+<td><code>&lt;selector&gt;._domainkey</code></td>
+<td>TXT</td>
+<td>DKIM public key</td>
+</tr>
+<tr>
+<td><code>doofnet.uk</code></td>
+<td><code>_dmarc</code></td>
+<td>TXT</td>
+<td><code>v=DMARC1; p=none; rua=mailto:dmarc-reports@doofnet.uk</code> (monitoring mode)</td>
+</tr>
+<tr>
+<td><code>dimension.sh</code></td>
+<td><code>_dmarc</code></td>
+<td>TXT</td>
+<td>DMARC policy</td>
+</tr>
+<tr>
+<td>Reverse</td>
+<td><code>11</code> in <code>8-15.25.169.217.in-addr.arpa</code></td>
+<td>PTR</td>
+<td><code>mx-01.doofnet.uk.</code></td>
+</tr>
+</tbody>
+</table>
+<p>The DKIM selector is derived at build time as the SHA1 hash of the string <code>mx-01.doofnet.uk</code>
+and is therefore stable as long as the hostname does not change.</p>
+<h2 id="service-summary">Service summary</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Package</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>postfix</td>
+<td>postfix</td>
+<td>MTA — inbound (postscreen + smtpd) and outbound SMTP</td>
+</tr>
+<tr>
+<td>dovecot2</td>
+<td>dovecot</td>
+<td>IMAP server and LMTP delivery agent</td>
+</tr>
+<tr>
+<td>opendkim</td>
+<td>opendkim</td>
+<td>DKIM signing (outbound) and verification (inbound)</td>
+</tr>
+<tr>
+<td>opendmarc</td>
+<td>opendmarc</td>
+<td>DMARC policy enforcement milter</td>
+</tr>
+<tr>
+<td>policyd-spf</td>
+<td>spf-engine</td>
+<td>SPF policy check (spawned by Postfix)</td>
+</tr>
+<tr>
+<td>prometheus-postfix-exporter</td>
+<td>prometheus-postfix-exporter</td>
+<td>Postfix queue and delivery metrics</td>
+</tr>
+<tr>
+<td>prometheus-dmarc-exporter</td>
+<td>prometheus-dmarc-exporter</td>
+<td>DMARC aggregate report metrics via IMAP</td>
+</tr>
+<tr>
+<td>alloy</td>
+<td>grafana-alloy</td>
+<td>Metrics and log shipping</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1747 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Andrew Williams">
+      
+      
+        <link rel="canonical" href="https://nikdoof.github.io/nixos-homeprod/dns/">
+      
+      
+        <link rel="prev" href="../hyp-01/">
+      
+      
+        <link rel="next" href="../mx-01/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ns-01 / ns-02 — DNS - NixOS Homeprod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="blue-grey">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dns-servers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="NixOS Homeprod" class="md-header__button md-logo" aria-label="NixOS Homeprod" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NixOS Homeprod
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ns-01 / ns-02 — DNS
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nikdoof/nixos-homeprod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nikdoof/nixos-homeprod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="NixOS Homeprod" class="md-nav__button md-logo" aria-label="NixOS Homeprod" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    NixOS Homeprod
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nikdoof/nixos-homeprod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nikdoof/nixos-homeprod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Infrastructure
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Infrastructure
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../base_host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Base Host Standards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gw/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gw — Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hyp-01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hyp-01 — Hypervisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ns-01 / ns-02 — DNS
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ns-01 / ns-02 — DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-doofnetbind-modulesdoofnetbind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module: doofnet.bind (modules/doofnet/bind/)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Module: doofnet.bind (modules/doofnet/bind/)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#zone-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zone rendering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zone-transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zone transfer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ddns-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDNS updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-over-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS-over-TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recursion-and-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recursion and caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate limiting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-policy-zone-rpz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response Policy Zone (RPZ)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Zones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#forward-zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward zones
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reverse-zones-ipv4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reverse zones (IPv4)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reverse-zones-ipv6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reverse zones (IPv6)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-records-in-intdoofnetuk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static records in int.doofnet.uk
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a new zone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-static-record-to-intdoofnetuk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a static record to int.doofnet.uk
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mx-01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mx-01 — Mail Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../macos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    macOS Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raspberry_pi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Raspberry Pi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-doofnetbind-modulesdoofnetbind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module: doofnet.bind (modules/doofnet/bind/)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Module: doofnet.bind (modules/doofnet/bind/)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#zone-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zone rendering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zone-transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zone transfer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ddns-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDNS updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-over-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS-over-TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recursion-and-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recursion and caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rate limiting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-policy-zone-rpz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response Policy Zone (RPZ)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Zones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#forward-zones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward zones
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reverse-zones-ipv4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reverse zones (IPv4)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reverse-zones-ipv6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reverse zones (IPv6)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-records-in-intdoofnetuk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static records in int.doofnet.uk
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a new zone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-static-record-to-intdoofnetuk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a static record to int.doofnet.uk
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="dns-servers">DNS Servers</h1>
+<p>The homelab runs four BIND9 DNS servers configured via a shared <code>doofnet.bind</code> NixOS module:
+two internal servers (ns-01, ns-02) that serve all zones and act as recursive resolvers, and
+two public AWS secondaries (ns-03, ns-04) that serve only externally-delegated zones.</p>
+<table>
+<thead>
+<tr>
+<th>Host</th>
+<th>Role</th>
+<th>Platform</th>
+<th>Address (IPv4)</th>
+<th>Address (IPv6)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ns-01</td>
+<td>Primary</td>
+<td>Raspberry Pi 3, aarch64</td>
+<td>10.101.1.2</td>
+<td>2001:8b0:bd9:101::2</td>
+</tr>
+<tr>
+<td>ns-02</td>
+<td>Secondary</td>
+<td>microVM on hyp-01 (VLAN 101)</td>
+<td>10.101.1.3</td>
+<td>2001:8b0:bd9:101::3</td>
+</tr>
+<tr>
+<td>ns-03</td>
+<td>Public secondary</td>
+<td>AWS EC2, eu-west-1 (x86_64)</td>
+<td>52.19.64.4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>ns-04</td>
+<td>Public secondary</td>
+<td>AWS EC2, eu-west-2 (x86_64)</td>
+<td>16.60.149.205</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>ns-01 and ns-02 also carry a ULA address on the private VLAN:</p>
+<ul>
+<li>ns-01: <code>fddd:d00f:dab0:101::2</code></li>
+<li>ns-02: <code>fddd:d00f:dab0:101::3</code></li>
+</ul>
+<h2 id="architecture">Architecture</h2>
+<p>All four servers run the same BIND configuration, toggled between <strong>primary</strong> and <strong>secondary</strong>
+mode by a single option. The primary holds the authoritative copy of every zone; secondaries
+receive zone transfers from the primary.</p>
+<p><strong>ns-01</strong> is deployed as a Raspberry Pi 3 SD card image. Because it is aarch64, the
+<code>nix-community.cachix.org</code> binary cache is configured to pull pre-built binaries during
+cross-compiled deployments from an x86_64 builder.</p>
+<p><strong>ns-02</strong> is a NixOS microVM (CID 13) running on hyp-01. It serves all zones and acts as a
+hot standby internal resolver. See <code>docs/hyp-01.md</code> for details on the microVM platform.</p>
+<p><strong>ns-03 and ns-04</strong> are AWS EC2 instances (eu-west-1 and eu-west-2 respectively) running in
+secondary mode with <code>publicOnly = true</code>. They only serve zones whose NS records include
+<code>ns-03.doofnet.uk.</code> or <code>ns-04.doofnet.uk.</code>, providing public authoritative DNS with geographic
+redundancy. They do not act as recursive resolvers. Because they cannot reach the internal
+primary directly, zone transfers use the gateway's public NAT IP (<code>81.187.48.147 → 10.101.1.2</code>).</p>
+<h2 id="module-doofnetbind-modulesdoofnetbind">Module: <code>doofnet.bind</code> (<code>modules/doofnet/bind/</code>)</h2>
+<p>Enabling the module on a host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>doofnet<span class="o">.</span><span class="ss">bind</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  <span class="ss">enable</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  <span class="ss">mode</span> <span class="o">=</span> <span class="s2">&quot;primary&quot;</span><span class="p">;</span>   <span class="c1"># or &quot;secondary&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">};</span>
+</code></pre></div>
+<p>For public-facing secondaries that cannot reach the primary on its internal address:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>doofnet<span class="o">.</span><span class="ss">bind</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  <span class="ss">enable</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  <span class="ss">mode</span> <span class="o">=</span> <span class="s2">&quot;secondary&quot;</span><span class="p">;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  <span class="ss">publicOnly</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>   <span class="c1"># serve only externally-delegated zones</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  <span class="ss">masters</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;81.187.48.147&quot;</span> <span class="p">];</span>  <span class="c1"># gateway&#39;s public NAT IP → 10.101.1.2</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">};</span>
+</code></pre></div>
+<p><code>publicOnly</code> filters the active zone list to only those zones whose NS records contain
+<code>ns-03.doofnet.uk.</code> or <code>ns-04.doofnet.uk.</code>. <code>masters</code> overrides the default internal
+primary addresses for hosts that reach ns-01 via NAT.</p>
+<h3 id="zone-rendering">Zone rendering</h3>
+<p>Zones are written as Nix expressions using the <a href="https://github.com/nix-community/dns"><code>dns</code></a>
+flake library. Every <code>.nix</code> file in <code>modules/doofnet/bind/zones/</code> (except <code>default.nix</code> and
+<code>lib.nix</code>) is automatically loaded as a zone, with the filename (minus <code>.nix</code>) used as the
+zone name. Each zone file receives <code>dns</code> (the upstream library) and <code>zlib</code> (local helpers
+exporting <code>mkSOA</code>, <code>internalNS</code>, <code>publicNS</code>).</p>
+<p>Each zone declares:</p>
+<ul>
+<li><code>zoneData</code> — DNS records, in <code>dns.lib</code>'s data model.</li>
+<li><code>dynamic</code> <em>(optional)</em> — DDNS configuration, structured as Nix data:</li>
+<li><code>dynamic.enable = false</code> <em>(default)</em> — static zone, no DDNS.</li>
+<li><code>dynamic.enable = true; dynamic.protect = [];</code> — blanket <code>allow-update</code> for the
+    DDNS TSIG key.</li>
+<li><code>dynamic.enable = true; dynamic.protect = [ "name1" "name2" … ];</code> — <code>update-policy</code>
+    that <strong>denies</strong> updates to the listed names (relative to the zone) and <strong>grants</strong>
+    everything else as <code>zonesub</code>. Used to shield statically-defined records from DHCP
+    overwrites.</li>
+</ul>
+<p>The module derives whether a zone is publicly delegated by checking its NS list against
+the known public secondary hostnames (<code>ns-03.doofnet.uk.</code>, <code>ns-04.doofnet.uk.</code>); public
+zones are transferred to ns-03/ns-04, all others stay on ns-02.</p>
+<p>Static zones are written to the Nix store at build time and BIND reads them directly.
+Dynamic zones (<code>dynamic.enable = true</code>) need a writable file so BIND can journal updates;
+the file is copied to <code>/var/lib/bind/zones/&lt;name&gt;.zone</code>. A <code>bind-update-zones</code> systemd
+service ordered before <code>bind.service</code> detects SOA serial changes between Nix rebuilds and
+merges the new static records with the dynamic DDNS records preserved from the on-disk
+zone file (backing up the old one and discarding the now-stale <code>.jnl</code> journal).</p>
+<h3 id="zone-transfer">Zone transfer</h3>
+<p>Primary sends transfers to:
+- <code>10.101.1.3</code> / <code>2001:8b0:bd9:101::3</code> (ns-02) — all zones
+- <code>52.19.64.4</code> (ns-03) and <code>16.60.149.205</code> (ns-04) — public zones only (those with ns-03/04 in NS records)</p>
+<p>Zone transfers are denied by default (<code>allow-transfer { none; }</code>); each zone's
+<code>slaves</code> list (derived by the module) provides the per-zone exception.</p>
+<h3 id="ddns-updates">DDNS updates</h3>
+<p>Dynamic DNS updates arrive from <code>kea-dhcp-ddns</code> on the gateway using TSIG key
+<code>doofnet-dhcp-updates</code> (HMAC-SHA256). The key is stored in an age-encrypted secret and
+included at runtime via BIND's <code>include</code> directive — it is never written to the Nix store.</p>
+<p>An <code>acl "doofnet-dhcp-updates"</code> block matches requests that present a valid TSIG signature.
+The module turns the zone's <code>dynamic</code> attribute into BIND's <code>allow-update</code> (open) or
+<code>update-policy</code> (with a <code>protect</code> list) directive — see <em>Zone rendering</em> above.</p>
+<h3 id="dns-over-tls">DNS-over-TLS</h3>
+<p>BIND listens on port 853 (TCP) with TLS on all interfaces. The certificate is obtained
+via ACME DNS-01 challenge using the DigitalOcean API (the domain's public NS is managed
+there). ACME renewal triggers a BIND service reload. The TLS configuration is defined in
+BIND's <code>tls local-tls</code> block referencing the certificate at:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/var/lib/acme/&lt;hostname&gt;.int.doofnet.uk/{fullchain,key}.pem
+</code></pre></div>
+<h3 id="recursion-and-caching">Recursion and caching</h3>
+<p>ns-01 and ns-02 act as recursive resolvers for internal clients (ns-03/04 do not). Recursion is permitted for:</p>
+<ul>
+<li><code>127.0.0.0/8</code> and <code>::1</code> (loopback)</li>
+<li>All internal networks (defined in <code>modules/doofnet/const.nix</code> as <code>allNetworks</code>)</li>
+</ul>
+<p>External clients receive <code>REFUSED</code>. Notable resolver settings:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dnssec-validation</code></td>
+<td><code>auto</code></td>
+<td>Validates DNSSEC; uses built-in trust anchors</td>
+</tr>
+<tr>
+<td><code>qname-minimisation</code></td>
+<td><code>strict</code></td>
+<td>Sends only the minimum labels needed per delegation step</td>
+</tr>
+<tr>
+<td><code>minimal-responses</code></td>
+<td><code>yes</code></td>
+<td>Omits unnecessary additional section records</td>
+</tr>
+<tr>
+<td><code>max-cache-size</code></td>
+<td>256 MiB</td>
+<td>Caps memory used by the answer cache</td>
+</tr>
+<tr>
+<td><code>max-cache-ttl</code></td>
+<td>86400 s</td>
+<td>Caps positive cache entries at 24 h</td>
+</tr>
+<tr>
+<td><code>max-ncache-ttl</code></td>
+<td>3600 s</td>
+<td>Caps negative cache entries at 1 h</td>
+</tr>
+<tr>
+<td><code>prefetch</code></td>
+<td>2 9</td>
+<td>Prefetches cache entries with ≤2 s left if queried ≥9×</td>
+</tr>
+<tr>
+<td><code>stale-answer-enable</code></td>
+<td>yes</td>
+<td>Serves stale answers during upstream outages</td>
+</tr>
+<tr>
+<td><code>stale-answer-ttl</code></td>
+<td>30 s</td>
+<td>Stale entries served for up to 30 s while refreshing</td>
+</tr>
+</tbody>
+</table>
+<p>Forwarders are explicitly empty — servers resolve iteratively from the root.</p>
+<h3 id="rate-limiting">Rate limiting</h3>
+<p>Responses are rate-limited to 10 per second per client, with a 5-second window. All
+internal networks are exempt, so rate limiting only applies to external clients (and is
+primarily a defence against amplification attacks).</p>
+<h3 id="response-policy-zone-rpz">Response Policy Zone (RPZ)</h3>
+<p>A local <code>rpz</code> zone provides DNS-level overrides enforced with <code>break-dnssec yes</code>. Current
+overrides:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Resolves to</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>svc-prod-ingress-external.doofnet.uk</code></td>
+<td>10.101.3.20</td>
+<td>Redirect internal clients to local ingress</td>
+</tr>
+<tr>
+<td><code>tester.mfg.cobaltmicro.com</code></td>
+<td>10.101.3.104</td>
+<td>Local override for third-party hostname</td>
+</tr>
+</tbody>
+</table>
+<p>The RPZ zone is served by both primary and secondary. To block a domain, add it with
+<code>CNAME = [ "." ]</code>; to pass it through the policy, use <code>CNAME = [ "rpz-passthru." ]</code>.</p>
+<h3 id="logging">Logging</h3>
+<p>BIND logs to two files under <code>/var/log/named/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Categories</th>
+<th>Retention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>security.log</code></td>
+<td>default, security, dnssec, query-errors, xfer-in/out, notify</td>
+<td>3 files × 20 MiB</td>
+</tr>
+<tr>
+<td><code>queries.log</code></td>
+<td>queries</td>
+<td>5 files × 100 MiB</td>
+</tr>
+</tbody>
+</table>
+<p>Noisy low-signal categories (<code>lame-servers</code>, <code>edns-disabled</code>, <code>rpz</code>) are sent to a null
+channel.</p>
+<p>Both log files are tailed by Grafana Alloy and shipped to Loki. The Alloy pipeline parses
+each format:</p>
+<ul>
+<li><strong>Query log</strong>: extracts <code>client_ip</code>, <code>client_port</code>, <code>qname</code>, <code>qtype</code>, <code>qclass</code>, <code>flags</code>
+  and stores them as structured metadata. <code>qtype</code> and <code>qclass</code> become Loki stream labels.</li>
+<li><strong>Security log</strong>: extracts <code>category</code> and <code>severity</code> as stream labels.</li>
+</ul>
+<p>Alloy's supplementary group membership (<code>named</code>) grants read access to the log directory
+without widening file permissions.</p>
+<h3 id="monitoring">Monitoring</h3>
+<p>A <code>prometheus-bind-exporter</code> instance runs on <code>127.0.0.1:9119</code>, scraping BIND's statistics
+channel at <code>127.0.0.1:8053</code>. The exporter is not exposed externally; Alloy scrapes it
+locally and ships metrics to Prometheus.</p>
+<h2 id="deployment">Deployment</h2>
+<p>Use <code>scripts/update-ns.sh</code> to deploy DNS servers in the correct order (primary first, then
+public secondaries). The script SSHes to <code>svc-02</code> and runs <code>nixos-rebuild switch</code> there
+against the published GitHub flake, so <strong>changes must be pushed before running</strong>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Deploy all servers (ns-01, ns-03, ns-04) in order</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>./scripts/update-ns.sh
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Deploy specific servers only</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>./scripts/update-ns.sh<span class="w"> </span>ns-01
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>./scripts/update-ns.sh<span class="w"> </span>ns-03<span class="w"> </span>ns-04
+</code></pre></div>
+<p>Environment variables to override defaults:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BUILD_HOST</code></td>
+<td><code>svc-02.int.doofnet.uk</code></td>
+<td>Host that runs <code>nixos-rebuild</code></td>
+</tr>
+<tr>
+<td><code>FLAKE</code></td>
+<td><code>github:nikdoof/nixos-homeprod</code></td>
+<td>Flake reference to deploy from</td>
+</tr>
+</tbody>
+</table>
+<p>The script resolves each host to its FQDN for <code>--target-host</code> (ns-01/02 use
+<code>.int.doofnet.uk</code>; ns-03/04 use <code>.doofnet.uk</code>) while using the short name as the flake
+config key.</p>
+<h2 id="zones">Zones</h2>
+<h3 id="forward-zones">Forward zones</h3>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>NS</th>
+<th>Dynamic</th>
+<th>DDNS</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int.doofnet.uk</code></td>
+<td>ns-01, ns-02</td>
+<td>yes</td>
+<td>policy</td>
+<td>Protected static records + open DDNS for clients</td>
+</tr>
+<tr>
+<td><code>pub.doofnet.uk</code></td>
+<td>ns-01, ns-02</td>
+<td>yes</td>
+<td>yes</td>
+<td>Public VLAN clients</td>
+</tr>
+<tr>
+<td><code>lab.doofnet.uk</code></td>
+<td>ns-01, ns-02</td>
+<td>yes</td>
+<td>yes</td>
+<td>Lab VLAN clients</td>
+</tr>
+<tr>
+<td><code>ha.doofnet.uk</code></td>
+<td>ns-01, ns-02</td>
+<td>yes</td>
+<td>yes</td>
+<td>Home automation VLAN clients</td>
+</tr>
+<tr>
+<td><code>svc.doofnet.uk</code></td>
+<td>ns-01, ns-02</td>
+<td>no</td>
+<td>—</td>
+<td>Service endpoints; wildcard <code>*.svc.doofnet.uk → 10.101.3.20</code></td>
+</tr>
+<tr>
+<td><code>service.arpa</code></td>
+<td>ns-01, ns-02</td>
+<td>no</td>
+<td>—</td>
+<td>Special-use (RFC 6761) local resolution</td>
+</tr>
+<tr>
+<td><code>rpz</code></td>
+<td>ns-01, ns-02</td>
+<td>no</td>
+<td>—</td>
+<td>Response Policy Zone</td>
+</tr>
+</tbody>
+</table>
+<p><code>svc.doofnet.uk</code> has a 300-second TTL (shorter than the default 3600 s) and includes
+specific overrides for <code>grafana</code>, <code>unifi</code>, <code>loki</code>, and <code>prometheus</code> pointing to <code>10.101.3.21</code>.</p>
+<h3 id="reverse-zones-ipv4">Reverse zones (IPv4)</h3>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>Covers</th>
+<th>Also on ns-03/04</th>
+<th>DDNS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>101.10.in-addr.arpa</code></td>
+<td>VLAN 101 (private)</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>102.10.in-addr.arpa</code></td>
+<td>VLAN 102 (public)</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>104.10.in-addr.arpa</code></td>
+<td>VLAN 104 (lab)</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>105.10.in-addr.arpa</code></td>
+<td>VLAN 105 (HA)</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>8-15.25.169.217.in-addr.arpa</code></td>
+<td>Hosted /29</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>147.48.187.81.in-addr.arpa</code></td>
+<td>PPPoE WAN address</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h3 id="reverse-zones-ipv6">Reverse zones (IPv6)</h3>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>Covers</th>
+<th>Also on ns-03/04</th>
+<th>DDNS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1.0.1.0.9.d.b…ip6.arpa</code></td>
+<td>VLAN 101 <code>2001:8b0:bd9:101:</code></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>2.0.1.0.9.d.b…ip6.arpa</code></td>
+<td>VLAN 102 <code>2001:8b0:bd9:102:</code></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>4.0.1.0.9.d.b…ip6.arpa</code></td>
+<td>VLAN 104 <code>2001:8b0:bd9:104:</code></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>6.0.1.0.9.d.b…ip6.arpa</code></td>
+<td>VLAN 106 <code>2001:8b0:bd9:106:</code></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>0.b.a.d.f.0.0.d.d.d.d.f.ip6.arpa</code></td>
+<td>ULA <code>fddd:d00f:dab0::/48</code></td>
+<td>no</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h3 id="static-records-in-intdoofnetuk">Static records in <code>int.doofnet.uk</code></h3>
+<p>Key infrastructure records that are protected from DDNS overwrites:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>IPv4</th>
+<th>IPv6 (ULA)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gw</td>
+<td>10.101.1.1</td>
+<td>2001:8b0:bd9:101::1</td>
+</tr>
+<tr>
+<td>ns-01</td>
+<td>10.101.1.2</td>
+<td>2001:8b0:bd9:101::2</td>
+</tr>
+<tr>
+<td>ns-02</td>
+<td>10.101.1.3</td>
+<td>2001:8b0:bd9:101::3</td>
+</tr>
+<tr>
+<td>nas-01</td>
+<td>10.101.3.16</td>
+<td>fddd:d00f:dab0:101::16</td>
+</tr>
+<tr>
+<td>svc-01</td>
+<td>10.101.3.20</td>
+<td>fddd:d00f:dab0:101::20</td>
+</tr>
+<tr>
+<td>svc-02</td>
+<td>10.101.3.21</td>
+<td>fddd:d00f:dab0:101::21</td>
+</tr>
+<tr>
+<td>hyp-01</td>
+<td>10.101.3.22</td>
+<td>fddd:d00f:dab0:101::22</td>
+</tr>
+<tr>
+<td>gw-mgmt</td>
+<td>10.101.3.23</td>
+<td>fddd:d00f:dab0:101::3:23</td>
+</tr>
+<tr>
+<td>afp-01</td>
+<td>10.101.3.30</td>
+<td>fddd:d00f:dab0:101::3:30</td>
+</tr>
+<tr>
+<td>grf-01</td>
+<td>10.101.3.31</td>
+<td>fddd:d00f:dab0:101::3:31</td>
+</tr>
+</tbody>
+</table>
+<h2 id="adding-a-new-zone">Adding a new zone</h2>
+<ol>
+<li>Create <code>modules/doofnet/bind/zones/&lt;zone-name&gt;.nix</code>. Filename (minus <code>.nix</code>) is the
+   zone name. Take <code>{ dns, zlib, ... }</code> and use <code>zlib.mkSOA &lt;serial&gt;</code>, <code>zlib.internalNS</code>
+   (or <code>zlib.publicNS</code> for publicly delegated zones).</li>
+<li>Set the SOA <code>serial</code> to today's date in <code>YYYYMMDDnn</code> format.</li>
+<li>For DDNS, add <code>dynamic.enable = true;</code> (blanket allow) or
+   <code>dynamic = { enable = true; protect = [ ... ]; };</code> (update-policy with denied names).</li>
+<li>Rebuild and deploy ns-01; ns-02 (and ns-03/ns-04 if <code>publicNS</code>) pick up the new zone via
+   AXFR automatically.</li>
+</ol>
+<h2 id="adding-a-static-record-to-intdoofnetuk">Adding a static record to <code>int.doofnet.uk</code></h2>
+<ol>
+<li>Add the subdomain to <code>int.doofnet.uk.nix</code> under <code>subdomains</code>.</li>
+<li>Add the relative name to <code>dynamic.protect</code> to shield it from DDNS overwrites.</li>
+<li>Increment the SOA serial.</li>
+<li>Rebuild ns-01; on the next bind restart <code>bind-update-zones</code> detects the serial change
+   and merges the new static records with preserved DDNS state.</li>
+</ol>
+<h2 id="service-summary">Service summary</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Package</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>named (BIND9)</td>
+<td>bind</td>
+<td>Authoritative DNS + recursive resolver</td>
+</tr>
+<tr>
+<td>bind-update-zones</td>
+<td>(custom systemd oneshot)</td>
+<td>Merges Nix zone changes with live DDNS journals</td>
+</tr>
+<tr>
+<td>prometheus-bind-exporter</td>
+<td>prometheus-bind-exporter</td>
+<td>BIND statistics → Prometheus</td>
+</tr>
+<tr>
+<td>alloy</td>
+<td>grafana-alloy</td>
+<td>Metrics and log shipping</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
