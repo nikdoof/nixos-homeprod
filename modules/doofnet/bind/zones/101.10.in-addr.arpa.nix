@@ -1,24 +1,11 @@
 {
-  dns,
+  zlib,
   ...
 }:
-with dns.lib.combinators;
 {
   zoneData = {
-    SOA = {
-      nameServer = "ns-01.int.doofnet.uk.";
-      adminEmail = "hostmaster@doofnet.uk";
-      serial = 2026032801;
-      refresh = 3600;
-      retry = 900;
-      expire = 604800;
-      minimum = 300;
-    };
-    NS = [
-      "ns-01.int.doofnet.uk."
-      "ns-02.int.doofnet.uk."
-    ];
-
+    SOA = zlib.mkSOA 2026032801;
+    NS = zlib.internalNS;
     TTL = 3600;
 
     # Gateway
@@ -39,7 +26,5 @@ with dns.lib.combinators;
     # VMs
     subdomains."30.3".PTR = [ "afp-01.int.doofnet.uk." ];
   };
-  extraConfig = ''
-    allow-update { doofnet-dhcp-updates; };
-  '';
+  dynamic.enable = true;
 }

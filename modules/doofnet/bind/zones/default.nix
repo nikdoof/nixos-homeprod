@@ -1,20 +1,26 @@
 { dns }:
 let
-  # Get all .nix files in the current directory except default.nix
+  zlib = import ./lib.nix;
+
+  # Files in this directory that are not zones (loader + helper library).
+  nonZoneFiles = [
+    "default.nix"
+    "lib.nix"
+  ];
+
   zoneFiles = builtins.filter (
-    name: name != "default.nix" && (builtins.match ".*\\.nix" name) != null
+    name: !(builtins.elem name nonZoneFiles) && (builtins.match ".*\\.nix" name) != null
   ) (builtins.attrNames (builtins.readDir ./.));
 
   # Convert filename to zone name by removing the .nix extension
   filenameToZoneName = filename: builtins.substring 0 ((builtins.stringLength filename) - 4) filename;
 
-  # Import each zone file with the required arguments
   importZone =
     file:
     let
       zoneName = filenameToZoneName file;
       zoneConfig = import (./. + "/${file}") {
-        inherit dns;
+        inherit dns zlib;
       };
     in
     {
@@ -22,7 +28,6 @@ let
       value = zoneConfig;
     };
 
-  # Create an attribute set of all zones
   zones = builtins.listToAttrs (map importZone zoneFiles);
 in
 zones

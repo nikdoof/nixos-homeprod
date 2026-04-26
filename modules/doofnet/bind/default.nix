@@ -31,24 +31,52 @@ let
     "16.60.149.205" # ns-04 (eu-west-2)
   ];
 
+  # NS hostnames that mark a zone as publicly delegated.
+  publicNameservers = [
+    "ns-03.doofnet.uk."
+    "ns-04.doofnet.uk."
+  ];
+
+  # TSIG key name authorising DDNS updates from kea-dhcp-ddns.
+  # Must match the key declared in the included secret file.
+  ddnsKey = "doofnet-dhcp-updates";
+
   # Directory for mutable zone files
   zoneDir = "/var/lib/bind/zones";
 
-  # Helper functions
-  # A zone is dynamic if it accepts updates via either allow-update or update-policy;
-  # both require a writable (non-store) zone file so BIND can maintain a journal.
-  hasDynamicUpdates =
+  # A zone is dynamic if it declares dynamic.enable = true. Dynamic zones
+  # require a writable (non-store) zone file so BIND can maintain a journal.
+  hasDynamicUpdates = zone: zone.value.dynamic.enable or false;
+
+  # A zone is publicly delegated if any of its NS records names a known
+  # public secondary. Used to drive zone transfers and the publicOnly filter.
+  isPublicZone =
+    zone: builtins.any (ns: builtins.elem ns publicNameservers) (zone.value.zoneData.NS or [ ]);
+
+  getZoneSerial = zone: zone.value.zoneData.SOA.serial or 0;
+
+  # Render the per-zone BIND directives controlling DDNS for a zone.
+  # - dynamic.enable = false  -> "" (static zone)
+  # - dynamic.protect = []    -> blanket allow-update for the DDNS key
+  # - dynamic.protect = [...] -> update-policy denying named records and
+  #                              granting everything else as zonesub
+  mkDynamicConfig =
     zone:
     let
-      extra = zone.value.extraConfig or "";
+      dyn = zone.value.dynamic or { enable = false; };
+      protect = dyn.protect or [ ];
     in
-    builtins.match ".*allow-update.*" extra != null || builtins.match ".*update-policy.*" extra != null;
-  isPublicZone =
-    zone:
-    builtins.any (ns: builtins.match ".*ns-0[34]\\.doofnet\\.uk\\..*" ns != null) (
-      zone.value.zoneData.NS or [ ]
-    );
-  getZoneSerial = zone: zone.value.zoneData.SOA.serial or 0;
+    if !(dyn.enable or false) then
+      ""
+    else if protect == [ ] then
+      "allow-update { ${ddnsKey}; };"
+    else
+      ''
+        update-policy {
+        ${lib.concatMapStringsSep "\n" (n: "  deny ${ddnsKey} name ${n}.${zone.name}. ANY;") protect}
+          grant ${ddnsKey} zonesub ANY;
+        };
+      '';
 
   writeZoneFile =
     zone:
@@ -62,7 +90,7 @@ let
     master = true;
     file = if hasDynamicUpdates zone then "${zoneDir}/${zone.name}.zone" else writeZoneFile zone;
     slaves = secondaryServers ++ lib.optionals (isPublicZone zone) publicSecondaryServers;
-    extraConfig = zone.value.extraConfig or "";
+    extraConfig = mkDynamicConfig zone;
   };
 
   mkSecondaryZone = zone: {
@@ -103,7 +131,12 @@ let
       };
     };
 
-  # Update script for dynamic zones
+  # Update script for dynamic zones.
+  #
+  # Runs ordered before bind.service, so BIND is never running when this
+  # fires. BIND flushes its journal to the zone file on clean shutdown, so
+  # the on-disk file is the authoritative record of dynamic DDNS state we
+  # need to preserve when the static (Nix-managed) part of the zone changes.
   mkZoneUpdateScript =
     zone:
     let
@@ -119,28 +152,32 @@ let
         NIX_SERIAL="${toString serial}"
 
         if [ "$STORED_SERIAL" != "$NIX_SERIAL" ]; then
-          echo "Zone ${zone.name}: Updating (serial $STORED_SERIAL -> $NIX_SERIAL)"
-          if systemctl is-active --quiet bind.service; then
-            rndc freeze ${zone.name}
-            cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
-            TMPWORK=$(mktemp -d)
-            # Normalise both zone files to fully-qualified one-record-per-line format
-            named-compilezone -f text -F text -o "$TMPWORK/frozen.zone" "${zone.name}" "${zonePath}" 2>/dev/null
-            named-compilezone -f text -F text -o "$TMPWORK/nix.zone"    "${zone.name}" "${zoneFilePath}" 2>/dev/null
-            # Extract records whose owner name is absent from the Nix zone (dynamic DHCP entries)
-            awk 'NR==FNR { names[$1]=1; next } !($1 in names) { print }' \
-              "$TMPWORK/nix.zone" "$TMPWORK/frozen.zone" > "$TMPWORK/dynamic.zone"
-            # Write Nix static records + preserved dynamic records
-            cat "${zoneFilePath}" "$TMPWORK/dynamic.zone" > "${zonePath}"
-            rm -rf "$TMPWORK"
-            rndc thaw ${zone.name}
-          else
-            cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
-            cp -f "${zoneFilePath}" "${zonePath}"
-            rm -f "${zonePath}.jnl"
-          fi
+          echo "Zone ${zone.name}: updating (serial $STORED_SERIAL -> $NIX_SERIAL)"
+
+          cp -f "${zonePath}" "${zonePath}.backup-$(date +%Y%m%d-%H%M%S)"
+
+          TMPWORK=$(mktemp -d)
+          trap 'rm -rf "$TMPWORK"' EXIT
+
+          # Normalise both zone files to fully-qualified one-record-per-line
+          # so records can be matched by owner name.
+          named-compilezone -f text -F text -o "$TMPWORK/current.zone" "${zone.name}" "${zonePath}"    >/dev/null
+          named-compilezone -f text -F text -o "$TMPWORK/nix.zone"     "${zone.name}" "${zoneFilePath}" >/dev/null
+
+          # Records whose owner name does not appear in the Nix zone are
+          # dynamic DDNS entries; preserve them.
+          awk 'NR==FNR { names[$1]=1; next } !($1 in names) { print }' \
+            "$TMPWORK/nix.zone" "$TMPWORK/current.zone" > "$TMPWORK/dynamic.zone"
+
+          cat "${zoneFilePath}" "$TMPWORK/dynamic.zone" > "${zonePath}"
+
+          # Journal entries belong to the previous zone content; replaying
+          # them on top of the new file would conflict. The merge above
+          # already preserved dynamic records from the previous zone file.
+          rm -f "${zonePath}.jnl"
+
           echo "$NIX_SERIAL" > "${serialPath}"
-          echo "Zone ${zone.name}: Update complete"
+          echo "Zone ${zone.name}: update complete"
         fi
       fi
 
@@ -327,8 +364,11 @@ in
       }
 
       loki.process "bind_security" {
+        // client_ip/client_port are optional - only present for client-scoped
+        // events (denials, query-errors); category/severity events without a
+        // client (e.g. DNSSEC validation) leave them empty.
         stage.regex {
-          expression = `^(?P<timestamp>\d{2}-\w{3}-\d{4} \d{2}:\d{2}:\d{2}\.\d{3}) (?P<category>\w[\w-]+): (?P<severity>\w+):`
+          expression = `^(?P<timestamp>\d{2}-\w{3}-\d{4} \d{2}:\d{2}:\d{2}\.\d{3}) (?P<category>\w[\w-]+): (?P<severity>\w+): (?:client (?:@\S+ )?(?P<client_ip>[0-9a-f.:]+)#(?P<client_port>\d+) )?`
         }
 
         stage.timestamp {

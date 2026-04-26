@@ -1,24 +1,13 @@
 {
   dns,
+  zlib,
   ...
 }:
 with dns.lib.combinators;
 {
   zoneData = {
-    SOA = {
-      nameServer = "ns-01.int.doofnet.uk.";
-      adminEmail = "hostmaster@doofnet.uk";
-      serial = 2026041401;
-      refresh = 3600;
-      retry = 900;
-      expire = 604800;
-      minimum = 300;
-    };
-    NS = [
-      "ns-01.int.doofnet.uk."
-      "ns-02.int.doofnet.uk."
-    ];
-
+    SOA = zlib.mkSOA 2026041401;
+    NS = zlib.internalNS;
     TTL = 3600;
 
     subdomains = {
@@ -47,23 +36,22 @@ with dns.lib.combinators;
       unifi.CNAME = [ "svc-01.int.doofnet.uk." ];
     };
   };
-  extraConfig = ''
-    update-policy {
-      # Protect all statically-defined records
-      deny doofnet-dhcp-updates name gw.int.doofnet.uk.      ANY;
-      deny doofnet-dhcp-updates name ns-01.int.doofnet.uk.   ANY;
-      deny doofnet-dhcp-updates name ns-02.int.doofnet.uk.   ANY;
-      deny doofnet-dhcp-updates name nas-01.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name nas-03.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name svc-01.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name svc-02.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name hyp-01.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name gw-mgmt.int.doofnet.uk. ANY;
-      deny doofnet-dhcp-updates name afp-01.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name grf-01.int.doofnet.uk.  ANY;
-      deny doofnet-dhcp-updates name unifi.int.doofnet.uk.   ANY;
-      # Allow DDNS updates for all other names in the zone (DHCP clients)
-      grant doofnet-dhcp-updates zonesub ANY;
-    };
-  '';
+  # DDNS allowed for any name except statically-defined infrastructure records.
+  dynamic = {
+    enable = true;
+    protect = [
+      "gw"
+      "ns-01"
+      "ns-02"
+      "nas-01"
+      "nas-03"
+      "svc-01"
+      "svc-02"
+      "hyp-01"
+      "gw-mgmt"
+      "afp-01"
+      "grf-01"
+      "unifi"
+    ];
+  };
 }

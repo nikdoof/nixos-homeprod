@@ -64,19 +64,33 @@ primary addresses for hosts that reach ns-01 via NAT.
 ### Zone rendering
 
 Zones are written as Nix expressions using the [`dns`](https://github.com/nix-community/dns)
-flake library. Every `.nix` file in `modules/doofnet/bind/zones/` (except `default.nix`) is
-automatically loaded as a zone, with the filename (minus `.nix`) used as the zone name.
+flake library. Every `.nix` file in `modules/doofnet/bind/zones/` (except `default.nix` and
+`lib.nix`) is automatically loaded as a zone, with the filename (minus `.nix`) used as the
+zone name. Each zone file receives `dns` (the upstream library) and `zlib` (local helpers
+exporting `mkSOA`, `internalNS`, `publicNS`).
 
-Zones are divided into two categories:
+Each zone declares:
 
-- **Static zones** — no `allow-update` or `update-policy` stanza. The zone file is written
-  to the Nix store at build time and BIND reads it directly. Zone content changes require a
-  NixOS rebuild.
-- **Dynamic zones** — contain `allow-update` or `update-policy`. The zone file is copied to
-  `/var/lib/bind/zones/<name>.zone` so BIND can maintain a journal for live updates. A
-  `bind-update-zones` systemd service detects serial number changes between Nix rebuilds and
-  safely replaces the zone file (backing up the old one, removing the `.jnl` journal) so
-  that static record changes propagate without breaking dynamic DDNS entries.
+- `zoneData` — DNS records, in `dns.lib`'s data model.
+- `dynamic` *(optional)* — DDNS configuration, structured as Nix data:
+  - `dynamic.enable = false` *(default)* — static zone, no DDNS.
+  - `dynamic.enable = true; dynamic.protect = [];` — blanket `allow-update` for the
+    DDNS TSIG key.
+  - `dynamic.enable = true; dynamic.protect = [ "name1" "name2" … ];` — `update-policy`
+    that **denies** updates to the listed names (relative to the zone) and **grants**
+    everything else as `zonesub`. Used to shield statically-defined records from DHCP
+    overwrites.
+
+The module derives whether a zone is publicly delegated by checking its NS list against
+the known public secondary hostnames (`ns-03.doofnet.uk.`, `ns-04.doofnet.uk.`); public
+zones are transferred to ns-03/ns-04, all others stay on ns-02.
+
+Static zones are written to the Nix store at build time and BIND reads them directly.
+Dynamic zones (`dynamic.enable = true`) need a writable file so BIND can journal updates;
+the file is copied to `/var/lib/bind/zones/<name>.zone`. A `bind-update-zones` systemd
+service ordered before `bind.service` detects SOA serial changes between Nix rebuilds and
+merges the new static records with the dynamic DDNS records preserved from the on-disk
+zone file (backing up the old one and discarding the now-stale `.jnl` journal).
 
 ### Zone transfer
 
@@ -94,14 +108,8 @@ Dynamic DNS updates arrive from `kea-dhcp-ddns` on the gateway using TSIG key
 included at runtime via BIND's `include` directive — it is never written to the Nix store.
 
 An `acl "doofnet-dhcp-updates"` block matches requests that present a valid TSIG signature.
-Dynamic zones use either:
-
-- `allow-update { doofnet-dhcp-updates; }` — unrestricted updates for the zone (simpler
-  zones where all records are DHCP-managed)
-- `update-policy` — fine-grained rules used for `int.doofnet.uk`, which **denies** updates
-  to statically-defined infrastructure records (gw, ns-01, ns-02, svc-01, etc.) while
-  **granting** updates for all other names, protecting static records from being overwritten
-  by DHCP clients.
+The module turns the zone's `dynamic` attribute into BIND's `allow-update` (open) or
+`update-policy` (with a `protect` list) directive — see *Zone rendering* above.
 
 ### DNS-over-TLS
 
@@ -267,22 +275,22 @@ Key infrastructure records that are protected from DDNS overwrites:
 
 ## Adding a new zone
 
-1. Create `modules/doofnet/bind/zones/<zone-name>.nix` using the `dns` library. Include
-   `extraConfig = ""` for static zones, or `allow-update { doofnet-dhcp-updates; };` /
-   `update-policy { ... };` for dynamic zones.
+1. Create `modules/doofnet/bind/zones/<zone-name>.nix`. Filename (minus `.nix`) is the
+   zone name. Take `{ dns, zlib, ... }` and use `zlib.mkSOA <serial>`, `zlib.internalNS`
+   (or `zlib.publicNS` for publicly delegated zones).
 2. Set the SOA `serial` to today's date in `YYYYMMDDnn` format.
-3. If the zone should be served by Hurricane Electric, add their NS records — the module
-   detects `*.he.net.` in the NS list and automatically includes them in the transfer list
-   and NOTIFY targets.
-4. Rebuild and deploy ns-01; ns-02 will pick up the new zone via AXFR automatically.
+3. For DDNS, add `dynamic.enable = true;` (blanket allow) or
+   `dynamic = { enable = true; protect = [ ... ]; };` (update-policy with denied names).
+4. Rebuild and deploy ns-01; ns-02 (and ns-03/ns-04 if `publicNS`) pick up the new zone via
+   AXFR automatically.
 
 ## Adding a static record to `int.doofnet.uk`
 
 1. Add the subdomain to `int.doofnet.uk.nix` under `subdomains`.
-2. Add a matching `deny` rule to the `update-policy` block to protect it from DDNS.
+2. Add the relative name to `dynamic.protect` to shield it from DDNS overwrites.
 3. Increment the SOA serial.
-4. Rebuild ns-01; the `bind-update-zones` service will detect the serial change, replace
-   the zone file, and trigger BIND to reload.
+4. Rebuild ns-01; on the next bind restart `bind-update-zones` detects the serial change
+   and merges the new static records with preserved DDNS state.
 
 ## Service summary
 

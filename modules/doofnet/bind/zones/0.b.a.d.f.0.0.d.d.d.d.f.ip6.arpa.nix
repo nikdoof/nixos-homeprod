@@ -1,27 +1,15 @@
 {
-  dns,
+  zlib,
   ...
 }:
-with dns.lib.combinators;
+# ULA reverse: fddd:d00f:dab0::/48
 {
   zoneData = {
-    SOA = {
-      nameServer = "ns-01.int.doofnet.uk.";
-      adminEmail = "hostmaster@doofnet.uk";
-      serial = 2026031301;
-      refresh = 3600;
-      retry = 900;
-      expire = 604800;
-      minimum = 300;
-    };
-    NS = [
-      "ns-01.int.doofnet.uk."
-      "ns-02.int.doofnet.uk."
-    ];
-
+    SOA = zlib.mkSOA 2026031301;
+    NS = zlib.internalNS;
     TTL = 3600;
 
-    # Infrastructure - VLAN101
+    # VLAN 101
     subdomains."1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "gw.int.doofnet.uk." ];
     subdomains."2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "ns-01.int.doofnet.uk." ];
     subdomains."3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "ns-02.int.doofnet.uk." ];

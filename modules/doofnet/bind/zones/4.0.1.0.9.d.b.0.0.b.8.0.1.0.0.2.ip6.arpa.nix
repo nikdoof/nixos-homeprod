@@ -1,30 +1,15 @@
 {
-  dns,
+  zlib,
   ...
 }:
-with dns.lib.combinators;
+# VLAN 104 reverse: 2001:8b0:bd9:104::/64
 {
   zoneData = {
-    SOA = {
-      nameServer = "ns-01.int.doofnet.uk.";
-      adminEmail = "hostmaster@doofnet.uk";
-      serial = 2026041001;
-      refresh = 3600;
-      retry = 900;
-      expire = 604800;
-      minimum = 300;
-    };
-    NS = [
-      "ns-03.doofnet.uk."
-      "ns-04.doofnet.uk."
-    ];
-
+    SOA = zlib.mkSOA 2026041001;
+    NS = zlib.publicNS;
     TTL = 3600;
 
-    # Gateway
     subdomains."1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0".PTR = [ "gw.lab.doofnet.uk." ];
   };
-  extraConfig = ''
-    allow-update { doofnet-dhcp-updates; };
-  '';
+  dynamic.enable = true;
 }
