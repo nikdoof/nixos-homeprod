@@ -166,15 +166,6 @@
                       url = "https://cal.doofnet.uk";
                       icon = "mdi:calendar-sync";
                     }
-                    {
-                      title = "Scrumboy";
-                      url = "https://scrum.doofnet.uk";
-                      icon = "mdi:developer-board";
-                      expected-status-codes = [
-                        200
-                        302
-                      ];
-                    }
                   ];
                 }
                 {

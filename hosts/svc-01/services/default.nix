@@ -19,7 +19,6 @@ _: {
     ./printing.nix
     ./rustical.nix
     ./scanservjs.nix
-    ./scrumboy.nix
     ./swarm-mirror.nix
     ./traefik-external.nix
   ];
