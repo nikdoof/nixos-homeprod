@@ -49,7 +49,8 @@ _: {
       # Named counters — exported to Prometheus via the nftables textfile collector.
       counter fw_wan_input_drop   { comment "WAN packets dropped in input chain (ppp0 input)" }
       counter fw_wan_forward_drop { comment "WAN inbound packets dropped (ppp0 forward chain)" }
-      counter fw_hosted_blocked   { comment "Hosted VLAN outbound packets blocked" }
+      counter fw_hosted_unmatched { comment "Hosted VLAN outbound packets that fell through accept rules" }
+      counter fw_synflood_drop    { comment "Inbound TCP SYNs dropped by per-source rate limit" }
       counter fw_forward_drop     { comment "All other forward chain drops (logged)" }
 
       # Shared TCP flag validation — drops malformed packets used in scanning/fingerprinting.
@@ -62,6 +63,21 @@ _: {
         tcp flags & (fin|ack) == fin drop
         tcp flags & (urg|ack) == urg drop
         tcp flags & (psh|ack) == psh drop
+      }
+
+      # Lab VLAN policy — block lateral movement to private and HA, otherwise allow.
+      # Encapsulated in a sub-chain so a future "vlan-lab accept"-style rule cannot
+      # accidentally precede the drops and open lateral movement.
+      chain forward_lab {
+        oifname "vlan-private" drop
+        oifname "vlan-ha"      drop
+        accept
+      }
+
+      # HA/IoT VLAN policy — block all internet-bound traffic. Falls through to the
+      # main forward chain (no terminal accept) so DNS / mDNS rules above still apply.
+      chain forward_ha {
+        oifname "ppp0" drop
       }
 
       chain input {
@@ -150,12 +166,24 @@ _: {
 
         jump tcp_flag_check
 
-        # ICMPv6 — transit types only; NDP and MLD are link-local and must not be forwarded
+        # SYN-flood mitigation — per-source rate limit on new TCP connections from WAN.
+        # Protects DNATed services (svc-01, ns-01, qbittorrent) from filling conntrack
+        # before the backend host sees the packets.
+        iifname "ppp0" tcp flags syn ct state new \
+          meter syn_flood4 size 65535 { ip  saddr limit rate over 50/second burst 100 packets } \
+          counter name fw_synflood_drop drop
+        iifname "ppp0" tcp flags syn ct state new \
+          meter syn_flood6 size 65535 { ip6 saddr limit rate over 50/second burst 100 packets } \
+          counter name fw_synflood_drop drop
+
+        # ICMPv6 — transit types only; NDP and MLD are link-local and must not be forwarded.
+        # PMTUD-critical types (packet-too-big, parameter-problem) are not rate limited
+        # because dropping them silently breaks IPv6 connectivity for many hosts at once.
+        ip6 nexthdr icmpv6 icmpv6 type { packet-too-big, parameter-problem } accept
         ip6 nexthdr icmpv6 icmpv6 type {
-          destination-unreachable, packet-too-big,
-          time-exceeded, parameter-problem,
+          destination-unreachable, time-exceeded,
           echo-request, echo-reply
-        } limit rate 10/second accept
+        } limit rate 100/second accept
 
         # Allow DNATs
         ct status dnat accept
@@ -166,8 +194,9 @@ _: {
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip6 daddr @ns6 udp dport 53 accept
         iifname { "vlan-public", "vlan-hosted", "vlan-ha" } ip6 daddr @ns6 tcp dport 53 accept
 
-        # HA/IoT VLAN (IPv6 only) - block all internet-bound traffic
-        iifname "vlan-ha" oifname "ppp0" drop
+        # HA/IoT VLAN (IPv6 only) — sub-chain drops internet-bound traffic, returns otherwise
+        # so the mDNS rule below still applies.
+        iifname "vlan-ha" jump forward_ha
 
         # mDNS (Bonjour/Avahi) between private, lab, and HA VLANs
         iifname { "vlan-private", "vlan-lab", "vlan-ha" } \
@@ -177,10 +206,8 @@ _: {
         # Private VLAN — full outbound access including to hosted
         iifname "vlan-private" accept
 
-        # Lab VLAN — block lateral movement to private and HA; allow hosted and WAN
-        iifname "vlan-lab" oifname "vlan-private" drop
-        iifname "vlan-lab" oifname "vlan-ha"      drop
-        iifname "vlan-lab" accept
+        # Lab VLAN — sub-chain blocks lateral movement to private and HA, accepts otherwise
+        iifname "vlan-lab" jump forward_lab
 
         # Tailscale
         iifname "tailscale0" accept
@@ -198,10 +225,12 @@ _: {
         iifname "vlan-hosted" ip daddr 10.101.3.21  tcp dport { 443, 9090 }     accept
         iifname "vlan-hosted" udp dport 41641                                   accept
         # Count hosted VLAN packets that fell through all accept rules
-        iifname "vlan-hosted" counter name fw_hosted_blocked
+        iifname "vlan-hosted" counter name fw_hosted_unmatched
 
-        # WAN -> Hosted VLAN (inbound to publicly routed /29, no NAT)
-        iifname "ppp0" oifname "vlan-hosted" accept
+        # WAN -> Hosted VLAN (inbound to publicly routed /29, no NAT).
+        # Restricted to the actual hosted prefixes so a misrouted packet can't slip through.
+        iifname "ppp0" oifname "vlan-hosted" ip  daddr 217.169.25.8/29       accept
+        iifname "ppp0" oifname "vlan-hosted" ip6 daddr 2001:8b0:bd9:106::/64 accept
 
         # Note: inbound BitTorrent to nas-03 (port 51413) is IPv4 only and
         # flows through the prerouting DNAT + `ct status dnat accept` path

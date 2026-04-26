@@ -222,18 +222,19 @@ lives in a single `table inet filter` plus a `table ip nat`.
 - **Tailscale** (`tailscale0`): unrestricted outbound
 - **Public VLAN**: outbound to WAN; HTTP/HTTPS to hosted; specific access to `10.101.3.20:443`
 - **Hosted VLAN**: restricted outbound to WAN (only `hosted_out_tcp/udp`); access to svc-01 (`10.101.3.20:443`) and svc-02 (`10.101.3.21:443,9090`); Tailscale port 41641
-- **WAN → hosted**: fully accepted (publicly routed, no NAT)
+- **WAN → hosted**: accepted to `217.169.25.8/29` and `2001:8b0:bd9:106::/64` (publicly routed, no NAT)
 - **WAN → private**: QBittorrent (TCP/UDP 51413) inbound for IPv6
 - WAN inbound drops counted silently; all other drops logged with `nft-forward-drop:` prefix
 
 ### Named counters (exported to Prometheus)
 
-| Counter               | Meaning                                      |
-|-----------------------|----------------------------------------------|
-| `fw_wan_input_drop`   | Packets dropped in input chain from ppp0     |
-| `fw_wan_forward_drop` | Inbound WAN packets dropped in forward chain |
-| `fw_hosted_blocked`   | Hosted VLAN outbound blocked packets         |
-| `fw_forward_drop`     | All other forward drops (internal traffic)   |
+| Counter               | Meaning                                                |
+|-----------------------|--------------------------------------------------------|
+| `fw_wan_input_drop`   | Packets dropped in input chain from ppp0               |
+| `fw_wan_forward_drop` | Inbound WAN packets dropped in forward chain           |
+| `fw_hosted_unmatched` | Hosted VLAN outbound packets that fell through accepts |
+| `fw_synflood_drop`    | Inbound TCP SYNs dropped by per-source rate limit      |
+| `fw_forward_drop`     | All other forward drops (internal traffic)             |
 
 ### NAT (`table ip nat`)
 
