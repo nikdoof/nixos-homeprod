@@ -138,7 +138,7 @@ in
       // Extract signature_severity from alert metadata as a stream label so
       // queries can use {sig_severity="Major"} as a fast indexed filter.
       stage.json {
-        expressions = { sig_severity = "alert.metadata.signature_severity.0" }
+        expressions = { sig_severity = "alert.metadata.signature_severity[0]" }
       }
 
       stage.labels {
