@@ -1,7 +1,7 @@
 { config, ... }:
 {
   virtualisation.oci-containers.containers.hcloud_exporter = {
-    image = "ghcr.io/promhippie/hcloud-exporter:3.12.1";
+    image = "ghcr.io/promhippie/hcloud-exporter:3.13.0";
     environment = {
       HCLOUD_EXPORTER_COLLECTOR_STORAGEBOXES = "true";
     };
