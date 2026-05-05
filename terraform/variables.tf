@@ -13,7 +13,7 @@ variable "regions" {
 variable "instance_type" {
   description = "Instance type to use for the DNS servers"
   type        = string
-  default     = "t3a.small"
+  default     = "t3a.micro"
 
 }
 
