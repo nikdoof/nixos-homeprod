@@ -93,8 +93,8 @@ in
         (import ./grafana/alert-services.nix mkPromData)
         (import ./grafana/alert-globaltalk.nix)
         (import ./grafana/alert-homeassistant.nix mkPromData)
-        (import ./grafana/alert-suricata.nix)
-        (import ./grafana/alert-suricata-compromise.nix)
+        #(import ./grafana/alert-suricata.nix)
+        #(import ./grafana/alert-suricata-compromise.nix)
       ];
 
       alerting.contactPoints.settings = {
