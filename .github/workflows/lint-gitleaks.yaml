@@ -9,7 +9,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: gitleaks-action
-        uses: zricethezav/gitleaks-action@v2
+        uses: zricethezav/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_NOTIFY_USER_LIST: "@nikdoof"
