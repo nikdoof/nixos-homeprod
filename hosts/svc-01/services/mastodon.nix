@@ -39,7 +39,7 @@ in
         "traefik.http.services.mastodon.loadbalancer.server.port" = "3000";
         "traefik.http.routers.mastodon.entrypoints" = "websecure,extwebsecure";
       };
-      image = "ghcr.io/mastodon/mastodon:v4.5.9";
+      image = "ghcr.io/mastodon/mastodon:v4.5.11";
       cmd = [
         "bash"
         "-c"
@@ -72,7 +72,7 @@ in
     };
 
     mastodon-sidekiq = {
-      image = "ghcr.io/mastodon/mastodon:v4.5.9";
+      image = "ghcr.io/mastodon/mastodon:v4.5.11";
       cmd = [
         "bundle"
         "exec"
