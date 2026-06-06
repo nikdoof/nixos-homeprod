@@ -21,5 +21,6 @@ _: {
     ./scanservjs.nix
     ./swarm-mirror.nix
     ./traefik-external.nix
+    ./hexgen.nix
   ];
 }
