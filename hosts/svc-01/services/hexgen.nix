@@ -7,7 +7,7 @@ _: {
         "traefik.http.services.hexgen.loadbalancer.server.port" = "5000";
         "traefik.http.routers.hexgen.entrypoints" = "websecure,extwebsecure";
       };
-      image = "ghcr.io/nikdoof/hexgen:1.5.0";
+      image = "ghcr.io/nikdoof/hexgen:1.7.0";
     };
   };
 }
