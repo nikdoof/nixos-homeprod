@@ -163,7 +163,7 @@ in
     # Postfix sender login maps — who can send as whom
     services.postfix.settings.main.smtpd_sender_login_maps = lib.mkIf (
       cfg.sharedAccess != { }
-    ) "texthash:/etc/postfix/sender_login_maps";
+    ) "texthash:/etc/sender-login-maps";
 
     services.postfix.settings.main.smtpd_sender_restrictions = lib.mkIf (cfg.sharedAccess != { }) (
       lib.mkForce (
@@ -179,7 +179,8 @@ in
       )
     );
 
-    environment.etc."postfix/sender_login_maps" = lib.mkIf (cfg.sharedAccess != { }) {
+    environment.etc."sender-login-maps" = lib.mkIf (cfg.sharedAccess != { }) {
+      mode = "0644";
       text =
         let
           allAccounts = builtins.attrNames cfg.accounts;
