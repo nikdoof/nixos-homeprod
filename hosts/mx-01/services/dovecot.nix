@@ -92,7 +92,13 @@ in
         acl_shared_dict = file:${vmailHome}/shared-mailboxes.db
       }
 
+      # Explicitly match separators for all list=yes namespaces
+      namespace inbox {
+        separator = /
+      }
+
       namespace shared {
+        separator = /
         type = shared
         prefix = shared/%%u/
         location = maildir:%%h/Maildir:INDEX=~/shared/%%u
