@@ -70,6 +70,9 @@ in
     };
 
     extraConfig = ''
+      # Allow dots in mailbox names (Dovecot 2.3 defaults to no, breaks shared mailboxes)
+      mailbox_name_allow_dots = yes
+
       # TLS hardening - match Postfix's TLSv1.2+ requirement for IMAP clients
       ssl_min_protocol = TLSv1.2
       ssl_prefer_server_ciphers = yes
