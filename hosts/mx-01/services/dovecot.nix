@@ -100,7 +100,7 @@ in
       namespace shared {
         separator = /
         type = shared
-        prefix = shared/%%u/
+        prefix = Shared/%%u/
         location = maildir:%%h/Maildir:INDEX=~/shared/%%u
         subscriptions = yes
         list = yes

@@ -160,6 +160,44 @@ in
 
     services.opendkim.domains = lib.mkForce (lib.concatStringsSep "," mailboxDomains);
 
+    # Postfix sender login maps — who can send as whom
+    services.postfix.settings.main.smtpd_sender_login_maps = lib.mkIf (
+      cfg.sharedAccess != { }
+    ) "texthash:/etc/postfix/sender_login_maps";
+
+    services.postfix.settings.main.smtpd_sender_restrictions = lib.mkIf (cfg.sharedAccess != { }) (
+      lib.mkForce (
+        lib.strings.concatMapStrings (x: x + ",") [
+          "permit_mynetworks"
+          "reject_non_fqdn_sender"
+          "reject_unknown_sender_domain"
+          "reject_sender_login_mismatch"
+          "reject_rhsbl_sender dbl.spamhaus.org"
+          "permit_sasl_authenticated"
+          "permit"
+        ]
+      )
+    );
+
+    environment.etc."postfix/sender_login_maps" = lib.mkIf (cfg.sharedAccess != { }) {
+      text =
+        let
+          allAccounts = builtins.attrNames cfg.accounts;
+          whoCanSend =
+            address:
+            let
+              self = [ address ];
+              grantees = lib.flatten (
+                lib.mapAttrsToList (
+                  grantee: targets: lib.optional (builtins.elem address targets) grantee
+                ) cfg.sharedAccess
+              );
+            in
+            "${address} ${lib.concatStringsSep "," (self ++ grantees)}";
+        in
+        lib.concatStringsSep "\n" (map whoCanSend allAccounts) + "\n";
+    };
+
     systemd.services.dovecot-shared-acls = lib.mkIf (cfg.sharedAccess != { }) {
       description = "Configure shared mailbox ACLs";
       after = [ "dovecot2.service" ];
@@ -182,7 +220,7 @@ in
               in
               ''
                 install -d -o vmail -g vmail -m 750 /persist/vmail/${dom}/${usr}/Maildir/{new,cur,tmp}
-                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' INBOX 'user=${grantee}' lookup read write || true
+                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' INBOX 'user=${grantee}' lookup read write write-seen write-deleted expunge || true
               ''
             ) targets
           ) cfg.sharedAccess
