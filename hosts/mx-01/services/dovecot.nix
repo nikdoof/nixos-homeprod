@@ -103,7 +103,7 @@ in
         prefix = shared/%%u/
         location = maildir:%%h/Maildir:INDEX=~/shared/%%u
         subscriptions = yes
-        list = children
+        list = yes
       }
 
       # connection to postfix via lmtp

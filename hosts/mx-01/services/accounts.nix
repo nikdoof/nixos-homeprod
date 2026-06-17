@@ -149,12 +149,12 @@ in
         RemainAfterExit = true;
       };
       script = ''
-        install -d -m 755 /etc/dovecot
-        cat > /etc/dovecot/users << 'USERSOF'
-          ${lib.concatStringsSep "\n" dovecotUserEntries}
+                install -d -m 755 /etc/dovecot
+                cat > /etc/dovecot/users << 'USERSOF'
+        ${lib.concatStringsSep "\n" dovecotUserEntries}
         USERSOF
-        chown vmail:vmail /etc/dovecot/users
-        chmod 600 /etc/dovecot/users
+                chown vmail:vmail /etc/dovecot/users
+                chmod 600 /etc/dovecot/users
       '';
     };
 
@@ -163,6 +163,7 @@ in
     systemd.services.dovecot-shared-acls = lib.mkIf (cfg.sharedAccess != { }) {
       description = "Configure shared mailbox ACLs";
       after = [ "dovecot2.service" ];
+      wantedBy = [ "dovecot2.service" ];
       bindsTo = [ "dovecot2.service" ];
       serviceConfig = {
         Type = "oneshot";
@@ -181,7 +182,7 @@ in
               in
               ''
                 install -d -o vmail -g vmail -m 750 /persist/vmail/${dom}/${usr}/Maildir/{new,cur,tmp}
-                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' "" 'user=${grantee}' read-write || true
+                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' INBOX 'user=${grantee}' lookup read write || true
               ''
             ) targets
           ) cfg.sharedAccess
