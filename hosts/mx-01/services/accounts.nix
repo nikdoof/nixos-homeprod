@@ -174,7 +174,15 @@ in
             grantee: targets:
             map (
               target:
-              "${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' 'user/${grantee}' read-write || true"
+              let
+                parts = lib.splitString "@" target;
+                dom = builtins.elemAt parts 1;
+                usr = builtins.elemAt parts 0;
+              in
+              ''
+                install -d -o vmail -g vmail -m 750 /persist/vmail/${dom}/${usr}/Maildir/{new,cur,tmp}
+                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' "" 'user=${grantee}' read-write || true
+              ''
             ) targets
           ) cfg.sharedAccess
         )
