@@ -158,8 +158,6 @@ in
       '';
     };
 
-    services.opendkim.domains = lib.mkForce (lib.concatStringsSep "," mailboxDomains);
-
     # Postfix sender login maps — who can send as whom
     services.postfix.settings.main.smtpd_sender_login_maps = lib.mkIf (
       cfg.sharedAccess != { }

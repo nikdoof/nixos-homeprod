@@ -52,11 +52,10 @@ in
           "${config.networking.hostName}.${config.networking.domain}"
         ];
 
-        # Milters: OpenDKIM (signing) + Rspamd (spam, DMARC)
+        # Milter: Rspamd (spam, DKIM, DMARC, SPF)
         milter_default_action = "accept";
         milter_protocol = "6";
         smtpd_milters = [
-          "unix:${lib.removePrefix "local:" config.services.opendkim.socket}"
           "inet:${(builtins.head config.services.rspamd.workers.proxy.bindSockets).socket}"
         ];
         non_smtpd_milters = "$smtpd_milters";
@@ -193,18 +192,5 @@ in
       };
     };
 
-  };
-
-  services.opendkim = {
-    enable = true;
-    keyPath = "/persist/opendkim/keys";
-    selector = builtins.hashString "sha1" "${config.services.postfix.settings.main.myhostname}";
-    domains = lib.strings.concatStringsSep "," config.doofnet.mailserver.virtualDomains;
-    inherit (config.services.postfix) user group;
-    settings = {
-      InternalHosts = lib.strings.concatStringsSep "," config.services.postfix.settings.main.mynetworks;
-      # Sign outbound and verify inbound
-      Mode = "sv";
-    };
   };
 }
