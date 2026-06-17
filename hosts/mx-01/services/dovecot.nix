@@ -95,6 +95,7 @@ in
       namespace shared {
         type = shared
         separator = /
+        prefix = shared/%%u/
         location = maildir:%%h/Maildir:INDEX=~/shared/%%u
         subscriptions = yes
         list = children
