@@ -253,3 +253,26 @@ resource "digitalocean_record" "ns_04" {
   value  = aws_eip.ns_04.public_ip
   ttl    = 3600
 }
+
+# Apple/iOS auto-discovery — users enter only email + password
+resource "digitalocean_record" "mx_imaps" {
+  domain   = "doofnet.uk"
+  type     = "SRV"
+  name     = "_imaps._tcp"
+  value    = "mx-01.doofnet.uk."
+  priority = 0
+  weight   = 1
+  port     = 993
+  ttl      = 3600
+}
+
+resource "digitalocean_record" "mx_submission" {
+  domain   = "doofnet.uk"
+  type     = "SRV"
+  name     = "_submission._tcp"
+  value    = "mx-01.doofnet.uk."
+  priority = 0
+  weight   = 1
+  port     = 587
+  ttl      = 3600
+}

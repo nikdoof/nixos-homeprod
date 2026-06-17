@@ -21,7 +21,7 @@ _: {
 
     workers.proxy = {
       type = "rspamd_proxy";
-      bindSockets = [ "inet:11332@127.0.0.1" ];
+      bindSockets = [ "127.0.0.1:11332" ];
       count = 1;
       extraConfig = "milter = yes; timeout = 120s;";
     };

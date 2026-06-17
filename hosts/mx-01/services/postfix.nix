@@ -58,7 +58,7 @@ in
         milter_protocol = "6";
         smtpd_milters = [
           "unix:${lib.removePrefix "local:" config.services.opendkim.socket}"
-          (builtins.head config.services.rspamd.workers.proxy.bindSockets).socket
+          "inet:${(builtins.head config.services.rspamd.workers.proxy.bindSockets).socket}"
         ];
         non_smtpd_milters = "$smtpd_milters";
 
