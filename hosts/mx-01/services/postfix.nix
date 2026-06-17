@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -161,25 +160,11 @@ in
           "reject_rbl_client bl.spamcop.net"
           "reject_rbl_client b.barracudacentral.org"
           "reject_rbl_client dnsbl-1.uceprotect.net"
-          "check_policy_service unix:private/policyd-spf"
           "permit"
         ];
-
-        smtpd_policy_service_timeout = "30s";
       };
 
       master = {
-        "policyd-spf" = {
-          type = "unix";
-          privileged = true;
-          chroot = false;
-          maxproc = 0;
-          command = "spawn";
-          args = [
-            "user=nobody"
-            "argv=${pkgs.spf-engine}/bin/policyd-spf"
-          ];
-        };
         # smtp_inet is the NixOS key for the inbound smtp inet listener (outputs as "smtp" in master.cf).
         # Overriding it here replaces the default smtpd command with postscreen.
         # The default smtp = {} unix transport key is left intact for outbound delivery.
@@ -209,14 +194,6 @@ in
     };
 
   };
-
-  environment.etc."python-policyd-spf/policyd-spf.conf".text = ''
-    # Reject on hard SPF fail; log but pass on softfail
-    HELO_reject = SPF_Not_Pass
-    Mail_From_reject = Fail
-    PermError_reject = False
-    TempError_Defer = False
-  '';
 
   services.opendkim = {
     enable = true;
