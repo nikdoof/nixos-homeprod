@@ -23,7 +23,14 @@ _: {
       type = "rspamd_proxy";
       bindSockets = [ "127.0.0.1:11332" ];
       count = 1;
-      extraConfig = "milter = yes; timeout = 120s;";
+      extraConfig = ''
+        milter = yes;
+        timeout = 120s;
+        upstream "local" {
+          default = yes;
+          self_scan = yes;
+        }
+      '';
     };
   };
 
