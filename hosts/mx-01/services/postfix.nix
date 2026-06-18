@@ -1,11 +1,20 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
 let
   postfixSpoolDir = config.users.users.postfix.home;
+  postfixResolvConf = pkgs.writeText "postfix-resolv.conf" ''
+    nameserver 1.1.1.1
+    nameserver 1.0.0.1
+    nameserver 2606:4700:4700::1111
+    nameserver 2606:4700:4700::1001
+    search doofnet.uk
+    options attempts:2 timeout:2
+  '';
 in
 {
   services.postfix = {
@@ -195,4 +204,11 @@ in
     };
 
   };
+
+  # Override Postfix's DNS resolver to use Cloudflare directly, bypassing
+  # systemd-resolved. This avoids latency from systemd-resolved's stub resolver
+  # and provides a warm, independent cache for Postfix's DNSBL/PTR lookups.
+  systemd.services.postfix.serviceConfig.BindReadOnlyPaths = [
+    "${postfixResolvConf}:/etc/resolv.conf"
+  ];
 }
