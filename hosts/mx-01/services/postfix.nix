@@ -184,6 +184,11 @@ in
           type = "pass";
           maxproc = 0;
           command = "smtpd";
+          args = [
+            # reject_sender_login_mismatch needs SASL, which isn't available on
+            # the port 25 smtpd pass path (behind postscreen).
+            "-o smtpd_sender_restrictions=permit_mynetworks,reject_non_fqdn_sender,reject_unknown_sender_domain,reject_rhsbl_sender dbl.spamhaus.org,permit"
+          ];
         };
         dnsblog = {
           type = "unix";
@@ -200,7 +205,7 @@ in
 
   };
 
-  # Override Postfix's DNS resolver to use Cloudflare directly, bypassing
+  # Override Postfix's DNS resolver to use A&A DNS directly, bypassing
   # systemd-resolved. This avoids latency from systemd-resolved's stub resolver
   # and provides a warm, independent cache for Postfix's DNSBL/PTR lookups.
   systemd.services.postfix.serviceConfig.BindReadOnlyPaths = [

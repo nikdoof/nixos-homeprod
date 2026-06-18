@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -13,6 +14,35 @@ in
     enable = true;
     cid = 12;
     vlan = "106";
+    mem = 2048;
+  };
+
+  services.redis = {
+    package = pkgs.valkey;
+    servers.rspamd = {
+      enable = true;
+      port = 6379;
+      bind = "127.0.0.1";
+      appendOnly = true;
+      save = [
+        [
+          900
+          1
+        ]
+        [
+          300
+          10
+        ]
+        [
+          60
+          10000
+        ]
+      ];
+      logLevel = "notice";
+      settings = {
+        dir = lib.mkForce "/persist/valkey";
+      };
+    };
   };
 
   # Networking

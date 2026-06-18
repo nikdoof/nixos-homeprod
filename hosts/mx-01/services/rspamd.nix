@@ -21,6 +21,9 @@ in
       "milter_headers.conf".text = ''
         use = ["x-spam-score", "x-spam-level", "authentication-results"];
       '';
+      "redis.conf".text = ''
+        servers = "127.0.0.1:6379";
+      '';
     };
 
     workers.controller = {
