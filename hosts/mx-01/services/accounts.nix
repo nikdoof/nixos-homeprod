@@ -219,7 +219,7 @@ in
               in
               ''
                 install -d -o vmail -g vmail -m 750 /persist/vmail/${dom}/${usr}/Maildir/{new,cur,tmp}
-                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' INBOX 'user=${grantee}' lookup read write write-seen write-deleted expunge || true
+                ${lib.getBin pkgs.dovecot}/bin/doveadm acl set -u '${target}' '*' 'user=${grantee}' lookup read write write-seen write-deleted expunge || true
               ''
             ) targets
           ) cfg.sharedAccess

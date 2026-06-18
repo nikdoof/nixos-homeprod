@@ -78,9 +78,12 @@ in
         "acl"
         "fts"
         "fts_flatcurve"
+        "quota"
       ];
       perProtocol.imap.enable = [
         "imap_acl"
+        "imap_compress"
+        "imap_quota"
         "listescape"
       ];
       perProtocol.lmtp.enable = [
@@ -99,6 +102,9 @@ in
       fts_filters_en = "lowercase snowball english-possessive stopwords";
       acl = "vfile";
       acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
+      quota = "maildir:User quota";
+      quota_vsizes = "yes";
+      quota_rule = "*:storage=10G";
       sieve = "~/.dovecot.sieve";
       sieve_dir = "~/sieve";
       sieve_before = "${spamToJunk}";
@@ -108,6 +114,15 @@ in
       # TLS hardening - match Postfix's TLSv1.2+ requirement for IMAP clients
       ssl_min_protocol = TLSv1.2
       ssl_prefer_server_ciphers = yes
+
+      # IMAP METADATA (RFC 5464) — per-mailbox and per-server annotations
+      mail_attribute_dict = file:%h/Maildir/dovecot-attributes
+
+      protocol imap {
+        imap_metadata = yes
+        imap_literal_minus = yes
+        imap_id_log = *
+      }
 
       # force to use full user name plus domain name
       # for disambiguation
@@ -130,9 +145,9 @@ in
         separator = /
         type = shared
         prefix = Shared/%%u/
-        location = maildir:%%h/Maildir:INDEX=~/shared/%%u
+        location = maildir:%%h/Maildir:INDEX=~/Maildir/shared/%%u
         subscriptions = yes
-        list = yes
+        list = children
       }
 
       # connection to postfix via lmtp
