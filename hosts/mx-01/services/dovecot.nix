@@ -90,8 +90,13 @@ in
 
     pluginSettings = {
       fts = "flatcurve";
-      fts_languages = "en";
       fts_autoindex = "yes";
+      fts_languages = "en de";
+      fts_tokenizers = "generic email-address";
+      fts_tokenizer_generic = "algorithm=simple maxlen=30";
+      fts_tokenizer_email_address = "maxlen=100";
+      fts_filters = "normalizer-icu snowball stopwords";
+      fts_filters_en = "lowercase snowball english-possessive stopwords";
       acl = "vfile";
       acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
       sieve = "~/.dovecot.sieve";
