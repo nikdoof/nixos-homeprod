@@ -8,10 +8,10 @@
 let
   postfixSpoolDir = config.users.users.postfix.home;
   postfixResolvConf = pkgs.writeText "postfix-resolv.conf" ''
-    nameserver 1.1.1.1
-    nameserver 1.0.0.1
-    nameserver 2606:4700:4700::1111
-    nameserver 2606:4700:4700::1001
+    nameserver 217.169.20.20
+    nameserver 217.169.20.21
+    nameserver 2001:8b0::2020
+    nameserver 2001:8b0::2021
     search doofnet.uk
     options attempts:2 timeout:2
   '';
