@@ -187,7 +187,9 @@ in
           args = [
             # reject_sender_login_mismatch needs SASL, which isn't available on
             # the port 25 smtpd pass path (behind postscreen).
-            "-o smtpd_sender_restrictions=permit_mynetworks,reject_non_fqdn_sender,reject_unknown_sender_domain,reject_rhsbl_sender dbl.spamhaus.org,permit"
+            # -o values can't contain spaces in master.cf, so reject_rhsbl_sender
+            # is dropped here (rspamd milter handles it anyway).
+            "-o smtpd_sender_restrictions=permit_mynetworks,reject_non_fqdn_sender,reject_unknown_sender_domain,permit"
           ];
         };
         dnsblog = {
