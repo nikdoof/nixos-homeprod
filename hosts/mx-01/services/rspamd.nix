@@ -13,7 +13,7 @@ in
         selector = "${selector}";
         path = "/persist/opendkim/keys/${selector}.private";
       '';
-      "greylisting.conf".text = "enabled = true;";
+      "greylist.conf".text = "enabled = true;";
       "dmarc.conf".text = ''
         reporting_enabled = true;
         actions = "reject:reject;";
@@ -23,6 +23,37 @@ in
       '';
       "redis.conf".text = ''
         servers = "127.0.0.1:6379";
+      '';
+      "settings.conf".text = ''
+        authenticated {
+          priority = high;
+          authenticated = yes;
+          apply {
+            groups_disabled = ["rbl", "spf", "neural"];
+            actions {
+              reject = 100;
+              "add header" = 20;
+              greylist = 50;
+            }
+          }
+        }
+      '';
+      "neural.conf".text = ''
+        servers = "127.0.0.1:6379";
+      '';
+      "mx_check.conf".text = ''
+        enabled = true;
+      '';
+      "ratelimit.conf".text = ''
+        rates {
+          authenticated_user {
+            selector = "authenticated:user";
+            bucket {
+              burst = 200;
+              rate = "100 / 1h";
+            }
+          }
+        }
       '';
     };
 
@@ -38,7 +69,6 @@ in
       count = 1;
       extraConfig = ''
         milter = yes;
-        timeout = 120s;
         upstream "local" {
           default = yes;
           self_scan = yes;

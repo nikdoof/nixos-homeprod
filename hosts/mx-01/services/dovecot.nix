@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -7,6 +8,39 @@
 let
   postfixSpoolDir = config.users.users.postfix.home;
   vmailHome = config.users.users.vmail.home;
+
+  spamToJunk = pkgs.writeText "spam-to-junk.sieve" ''
+    require ["fileinto", "mailbox"];
+
+    if header :contains "X-Spam-Level" "*****" {
+      fileinto :create "Junk";
+      stop;
+    }
+  '';
+
+  learnSpam = pkgs.writeText "learn-spam.sieve" ''
+    require ["vnd.dovecot.pipe", "imapsieve", "environment", "variables"];
+
+    if environment :matches "imap.mailbox" "*" {
+      set "mailbox" "''${1}";
+    }
+
+    if string "''${mailbox}" "Junk" {
+      pipe "rspamc-learn-spam" [];
+    }
+  '';
+
+  learnHam = pkgs.writeText "learn-ham.sieve" ''
+    require ["vnd.dovecot.pipe", "imapsieve", "environment", "variables"];
+
+    if environment :matches "imap.mailbox" "*" {
+      set "mailbox" "''${1}";
+    }
+
+    if not string "''${mailbox}" "Junk" {
+      pipe "rspamc-learn-ham" [];
+    }
+  '';
 in
 {
   services.dovecot2 = {
@@ -16,6 +50,43 @@ in
     enableImap = true;
     enablePop3 = false;
     enablePAM = false;
+
+    sieve = {
+      pipeBins = [
+        (lib.getExe (
+          pkgs.writeShellScriptBin "rspamc-learn-spam" ''
+            exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_spam
+          ''
+        ))
+        (lib.getExe (
+          pkgs.writeShellScriptBin "rspamc-learn-ham" ''
+            exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_ham
+          ''
+        ))
+      ];
+      scripts = {
+        before = spamToJunk;
+      };
+    };
+
+    imapsieve = {
+      mailbox = [
+        {
+          name = "Junk";
+          causes = [
+            "COPY"
+            "APPEND"
+          ];
+          before = learnSpam;
+        }
+        {
+          name = "*";
+          from = "Junk";
+          causes = [ "COPY" ];
+          before = learnHam;
+        }
+      ];
+    };
 
     sslServerCert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
     sslServerKey = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
@@ -65,8 +136,27 @@ in
     };
 
     mailPlugins = {
-      globally.enable = [ "acl" ];
-      perProtocol.imap.enable = [ "imap_acl" ];
+      globally.enable = [
+        "acl"
+        "fts"
+        "fts_flatcurve"
+        "sieve"
+      ];
+      perProtocol.imap.enable = [
+        "imap_acl"
+        "listescape"
+        "imap_sieve"
+      ];
+    };
+
+    pluginSettings = {
+      fts = "flatcurve";
+      fts_flatcurve = "default";
+      fts_autoindex = "yes";
+      acl = "vfile";
+      acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
+      sieve = "~/.dovecot.sieve";
+      sieve_dir = "~/sieve";
     };
 
     extraConfig = ''
@@ -84,12 +174,6 @@ in
       userdb {
         driver = static
         args = uid=vmail gid=vmail username_format=%u home=${vmailHome}/%d/%n
-      }
-
-      # ACL for shared mailboxes
-      plugin {
-        acl = vfile
-        acl_shared_dict = file:${vmailHome}/shared-mailboxes.db
       }
 
       # Explicitly match separators for all list=yes namespaces
@@ -152,5 +236,8 @@ in
   # Ensure vmail owns its home before Dovecot starts
   systemd.services.dovecot.serviceConfig.ExecStartPre =
     "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.mailUser}:${config.services.dovecot2.mailGroup} ${vmailHome}";
+
+  # Dovecot FTS flatcurve plugin for full-text search
+  environment.systemPackages = [ pkgs.dovecot-fts-flatcurve ];
 
 }
