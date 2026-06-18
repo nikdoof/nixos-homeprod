@@ -29,7 +29,13 @@ nav:
     - gw — Gateway: gw.md
     - hyp-01 — Hypervisor: hyp-01.md
     - ns-01 / ns-02 — DNS: dns.md
+    - svc-01 — Services: svc-01.md
+    - svc-02 — Monitoring: svc-02.md
+    - hs-01 — Headscale VPN: hs-01.md
+    - web-01 — Web Hosting: web-01.md
     - mx-01 — Mail Server: mx-01.md
+    - afp-01 — Apple File Sharing: afp-01.md
+    - grf-01 — Grafana Dashboard: grf-01.md
   - Guides:
     - macOS Setup: macos.md
     - Raspberry Pi: raspberry_pi.md

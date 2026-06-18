@@ -25,7 +25,7 @@ defined:
 | 101  | `vlan-private`  | 10.101.0.0/16    | 2001:8b0:bd9:101::/64           | `int.doofnet.uk`| Internal infrastructure              |
 | 102  | `vlan-public`   | 10.102.0.0/16    | 2001:8b0:bd9:102::/64           | `pub.doofnet.uk`| Public-facing services (NATed)       |
 | 104  | `vlan-lab`      | 10.104.0.0/16    | 2001:8b0:bd9:104::/64           | `lab.doofnet.uk`| Lab / experimental                   |
-| 105  | `vlan-ha`       | 10.105.0.0/16    | —                               | `ha.doofnet.uk` | Home automation / IoT                |
+| 105  | `vlan-ha`       | —                | 2001:8b0:bd9:105::/64           | `ha.doofnet.uk` | Home automation / IoT (IPv6 only)    |
 | 106  | `vlan-hosted`   | 217.169.25.8/29  | 2001:8b0:bd9:106::/64           | —               | Internet-facing, publicly routed     |
 
 The hosted VLAN (106) is **not NATed** — traffic to/from 217.169.25.8/29 is routed directly
@@ -89,14 +89,15 @@ The `next-server` for VLAN 101 is `10.101.3.21` (svc-02/JRouter); for VLAN 104 i
 
 ### DHCP — Kea DHCPv6 (`services/dhcp6.nix`)
 
-Kea serves DHCPv6 on VLANs 101, 102, and 104 (VLAN 105 and 106 are IPv4-only or SLAAC
-respectively). Leases are coordinated with DDNS.
+Kea serves DHCPv6 on VLANs 101, 102, 104, and 105 (VLAN 106 uses SLAAC only). Leases are
+coordinated with DDNS.
 
 | VLAN | Pool                                                    | DNS servers                              |
 |------|---------------------------------------------------------|------------------------------------------|
 | 101  | 2001:8b0:bd9:101::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
 | 102  | 2001:8b0:bd9:102::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
 | 104  | 2001:8b0:bd9:104::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
+| 105  | 2001:8b0:bd9:105::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
 
 VLAN 101 also offers **prefix delegation** from `2001:8b0:bd9:200::/56`, handing out /64s
 for clients that need their own subnet.
@@ -129,9 +130,9 @@ this Unbound instance.
 
 ### IPv6 Router Advertisements — radvd (`services/radvd.nix`)
 
-`radvd` sends Router Advertisements on VLANs 101, 102, 104, and 106. `AdvManagedFlag on`
-directs clients to use DHCPv6 (stateful) on VLANs 101, 102, and 104. VLAN 106 uses SLAAC
-only (`AdvManagedFlag off`, `AdvAutonomous on`).
+`radvd` sends Router Advertisements on VLANs 101, 102, 104, 105, and 106. `AdvManagedFlag on`
+directs clients to use DHCPv6 (stateful) on VLANs 101, 102, and 104. VLANs 105 and 106 use
+SLAAC only (`AdvManagedFlag off`, `AdvAutonomous on`).
 
 The ULA prefixes for VLANs 101 and 104 are advertised with `AdvAutonomous on` so clients
 self-configure stable ULA addresses without needing DHCPv6 for them.
@@ -161,6 +162,20 @@ Port ranges are restricted: only ports 1024–65535 may be mapped, and only for 
 
 miniupnpd manages its own `miniupnpd` nftables table at runtime and does not modify the
 main `inet filter` or `ip nat` tables.
+
+### Suricata IDS (`services/suricata.nix`)
+
+Suricata runs as a passive IDS monitoring `vlan-hosted` via `af-packet` mode. ET Open
+rules are fetched daily via `suricata-update` and live-reloaded with `SIGUSR2`. Alerts
+from `eve.json` are shipped to Loki via Alloy, filtered to only alert-level events with
+extracted `signature_severity` labels.
+
+### Kernel auditing (`services/auditd.nix`)
+
+`auditd` is enabled with CIS-inspired rules covering time changes, identity changes,
+network environment, privilege scope, login/session events, DAC permission changes,
+mounts, and kernel module load/unload. Events are forwarded to syslog (→ journald → Loki)
+and kept locally with 5 × 20 MiB rotation.
 
 ### Tailscale VPN (`services/tailscale.nix`)
 
@@ -282,6 +297,7 @@ Loki. Additional exporters configured in `services/alloy.nix`:
 
 - **kea-exporter** (port 9547) — Kea DHCP lease and server statistics
 - **chrony-exporter** (port 9123) — NTP sync status and offset
+- **suricata** (via `eve.json` → Loki) — IDS alerts with severity labels
 
 Firewall counters (`fw_wan_input_drop`, etc.) are collected via the nftables textfile
 collector and exposed through the node exporter.
@@ -300,5 +316,7 @@ collector and exposed through the node exporter.
 | avahi         | avahi         | mDNS reflection across private/lab/HA      |
 | miniupnpd     | miniupnpd     | UPnP / NAT-PMP port mapping                |
 | tailscale     | tailscale     | Mesh VPN via self-hosted Headscale         |
+| suricata      | suricata      | NIDS monitoring of hosted VLAN             |
+| auditd        | auditd        | Kernel audit logging (CIS-inspired)        |
 | lldpd         | lldpd         | LLDP (trunk interface only)                |
 | alloy         | grafana-alloy | Metrics and log shipping                   |

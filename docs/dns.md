@@ -242,7 +242,6 @@ specific overrides for `grafana`, `unifi`, `loki`, and `prometheus` pointing to 
 | `101.10.in-addr.arpa`            | VLAN 101 (private)   | no               | yes  |
 | `102.10.in-addr.arpa`            | VLAN 102 (public)    | no               | yes  |
 | `104.10.in-addr.arpa`            | VLAN 104 (lab)       | no               | yes  |
-| `105.10.in-addr.arpa`            | VLAN 105 (HA)        | no               | yes  |
 | `8-15.25.169.217.in-addr.arpa`   | Hosted /29           | yes              | no   |
 | `147.48.187.81.in-addr.arpa`     | PPPoE WAN address    | yes              | no   |
 
@@ -253,6 +252,7 @@ specific overrides for `grafana`, `unifi`, `loki`, and `prometheus` pointing to 
 | `1.0.1.0.9.d.b…ip6.arpa`                    | VLAN 101 `2001:8b0:bd9:101:` | yes              | yes  |
 | `2.0.1.0.9.d.b…ip6.arpa`                    | VLAN 102 `2001:8b0:bd9:102:` | yes              | yes  |
 | `4.0.1.0.9.d.b…ip6.arpa`                    | VLAN 104 `2001:8b0:bd9:104:` | yes              | yes  |
+| `5.0.1.0.9.d.b…ip6.arpa`                    | VLAN 105 `2001:8b0:bd9:105:` | yes              | yes  |
 | `6.0.1.0.9.d.b…ip6.arpa`                    | VLAN 106 `2001:8b0:bd9:106:` | yes              | yes  |
 | `0.b.a.d.f.0.0.d.d.d.d.f.ip6.arpa`          | ULA `fddd:d00f:dab0::/48`    | no               | no   |
 

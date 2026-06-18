@@ -37,9 +37,11 @@ NixOS module using QEMU as the hypervisor.
 
 ### Host-side configuration (`hosts/hyp-01/microvms.nix`)
 
-Each guest is registered with `microvm.vms.<name>` pointing at the flake. Setting
-`restartIfChanged = true` causes `nixos-rebuild` on the host to restart a guest when its
-configuration changes.
+Each guest is registered with `microvm.vms.<name>` pointing at the flake. The
+`restartIfChanged` option controls whether `nixos-rebuild` on the host restarts a guest when
+its configuration changes. Most guests set this to `false` and receive their new
+configuration on the next reboot; `mx-01` sets `restartIfChanged = true` so mail service is
+resumed immediately after a config change.
 
 At evaluation time the file cross-references every guest's evaluated NixOS configuration
 (via `inputs.self.nixosConfigurations`) to extract its `doofnet.microvm.cid` value. A
