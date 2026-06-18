@@ -121,7 +121,8 @@ in
         # Postscreen - pre-screen inbound SMTP connections before they reach smtpd
         postscreen_access_list = "permit_mynetworks";
         postscreen_blacklist_action = "drop";
-        postscreen_greet_action = "enforce";
+        postscreen_greet_action = "ignore";
+
         postscreen_bare_newline_enable = "yes";
         postscreen_bare_newline_action = "enforce";
         postscreen_dnsbl_action = "enforce";
