@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -93,16 +92,23 @@ in
     domains = [ "dimension.sh" ];
 
     accounts = {
-      "dmarc-reports@doofnet.uk" = {
-        password = "!";
-      };
+      # Humans
       "nikdoof@doofnet.uk" = {
         password = "{SHA512-CRYPT}$6$vxZqxWy4ReW.c22G$UJkC9IxlcMdNOMBDz9N8hMsJTVNEUfJ1fcSIed7qAcBNYMGkr/DzuLHM/8jycLBwAm429f56.CuYnQHh.UwN01";
+      };
+
+      "salkunh@doofnet.uk" = {
+        password = "!";
+      };
+
+      # Shared mailbox
+      "dmarc-reports@doofnet.uk" = {
+        password = "!";
       };
       "paperless@doofnet.uk" = {
         password = "{SHA512-CRYPT}$6$5PeSPUO39jE4or0v$LL3DIOyDpzXcHC5UScNRgy0gQ2kxxxQX88aO1KV3Zl7GpHPArDwngpLhb77ytNMKt4iQtT81uH6npHZgdWmUQ1";
       };
-      "salkunh@doofnet.uk" = {
+      "hello@nikdoof.com" = {
         password = "!";
       };
     };
@@ -117,14 +123,22 @@ in
       "root@lab.doofnet.uk" = "root-mail@m.tensixtyone.com";
       "root@pub.doofnet.uk" = "root-mail@m.tensixtyone.com";
       "root@dmz.doofnet.uk" = "root-mail@m.tensixtyone.com";
-      "nikdoof@dimension.sh" = "nikdoof@doofnet.uk";
+
       "salkunh@dimension.sh" = "salkunh@doofnet.uk";
+
+      "nikdoof@dimension.sh" = "nikdoof@doofnet.uk";
+      "nikdoof@nikdoof.com" = "nikdoof@doofnet.uk";
+      "nik_doof@nikdoof.com" = "nikdoof@doofnet.uk";
+      "andy@nikdoof.com" = "nikdoof@doofnet.uk";
+
+      "reply@nikdoof.com" = "hello@nikdoof.com";
     };
 
     sharedAccess = {
       "nikdoof@doofnet.uk" = [
         "paperless@doofnet.uk"
         "dmarc-reports@doofnet.uk"
+        "hello@nikdoof.com"
       ];
     };
   };

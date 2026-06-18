@@ -40,19 +40,19 @@ in
   microvm.vms = {
     afp-01 = {
       flake = inputs.self;
-      restartIfChanged = true;
+      restartIfChanged = false;
     };
     ns-02 = {
       flake = inputs.self;
-      restartIfChanged = true;
+      restartIfChanged = false;
     };
     hs-01 = {
       flake = inputs.self;
-      restartIfChanged = true;
+      restartIfChanged = false;
     };
     web-01 = {
       flake = inputs.self;
-      restartIfChanged = true;
+      restartIfChanged = false;
     };
     mx-01 = {
       flake = inputs.self;
@@ -60,7 +60,7 @@ in
     };
     grf-01 = {
       flake = inputs.self;
-      restartIfChanged = true;
+      restartIfChanged = false;
     };
   };
 
