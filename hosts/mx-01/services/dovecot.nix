@@ -238,6 +238,9 @@ in
     "${pkgs.coreutils}/bin/chown -R ${config.services.dovecot2.mailUser}:${config.services.dovecot2.mailGroup} ${vmailHome}";
 
   # Dovecot FTS flatcurve plugin for full-text search
-  environment.systemPackages = [ pkgs.dovecot-fts-flatcurve ];
+  environment.systemPackages = [
+    pkgs.dovecot-fts-flatcurve
+    pkgs.dovecot_pigeonhole
+  ];
 
 }
