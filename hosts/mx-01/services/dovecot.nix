@@ -79,11 +79,12 @@ in
         "fts"
         "fts_flatcurve"
         "quota"
+        "zlib"
       ];
       perProtocol.imap.enable = [
         "imap_acl"
-        "imap_compress"
         "imap_quota"
+        "imap_zlib"
         "listescape"
       ];
       perProtocol.lmtp.enable = [
