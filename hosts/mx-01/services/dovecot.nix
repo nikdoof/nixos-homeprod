@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
@@ -17,49 +16,6 @@ let
       stop;
     }
   '';
-
-  learnSpam = pkgs.writeText "learn-spam.sieve" ''
-    require ["vnd.dovecot.pipe", "imapsieve", "environment", "variables"];
-
-    if environment :matches "imap.mailbox" "*" {
-      set "mailbox" "''${1}";
-    }
-
-    if string "''${mailbox}" "Junk" {
-      pipe "rspamc-learn-spam" [];
-    }
-  '';
-
-  learnHam = pkgs.writeText "learn-ham.sieve" ''
-    require ["vnd.dovecot.pipe", "imapsieve", "environment", "variables"];
-
-    if environment :matches "imap.mailbox" "*" {
-      set "mailbox" "''${1}";
-    }
-
-    if not string "''${mailbox}" "Junk" {
-      pipe "rspamc-learn-ham" [];
-    }
-  '';
-
-  pipeBins = pkgs.linkFarm "sieve-pipe-bins" [
-    {
-      name = "rspamc-learn-spam";
-      path = lib.getExe (
-        pkgs.writeShellScriptBin "rspamc-learn-spam" ''
-          exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_spam
-        ''
-      );
-    }
-    {
-      name = "rspamc-learn-ham";
-      path = lib.getExe (
-        pkgs.writeShellScriptBin "rspamc-learn-ham" ''
-          exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_ham
-        ''
-      );
-    }
-  ];
 in
 {
   services.dovecot2 = {
@@ -122,12 +78,13 @@ in
         "acl"
         "fts"
         "fts_flatcurve"
-        "sieve"
       ];
       perProtocol.imap.enable = [
         "imap_acl"
         "listescape"
-        "imap_sieve"
+      ];
+      perProtocol.lmtp.enable = [
+        "sieve"
       ];
     };
 
@@ -140,16 +97,6 @@ in
       sieve = "~/.dovecot.sieve";
       sieve_dir = "~/sieve";
       sieve_before = "${spamToJunk}";
-      sieve_pipe_bin_dir = "${pipeBins}";
-      sieve_plugins = "sieve_imapsieve sieve_extprograms";
-      sieve_global_extensions = "+vnd.dovecot.pipe";
-      imapsieve_mailbox1_name = "Junk";
-      imapsieve_mailbox1_causes = "COPY APPEND";
-      imapsieve_mailbox1_before = "${learnSpam}";
-      imapsieve_mailbox2_name = "*";
-      imapsieve_mailbox2_from = "Junk";
-      imapsieve_mailbox2_causes = "COPY";
-      imapsieve_mailbox2_before = "${learnHam}";
     };
 
     extraConfig = ''
