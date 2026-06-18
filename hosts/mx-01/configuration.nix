@@ -39,10 +39,21 @@ in
         ]
       ];
       logLevel = "notice";
-      settings = {
-        dir = lib.mkForce "/persist/valkey";
-      };
     };
+  };
+
+  # Ensure /persist/valkey exists for the bind mount below.
+  # systemd-tmpfiles runs before local-fs.target (which processes mount units),
+  # and the virtiofs /persist mount is available from early boot.
+  systemd.tmpfiles.rules = [
+    "d /persist/valkey 0700 redis-rspamd redis-rspamd -"
+  ];
+
+  # Persist Valkey data across rebuilds (systemd's ProtectSystem=strict blocks
+  # writes to non-standard paths, so bind mount over the default StateDirectory).
+  fileSystems."/var/lib/redis-rspamd" = {
+    device = "/persist/valkey";
+    options = [ "bind" ];
   };
 
   # Networking
