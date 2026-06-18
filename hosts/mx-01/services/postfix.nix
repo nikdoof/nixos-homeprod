@@ -98,6 +98,7 @@ in
         smtp_tls_loglevel = "1";
         smtp_tls_fingerprint_digest = "sha256";
         smtp_tls_session_cache_database = "btree:/var/lib/postfix/data/smtp_scache";
+        smtp_bind_address = "217.169.25.11";
         smtp_bind_address6 = "2001:8b0:bd9:106::3";
         smtpd_tls_session_cache_database = "btree:/var/lib/postfix/data/smtpd_scache";
 
