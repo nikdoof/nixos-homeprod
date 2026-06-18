@@ -14,7 +14,7 @@ in
     enable = true;
     cid = 12;
     vlan = "106";
-    mem = 2048;
+    mem = 2560;
   };
 
   services.redis = {
