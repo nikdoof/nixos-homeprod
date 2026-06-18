@@ -9,7 +9,7 @@ in
     locals = {
       "dkim_signing.conf".text = ''
         allow_hdrhash_md5 = false;
-        sign_condition = "return true;";
+        sign_condition = "return not task:has_flag('empty_sender');";
         selector = "${selector}";
         path = "/persist/opendkim/keys/${selector}.private";
       '';
