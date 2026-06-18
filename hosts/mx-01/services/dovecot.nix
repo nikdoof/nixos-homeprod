@@ -90,7 +90,7 @@ in
 
     pluginSettings = {
       fts = "flatcurve";
-      fts_flatcurve = "default";
+      fts_languages = "en";
       fts_autoindex = "yes";
       acl = "vfile";
       acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
