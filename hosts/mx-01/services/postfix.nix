@@ -134,7 +134,10 @@ in
 
         postscreen_bare_newline_enable = "yes";
         postscreen_bare_newline_action = "enforce";
-        postscreen_dnsbl_action = "enforce";
+        postscreen_dnsbl_action = "ignore";
+        # postscreen DNSBL is set to ignore — smtpd's own reject_rbl_client
+        # checks (in smtpd_recipient_restrictions) handle DNSBL enforcement
+        # with proper 550 rejections instead of tempfailing clean clients.
         postscreen_dnsbl_threshold = "2";
         postscreen_dnsbl_whitelist_threshold = "-2";
         postscreen_dnsbl_sites = "zen.spamhaus.org*2 dnsbl.dronebl.org*2 bl.spamcop.net*1";
