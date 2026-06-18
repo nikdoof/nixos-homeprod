@@ -151,6 +151,14 @@ in
         list = children
       }
 
+      # ManageSieve (RFC 5804) — remote Sieve script management
+      service managesieve-login {
+        inet_listener sieve {
+          port = 4190
+          ssl = yes
+        }
+      }
+
       # connection to postfix via lmtp
       service lmtp {
        unix_listener ${postfixSpoolDir}/dovecot-lmtp {
