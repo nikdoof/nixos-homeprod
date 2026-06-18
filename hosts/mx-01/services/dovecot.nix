@@ -41,6 +41,25 @@ let
       pipe "rspamc-learn-ham" [];
     }
   '';
+
+  pipeBins = pkgs.linkFarm "sieve-pipe-bins" [
+    {
+      name = "rspamc-learn-spam";
+      path = lib.getExe (
+        pkgs.writeShellScriptBin "rspamc-learn-spam" ''
+          exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_spam
+        ''
+      );
+    }
+    {
+      name = "rspamc-learn-ham";
+      path = lib.getExe (
+        pkgs.writeShellScriptBin "rspamc-learn-ham" ''
+          exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_ham
+        ''
+      );
+    }
+  ];
 in
 {
   services.dovecot2 = {
@@ -50,43 +69,6 @@ in
     enableImap = true;
     enablePop3 = false;
     enablePAM = false;
-
-    sieve = {
-      pipeBins = [
-        (lib.getExe (
-          pkgs.writeShellScriptBin "rspamc-learn-spam" ''
-            exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_spam
-          ''
-        ))
-        (lib.getExe (
-          pkgs.writeShellScriptBin "rspamc-learn-ham" ''
-            exec ${pkgs.rspamd}/bin/rspamc -h 127.0.0.1:11334 learn_ham
-          ''
-        ))
-      ];
-      scripts = {
-        before = spamToJunk;
-      };
-    };
-
-    imapsieve = {
-      mailbox = [
-        {
-          name = "Junk";
-          causes = [
-            "COPY"
-            "APPEND"
-          ];
-          before = learnSpam;
-        }
-        {
-          name = "*";
-          from = "Junk";
-          causes = [ "COPY" ];
-          before = learnHam;
-        }
-      ];
-    };
 
     sslServerCert = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
     sslServerKey = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
@@ -157,6 +139,17 @@ in
       acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
       sieve = "~/.dovecot.sieve";
       sieve_dir = "~/sieve";
+      sieve_before = "${spamToJunk}";
+      sieve_pipe_bin_dir = "${pipeBins}";
+      sieve_plugins = "sieve_imapsieve sieve_extprograms";
+      sieve_global_extensions = "+vnd.dovecot.pipe";
+      imapsieve_mailbox1_name = "Junk";
+      imapsieve_mailbox1_causes = "COPY APPEND";
+      imapsieve_mailbox1_before = "${learnSpam}";
+      imapsieve_mailbox2_name = "*";
+      imapsieve_mailbox2_from = "Junk";
+      imapsieve_mailbox2_causes = "COPY";
+      imapsieve_mailbox2_before = "${learnHam}";
     };
 
     extraConfig = ''
