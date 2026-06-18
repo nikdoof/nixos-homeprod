@@ -75,7 +75,7 @@ in
         smtpd_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtpd_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
         smtpd_tls_mandatory_ciphers = "high";
-        smtpd_tls_loglevel = "1";
+        smtpd_tls_loglevel = "2";
 
         # Outbound TLS (smtp client)
         # DANE: upgrade to DNSSEC-verified TLS for servers publishing TLSA records,
@@ -172,7 +172,8 @@ in
           type = "inet";
           private = false;
           maxproc = 1;
-          command = lib.mkForce "postscreen";
+          command = lib.mkForce "postscreen -v";
+
         };
         smtpd = {
           type = "pass";
