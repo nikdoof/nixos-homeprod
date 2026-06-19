@@ -109,6 +109,7 @@ in
       sieve = "~/.dovecot.sieve";
       sieve_dir = "~/sieve";
       sieve_before = "${spamToJunk}";
+      sieve_global_extensions = "+fileinto +mailbox";
     };
 
     extraConfig = ''
