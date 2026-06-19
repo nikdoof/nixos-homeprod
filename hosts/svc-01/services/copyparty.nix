@@ -19,6 +19,8 @@ let
        salkunh: +Yy99cmaRLOj8cnEW89oQVsQ8lCIy8s78
        metrics: +XdQLDeFstloEzhIJ7z5lYsnya_LUUPyQ
 
+       gamesday: +SMAjvaaoT3jFgs2d8sCKg-fVZRQdllnB
+
      [groups]
        home: doofnet, nikdoof, salkunh
 
@@ -27,6 +29,12 @@ let
        accs:
          r: *
          a: metrics
+         A: @home
+
+     [/gamesday]
+       /w/gamesday
+       accs:
+         rw: gamesday
          A: @home
 
      [/inc]
