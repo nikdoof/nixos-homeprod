@@ -16,6 +16,8 @@ let
       stop;
     }
   '';
+
+  sieveDir = "/var/lib/dovecot/sieve";
 in
 {
   services.dovecot2 = {
@@ -108,7 +110,7 @@ in
       quota_rule = "*:storage=10G";
       sieve = "~/.dovecot.sieve";
       sieve_dir = "~/sieve";
-      sieve_before = "${spamToJunk}";
+      sieve_before = "${sieveDir}/spam-to-junk.sieve";
       sieve_global_extensions = "+fileinto +mailbox";
     };
 
@@ -202,6 +204,13 @@ in
       }
     '';
   };
+
+  # Copy Sieve script from Nix store to writable location so Dovecot can
+  # write the compiled .svbin binary alongside it (Nix store is read-only).
+  systemd.tmpfiles.rules = [
+    "d ${sieveDir} 0750 dovecot2 dovecot2 -"
+    "C ${sieveDir}/spam-to-junk.sieve ${spamToJunk} - - -"
+  ];
 
   # Ensure vmail owns its home before Dovecot starts
   systemd.services.dovecot.serviceConfig.ExecStartPre =
