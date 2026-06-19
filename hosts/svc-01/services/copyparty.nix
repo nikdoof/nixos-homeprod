@@ -19,7 +19,7 @@ let
        salkunh: +Yy99cmaRLOj8cnEW89oQVsQ8lCIy8s78
        metrics: +XdQLDeFstloEzhIJ7z5lYsnya_LUUPyQ
 
-       gamesday: +SMAjvaaoT3jFgs2d8sCKg-fVZRQdllnB
+       gamesday: +R_uOxTwQNk69_icuXuSwOr8HFxg5yIMk
 
      [groups]
        home: doofnet, nikdoof, salkunh
