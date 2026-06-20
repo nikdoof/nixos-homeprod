@@ -1,5 +1,29 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
+let
+  rusticalConfig = pkgs.writeText "config.toml" ''
+    [oidc]
+    name = "Doofnet"
+    issuer = "https://id.doofnet.uk"
+    client_id = "908ba885-2fbd-4bfc-b7d3-80a500e18caa"
+    claim_userid = "preferred_username"
+    scopes = ["openid", "email", "profile", "groups"]
+    require_group = "home"
+    allow_sign_up = true
+
+    [oidc.assign_memberships]
+    home = ["group.home"]
+
+    [frontend]
+    allow_password_login = false
+
+    [tracing]
+    opentelemetry = true
+
+    [dav_push]
+    enabled = true
+  '';
+in
 {
   age.secrets = {
     rusticalClientSecret = {
@@ -7,7 +31,6 @@
     };
   };
 
-  # Rustical
   virtualisation.oci-containers.containers.rustical = {
     labels = {
       "traefik.enable" = "true";
@@ -18,7 +41,7 @@
     image = "ghcr.io/lennart-k/rustical:0.13.1";
     environmentFiles = [ config.age.secrets.rusticalClientSecret.path ];
     volumes = [
-      "/srv/data/rustical/config/config.toml:/etc/rustical/config.toml:U"
+      "${rusticalConfig}:/etc/rustical/config.toml:ro"
       "/srv/data/rustical/data:/var/lib/rustical:U"
     ];
   };
