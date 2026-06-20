@@ -11,25 +11,25 @@ HP ProDesk 600 G3 DM — see `docs/base_host.md`.
 
 ### Observability
 
-| Service         | Port(s)     | Purpose                                      |
-|-----------------|-------------|----------------------------------------------|
-| Prometheus      | 9090        | Metrics aggregation from all hosts           |
-| Loki            | 3100        | Log aggregation from all hosts               |
-| Promtail        | —           | Agent for log shipping (legacy, replaced by Alloy on most hosts) |
-| Grafana         | 3000        | Dashboarding (local, grf-01 is the primary UI) |
-| Blackbox exporter | 9115      | External endpoint monitoring                 |
-| Graphite exporter | 9109      | Graphite metrics compatibility               |
-| HCloud exporter | 9234        | Hetzner Cloud API metrics                    |
-| Unpoller        | —           | UniFi AP metrics                             |
+| Service           | Port(s) | Purpose                                                          |
+| ----------------- | ------- | ---------------------------------------------------------------- |
+| Prometheus        | 9090    | Metrics aggregation from all hosts                               |
+| Loki              | 3100    | Log aggregation from all hosts                                   |
+| Promtail          | —       | Agent for log shipping (legacy, replaced by Alloy on most hosts) |
+| Grafana           | 3000    | Dashboarding (local, grf-01 is the primary UI)                   |
+| Blackbox exporter | 9115    | External endpoint monitoring                                     |
+| Graphite exporter | 9109    | Graphite metrics compatibility                                   |
+| HCloud exporter   | 9234    | Hetzner Cloud API metrics                                        |
+| Unpoller          | —       | UniFi AP metrics                                                 |
 
 ### Network infrastructure
 
-| Service         | Purpose                                      |
-|-----------------|----------------------------------------------|
-| JRouter         | AppleTalk/DDP routing for afp-01             |
-| TFTP            | PXE boot files (iPXE, undionly) for DHCP on gw |
-| Unifi Controller| UniFi network management                     |
-| AAISP exporter  | AAISP usage metrics (via aaisp-chaos flake)  |
+| Service          | Purpose                                        |
+| ---------------- | ---------------------------------------------- |
+| JRouter          | AppleTalk/DDP routing for afp-01               |
+| TFTP             | PXE boot files (iPXE, undionly) for DHCP on gw |
+| Unifi Controller | UniFi network management                       |
+| AAISP exporter   | AAISP usage metrics (via aaisp-chaos flake)    |
 
 ### Prometheus federation
 
@@ -50,12 +50,12 @@ DHCP PXE configuration.
 
 ## Networking
 
-| Property     | Value                          |
-|--------------|--------------------------------|
-| IPv4         | 10.101.3.21/16                 |
-| IPv6         | 2001:8b0:bd9:101::21/64       |
-| ULA          | fddd:d00f:dab0:101::21/64     |
-| DNS suffix   | svc.doofnet.uk                 |
+| Property   | Value                     |
+| ---------- | ------------------------- |
+| IPv4       | 10.101.3.21/16            |
+| IPv6       | 2001:8b0:bd9:101::21/64   |
+| ULA        | fddd:d00f:dab0:101::21/64 |
+| DNS suffix | svc.doofnet.uk            |
 
 ## Cross-compilation
 
@@ -67,18 +67,18 @@ substitute cache entries.
 ## Aliases
 
 - `nrs-ns01` — shortcut to rebuild ns-01 from this host (`nixos-rebuild switch --flake
-  github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01`)
+github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01`)
 
 ## Service summary
 
-| Service              | Package                   | Purpose                                    |
-|----------------------|---------------------------|--------------------------------------------|
-| prometheus           | prometheus                | Metrics aggregation                        |
-| loki                 | loki                      | Log aggregation                            |
-| grafana              | grafana                   | Dashboards (backup UI)                     |
-| unifi                | unifi                     | UniFi controller                           |
-| unpoller             | unpoller                  | UniFi metrics → Prometheus                 |
-| alloy                | grafana-alloy             | Local agent scraping                       |
-| jrouter              | (custom Go service)       | AppleTalk routing                           |
-| tftp-hpa             | tftp-hpa                  | PXE boot file server                        |
-| aaisp-exporter       | aaisp-chaos flake         | AAISP broadband usage metrics              |
+| Service        | Package             | Purpose                       |
+| -------------- | ------------------- | ----------------------------- |
+| prometheus     | prometheus          | Metrics aggregation           |
+| loki           | loki                | Log aggregation               |
+| grafana        | grafana             | Dashboards (backup UI)        |
+| unifi          | unifi               | UniFi controller              |
+| unpoller       | unpoller            | UniFi metrics → Prometheus    |
+| alloy          | grafana-alloy       | Local agent scraping          |
+| jrouter        | (custom Go service) | AppleTalk routing             |
+| tftp-hpa       | tftp-hpa            | PXE boot file server          |
+| aaisp-exporter | aaisp-chaos flake   | AAISP broadband usage metrics |

@@ -6,13 +6,16 @@ installation and LSP tooling for editor support.
 ## Installation
 
 1. Install Nix using the [Determinate Nix Installer](https://determinate.systems/nix-installer/):
+
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
    ```
+
    This provides a deterministic Nix installation with automatic updates and a graceful
    uninstall path.
 
 2. Restart your terminal, then install development tools:
+
    ```bash
    nix profile install nixpkgs#nixfmt-rfc-style
    nix profile install nixpkgs#statix
@@ -44,6 +47,7 @@ following plugins are recommended:
 ### Zed
 
 Nix language support is built-in. The LSP server must be on PATH:
+
 ```json
 {
   "lsp": {

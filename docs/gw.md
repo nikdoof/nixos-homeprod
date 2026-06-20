@@ -7,11 +7,11 @@ provides routing, firewalling, DHCP, DNS, NTP, and VPN services for all VLANs.
 
 HP Prodesk 400 G4 SFF (Intel Kaby Lake). Three network interfaces are relevant:
 
-| Interface  | Role                                   |
-|------------|----------------------------------------|
-| `enp2s0`   | Management (out-of-band access to gw)  |
-| `enp3s0f0` | Internal trunk (carries all VLANs)     |
-| `enp3s0f1` | WAN (uplink to CityFibre ONT)          |
+| Interface  | Role                                  |
+| ---------- | ------------------------------------- |
+| `enp2s0`   | Management (out-of-band access to gw) |
+| `enp3s0f0` | Internal trunk (carries all VLANs)    |
+| `enp3s0f1` | WAN (uplink to CityFibre ONT)         |
 
 ## Network
 
@@ -20,13 +20,13 @@ HP Prodesk 400 G4 SFF (Intel Kaby Lake). Three network interfaces are relevant:
 All internal traffic is carried as 802.1Q tagged frames on `enp3s0f0`. Five VLANs are
 defined:
 
-| VLAN | Interface       | IPv4 prefix      | IPv6 prefix                     | DNS zone        | Purpose                              |
-|------|-----------------|------------------|---------------------------------|-----------------|--------------------------------------|
-| 101  | `vlan-private`  | 10.101.0.0/16    | 2001:8b0:bd9:101::/64           | `int.doofnet.uk`| Internal infrastructure              |
-| 102  | `vlan-public`   | 10.102.0.0/16    | 2001:8b0:bd9:102::/64           | `pub.doofnet.uk`| Public-facing services (NATed)       |
-| 104  | `vlan-lab`      | 10.104.0.0/16    | 2001:8b0:bd9:104::/64           | `lab.doofnet.uk`| Lab / experimental                   |
-| 105  | `vlan-ha`       | —                | 2001:8b0:bd9:105::/64           | `ha.doofnet.uk` | Home automation / IoT (IPv6 only)    |
-| 106  | `vlan-hosted`   | 217.169.25.8/29  | 2001:8b0:bd9:106::/64           | —               | Internet-facing, publicly routed     |
+| VLAN | Interface      | IPv4 prefix     | IPv6 prefix           | DNS zone         | Purpose                           |
+| ---- | -------------- | --------------- | --------------------- | ---------------- | --------------------------------- |
+| 101  | `vlan-private` | 10.101.0.0/16   | 2001:8b0:bd9:101::/64 | `int.doofnet.uk` | Internal infrastructure           |
+| 102  | `vlan-public`  | 10.102.0.0/16   | 2001:8b0:bd9:102::/64 | `pub.doofnet.uk` | Public-facing services (NATed)    |
+| 104  | `vlan-lab`     | 10.104.0.0/16   | 2001:8b0:bd9:104::/64 | `lab.doofnet.uk` | Lab / experimental                |
+| 105  | `vlan-ha`      | —               | 2001:8b0:bd9:105::/64 | `ha.doofnet.uk`  | Home automation / IoT (IPv6 only) |
+| 106  | `vlan-hosted`  | 217.169.25.8/29 | 2001:8b0:bd9:106::/64 | —                | Internet-facing, publicly routed  |
 
 The hosted VLAN (106) is **not NATed** — traffic to/from 217.169.25.8/29 is routed directly
 by the ISP. All other VLANs use IPv4 masquerade NAT via the PPPoE interface.
@@ -34,10 +34,10 @@ by the ISP. All other VLANs use IPv4 masquerade NAT via the PPPoE interface.
 Private (101) and Lab (104) also receive a ULA prefix for stable internal IPv6 addressing
 independent of the ISP:
 
-| VLAN | ULA prefix                 |
-|------|----------------------------|
-| 101  | `fddd:d00f:dab0:101::/64`  |
-| 104  | `fddd:d00f:dab0:104::/64`  |
+| VLAN | ULA prefix                |
+| ---- | ------------------------- |
+| 101  | `fddd:d00f:dab0:101::/64` |
+| 104  | `fddd:d00f:dab0:104::/64` |
 
 ### Management interface
 
@@ -63,20 +63,20 @@ PPPoE credentials are stored in an age-encrypted secret deployed to `/etc/ppp/pa
 Kea serves DHCPv4 on VLANs 101, 102, 104, and 105. Lease lifetime is 24 hours. All subnets
 send DNS update requests to the local `kea-dhcp-ddns` server (port 53001).
 
-| VLAN | Pool                         | Router       | DNS servers                  | DNS suffix       |
-|------|------------------------------|--------------|------------------------------|------------------|
-| 101  | 10.101.2.1 – 10.101.2.254    | 10.101.1.1   | 10.101.1.2, 10.101.1.3       | int.doofnet.uk   |
-| 102  | 10.102.2.1 – 10.102.2.254    | 10.102.1.1   | 10.101.1.2, 10.101.1.3       | pub.doofnet.uk   |
-| 104  | 10.104.2.1 – 10.104.2.254    | 10.104.1.1   | 10.101.1.2, 10.101.1.3       | lab.doofnet.uk   |
-| 105  | 10.105.2.1 – 10.105.2.254    | 10.105.1.1   | 10.101.1.2, 10.101.1.3       | ha.doofnet.uk    |
+| VLAN | Pool                      | Router     | DNS servers            | DNS suffix     |
+| ---- | ------------------------- | ---------- | ---------------------- | -------------- |
+| 101  | 10.101.2.1 – 10.101.2.254 | 10.101.1.1 | 10.101.1.2, 10.101.1.3 | int.doofnet.uk |
+| 102  | 10.102.2.1 – 10.102.2.254 | 10.102.1.1 | 10.101.1.2, 10.101.1.3 | pub.doofnet.uk |
+| 104  | 10.104.2.1 – 10.104.2.254 | 10.104.1.1 | 10.101.1.2, 10.101.1.3 | lab.doofnet.uk |
+| 105  | 10.105.2.1 – 10.105.2.254 | 10.105.1.1 | 10.101.1.2, 10.101.1.3 | ha.doofnet.uk  |
 
 Static reservations on VLAN 101:
 
-| Hostname | IP            | MAC               |
-|----------|---------------|-------------------|
-| svc-01   | 10.101.3.20   | 10:62:e5:14:61:84 |
-| svc-02   | 10.101.3.21   | f4:39:09:3a:4d:a4 |
-| hyp-01   | 10.101.3.22   | 10:e7:c6:03:97:18 |
+| Hostname | IP          | MAC               |
+| -------- | ----------- | ----------------- |
+| svc-01   | 10.101.3.20 | 10:62:e5:14:61:84 |
+| svc-02   | 10.101.3.21 | f4:39:09:3a:4d:a4 |
+| hyp-01   | 10.101.3.22 | 10:e7:c6:03:97:18 |
 
 **PXE boot** is supported on VLANs 101 and 104. Client architecture option 93 selects the
 boot file:
@@ -92,12 +92,12 @@ The `next-server` for VLAN 101 is `10.101.3.21` (svc-02/JRouter); for VLAN 104 i
 Kea serves DHCPv6 on VLANs 101, 102, 104, and 105 (VLAN 106 uses SLAAC only). Leases are
 coordinated with DDNS.
 
-| VLAN | Pool                                                    | DNS servers                              |
-|------|---------------------------------------------------------|------------------------------------------|
-| 101  | 2001:8b0:bd9:101::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
-| 102  | 2001:8b0:bd9:102::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
-| 104  | 2001:8b0:bd9:104::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
-| 105  | 2001:8b0:bd9:105::2000 – ::2fff                         | 2001:8b0:bd9:101::2 / ::3               |
+| VLAN | Pool                            | DNS servers               |
+| ---- | ------------------------------- | ------------------------- |
+| 101  | 2001:8b0:bd9:101::2000 – ::2fff | 2001:8b0:bd9:101::2 / ::3 |
+| 102  | 2001:8b0:bd9:102::2000 – ::2fff | 2001:8b0:bd9:101::2 / ::3 |
+| 104  | 2001:8b0:bd9:104::2000 – ::2fff | 2001:8b0:bd9:101::2 / ::3 |
+| 105  | 2001:8b0:bd9:105::2000 – ::2fff | 2001:8b0:bd9:101::2 / ::3 |
 
 VLAN 101 also offers **prefix delegation** from `2001:8b0:bd9:200::/56`, handing out /64s
 for clients that need their own subnet.
@@ -196,14 +196,14 @@ lives in a single `table inet filter` plus a `table ip nat`.
 
 ### Named sets
 
-| Set              | Contents                                                  |
-|------------------|-----------------------------------------------------------|
-| `local4`         | `10.0.0.0/8`, `217.169.25.8/29`                          |
-| `local6`         | `2001:8b0:bd9::/48`, `fc00::/7`                          |
-| `pub_ns4`        | Public secondary nameservers — ns-03 (`52.19.64.4`) and ns-04 (`16.60.149.205`) |
-| `ns4/6`          | Internal resolvers (`10.101.1.2/3`, their IPv6 counterparts) |
+| Set              | Contents                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `local4`         | `10.0.0.0/8`, `217.169.25.8/29`                                                    |
+| `local6`         | `2001:8b0:bd9::/48`, `fc00::/7`                                                    |
+| `pub_ns4`        | Public secondary nameservers — ns-03 (`52.19.64.4`) and ns-04 (`16.60.149.205`)    |
+| `ns4/6`          | Internal resolvers (`10.101.1.2/3`, their IPv6 counterparts)                       |
 | `hosted_out_tcp` | TCP ports hosted VLAN may use outbound: 22, 23, 25, 53, 70, 79, 80, 123, 443, 1965 |
-| `hosted_out_udp` | UDP ports hosted VLAN may use outbound: 53, 123           |
+| `hosted_out_udp` | UDP ports hosted VLAN may use outbound: 53, 123                                    |
 
 ### Input chain (policy: drop)
 
@@ -244,7 +244,7 @@ lives in a single `table inet filter` plus a `table ip nat`.
 ### Named counters (exported to Prometheus)
 
 | Counter               | Meaning                                                |
-|-----------------------|--------------------------------------------------------|
+| --------------------- | ------------------------------------------------------ |
 | `fw_wan_input_drop`   | Packets dropped in input chain from ppp0               |
 | `fw_wan_forward_drop` | Inbound WAN packets dropped in forward chain           |
 | `fw_hosted_unmatched` | Hosted VLAN outbound packets that fell through accepts |
@@ -255,12 +255,12 @@ lives in a single `table inet filter` plus a `table ip nat`.
 
 **Prerouting DNATs** (applied to `ppp0` ingress, skipped for the hosted /29):
 
-| Destination port | Protocol | DNAT target          | Service                          |
-|------------------|----------|----------------------|----------------------------------|
-| 443              | TCP+UDP  | 10.101.3.20:8443     | HTTPS → svc-01                   |
-| 53 (ns-03/04 src)| TCP+UDP  | 10.101.1.2:53        | DNS → ns-01 (zone transfers)     |
-| 51413            | TCP+UDP  | 10.101.3.16          | BitTorrent → QBittorrent         |
-| 387 (UDP)        | UDP      | 10.101.3.21          | AARP/AppleTalk → JRouter         |
+| Destination port  | Protocol | DNAT target      | Service                      |
+| ----------------- | -------- | ---------------- | ---------------------------- |
+| 443               | TCP+UDP  | 10.101.3.20:8443 | HTTPS → svc-01               |
+| 53 (ns-03/04 src) | TCP+UDP  | 10.101.1.2:53    | DNS → ns-01 (zone transfers) |
+| 51413             | TCP+UDP  | 10.101.3.16      | BitTorrent → QBittorrent     |
+| 387 (UDP)         | UDP      | 10.101.3.21      | AARP/AppleTalk → JRouter     |
 
 **Postrouting**: all `10.0.0.0/8` traffic leaving `ppp0` is masqueraded (the hosted /29 is
 excluded by the prerouting `return`).
@@ -269,26 +269,26 @@ excluded by the prerouting `return`).
 
 The following sysctl settings are applied, mostly following CIS benchmarks:
 
-| Setting                          | Value | Rationale                                          |
-|----------------------------------|-------|----------------------------------------------------|
-| `net.ipv4/6.conf.all.forwarding` | 1     | Required for router operation                      |
-| `rp_filter` (all/default)        | 1     | Strict reverse-path filtering (anti-spoofing)      |
-| `rp_filter` (ppp0)               | 2     | Loose mode for PPPoE asymmetric routing            |
-| `accept_source_route`            | 0     | Disable IP source routing (CIS 3.2.1)              |
-| `accept_redirects`               | 0     | Reject ICMP redirects (CIS 3.2.2)                 |
-| `send_redirects`                 | 0     | Do not send ICMP redirects (CIS 3.1.2)             |
-| `log_martians`                   | 1     | Log spoofed/impossible source addresses (CIS 3.2.4)|
-| `icmp_echo_ignore_broadcasts`    | 1     | Smurf amplification protection (CIS 3.2.5)         |
-| `tcp_syncookies`                 | 1     | SYN flood protection (CIS 3.2.8)                  |
-| `tcp_rfc1337`                    | 1     | TIME_WAIT assassination protection (RFC 1337)      |
-| `kernel.dmesg_restrict`          | 1     | Restrict dmesg access                              |
-| `kernel.kptr_restrict`           | 2     | Hide kernel pointers                               |
-| `kernel.randomize_va_space`      | 2     | Full ASLR (CIS 1.5.3)                             |
-| `kernel.yama.ptrace_scope`       | 1     | Restrict ptrace to parent processes                |
-| `fs.protected_hardlinks/symlinks`| 1     | Prevent privilege escalation via links             |
-| `fs.suid_dumpable`               | 0     | No core dumps for SUID programs (CIS 1.5.1)        |
-| `kernel.unprivileged_bpf_disabled`| 1    | Disable unprivileged BPF                           |
-| `net.core.bpf_jit_harden`       | 2     | Harden BPF JIT against info leaks                 |
+| Setting                            | Value | Rationale                                           |
+| ---------------------------------- | ----- | --------------------------------------------------- |
+| `net.ipv4/6.conf.all.forwarding`   | 1     | Required for router operation                       |
+| `rp_filter` (all/default)          | 1     | Strict reverse-path filtering (anti-spoofing)       |
+| `rp_filter` (ppp0)                 | 2     | Loose mode for PPPoE asymmetric routing             |
+| `accept_source_route`              | 0     | Disable IP source routing (CIS 3.2.1)               |
+| `accept_redirects`                 | 0     | Reject ICMP redirects (CIS 3.2.2)                   |
+| `send_redirects`                   | 0     | Do not send ICMP redirects (CIS 3.1.2)              |
+| `log_martians`                     | 1     | Log spoofed/impossible source addresses (CIS 3.2.4) |
+| `icmp_echo_ignore_broadcasts`      | 1     | Smurf amplification protection (CIS 3.2.5)          |
+| `tcp_syncookies`                   | 1     | SYN flood protection (CIS 3.2.8)                    |
+| `tcp_rfc1337`                      | 1     | TIME_WAIT assassination protection (RFC 1337)       |
+| `kernel.dmesg_restrict`            | 1     | Restrict dmesg access                               |
+| `kernel.kptr_restrict`             | 2     | Hide kernel pointers                                |
+| `kernel.randomize_va_space`        | 2     | Full ASLR (CIS 1.5.3)                               |
+| `kernel.yama.ptrace_scope`         | 1     | Restrict ptrace to parent processes                 |
+| `fs.protected_hardlinks/symlinks`  | 1     | Prevent privilege escalation via links              |
+| `fs.suid_dumpable`                 | 0     | No core dumps for SUID programs (CIS 1.5.1)         |
+| `kernel.unprivileged_bpf_disabled` | 1     | Disable unprivileged BPF                            |
+| `net.core.bpf_jit_harden`          | 2     | Harden BPF JIT against info leaks                   |
 
 ## Observability
 
@@ -304,19 +304,19 @@ collector and exposed through the node exporter.
 
 ## Service summary
 
-| Service       | Package       | Purpose                                    |
-|---------------|---------------|--------------------------------------------|
-| pppd          | ppp           | PPPoE WAN connection to AAISP              |
-| kea-dhcp4     | kea           | DHCPv4 for VLANs 101, 102, 104, 105        |
-| kea-dhcp6     | kea           | DHCPv6 for VLANs 101, 102, 104             |
-| kea-dhcp-ddns | kea           | Dynamic DNS updates via TSIG               |
-| unbound       | unbound       | DNS resolver for hosted VLAN only          |
-| radvd         | radvd         | IPv6 router advertisements                 |
-| chrony        | chrony        | NTP server                                 |
-| avahi         | avahi         | mDNS reflection across private/lab/HA      |
-| miniupnpd     | miniupnpd     | UPnP / NAT-PMP port mapping                |
-| tailscale     | tailscale     | Mesh VPN via self-hosted Headscale         |
-| suricata      | suricata      | NIDS monitoring of hosted VLAN             |
-| auditd        | auditd        | Kernel audit logging (CIS-inspired)        |
-| lldpd         | lldpd         | LLDP (trunk interface only)                |
-| alloy         | grafana-alloy | Metrics and log shipping                   |
+| Service       | Package       | Purpose                               |
+| ------------- | ------------- | ------------------------------------- |
+| pppd          | ppp           | PPPoE WAN connection to AAISP         |
+| kea-dhcp4     | kea           | DHCPv4 for VLANs 101, 102, 104, 105   |
+| kea-dhcp6     | kea           | DHCPv6 for VLANs 101, 102, 104        |
+| kea-dhcp-ddns | kea           | Dynamic DNS updates via TSIG          |
+| unbound       | unbound       | DNS resolver for hosted VLAN only     |
+| radvd         | radvd         | IPv6 router advertisements            |
+| chrony        | chrony        | NTP server                            |
+| avahi         | avahi         | mDNS reflection across private/lab/HA |
+| miniupnpd     | miniupnpd     | UPnP / NAT-PMP port mapping           |
+| tailscale     | tailscale     | Mesh VPN via self-hosted Headscale    |
+| suricata      | suricata      | NIDS monitoring of hosted VLAN        |
+| auditd        | auditd        | Kernel audit logging (CIS-inspired)   |
+| lldpd         | lldpd         | LLDP (trunk interface only)           |
+| alloy         | grafana-alloy | Metrics and log shipping              |

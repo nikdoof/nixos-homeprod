@@ -5,23 +5,23 @@ sharing via Netatalk and AppleTalk printing via papd for legacy Mac clients.
 
 ## Network
 
-| Property     | Value                          |
-|--------------|--------------------------------|
-| Platform     | microVM, CID 11, VLAN 101      |
-| IPv4         | 10.101.3.30/16                 |
-| IPv6         | 2001:8b0:bd9:101::3:30/64     |
-| ULA          | fddd:d00f:dab0:101::3:30/64   |
+| Property | Value                       |
+| -------- | --------------------------- |
+| Platform | microVM, CID 11, VLAN 101   |
+| IPv4     | 10.101.3.30/16              |
+| IPv6     | 2001:8b0:bd9:101::3:30/64   |
+| ULA      | fddd:d00f:dab0:101::3:30/64 |
 
 ## Netatalk (AFP file sharing)
 
 Netatalk 4.4.1 serves AFP volumes to legacy Mac clients over AppleTalk and TCP:
 
-| Volume               | Path                             | Access                      |
-|----------------------|----------------------------------|-----------------------------|
-| Software Archive     | `/persist/netatalk/shares/archive` | Read-only (nobody), write (nikdoof) |
-| Dropbox              | `/persist/netatalk/shares/dropbox`  | Read-write (anyone)         |
-| Transfer             | `/persist/netatalk/shares/transfer` | nikdoof only                |
-| Data                 | `/persist/netatalk/shares/data`     | Read-only (nobody), write (nikdoof) |
+| Volume           | Path                                | Access                              |
+| ---------------- | ----------------------------------- | ----------------------------------- |
+| Software Archive | `/persist/netatalk/shares/archive`  | Read-only (nobody), write (nikdoof) |
+| Dropbox          | `/persist/netatalk/shares/dropbox`  | Read-write (anyone)                 |
+| Transfer         | `/persist/netatalk/shares/transfer` | nikdoof only                        |
+| Data             | `/persist/netatalk/shares/data`     | Read-only (nobody), write (nikdoof) |
 
 ### AppleTalk daemon (`atalkd`)
 
@@ -50,13 +50,13 @@ Netatalk shares and CNID databases are stored under `/persist/netatalk/`.
 
 ## Service summary
 
-| Service         | Package             | Purpose                                    |
-|-----------------|---------------------|--------------------------------------------|
-| netatalk        | netatalk 4.4.1      | AFP file server                            |
-| atalkd          | netatalk            | AppleTalk Phase 2 routing                  |
-| papd            | netatalk            | AppleTalk printing                          |
-| avahi           | avahi               | mDNS/Bonjour service discovery              |
-| globaltalk-scraper | globaltalk-scraper flake | AppleTalk trend scraper                |
-| cupd            | cups                | IPP printing                                |
-| dropbox-notify  | (custom)            | Watch dropbox and notify via Mastodon       |
-| alloy           | grafana-alloy       | Metrics and log shipping                    |
+| Service            | Package                  | Purpose                               |
+| ------------------ | ------------------------ | ------------------------------------- |
+| netatalk           | netatalk 4.4.1           | AFP file server                       |
+| atalkd             | netatalk                 | AppleTalk Phase 2 routing             |
+| papd               | netatalk                 | AppleTalk printing                    |
+| avahi              | avahi                    | mDNS/Bonjour service discovery        |
+| globaltalk-scraper | globaltalk-scraper flake | AppleTalk trend scraper               |
+| cupd               | cups                     | IPP printing                          |
+| dropbox-notify     | (custom)                 | Watch dropbox and notify via Mastodon |
+| alloy              | grafana-alloy            | Metrics and log shipping              |

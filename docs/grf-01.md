@@ -6,23 +6,23 @@ as its datasource.
 
 ## Network
 
-| Property     | Value                          |
-|--------------|--------------------------------|
-| Platform     | microVM, CID 15, VLAN 101      |
-| IPv4         | 10.101.3.31/16                 |
-| IPv6         | 2001:8b0:bd9:101::3:31/64     |
-| ULA          | fddd:d00f:dab0:101::3:31/64   |
-| DNS suffix   | globaltalk.doofnet.uk          |
+| Property   | Value                       |
+| ---------- | --------------------------- |
+| Platform   | microVM, CID 15, VLAN 101   |
+| IPv4       | 10.101.3.31/16              |
+| IPv6       | 2001:8b0:bd9:101::3:31/64   |
+| ULA        | fddd:d00f:dab0:101::3:31/64 |
+| DNS suffix | globaltalk.doofnet.uk       |
 
 ## Grafana
 
-| Setting           | Value                                |
-|-------------------|--------------------------------------|
-| Domain            | `globaltalk.doofnet.uk`              |
-| Port              | 3000                                 |
-| Auth              | Anonymous view-only (login disabled) |
-| SMTP              | Outbound via mx-01                   |
-| Alerting          | Disabled                             |
+| Setting  | Value                                |
+| -------- | ------------------------------------ |
+| Domain   | `globaltalk.doofnet.uk`              |
+| Port     | 3000                                 |
+| Auth     | Anonymous view-only (login disabled) |
+| SMTP     | Outbound via mx-01                   |
+| Alerting | Disabled                             |
 
 ### Datasource
 
@@ -43,7 +43,7 @@ Grafana data is bind-mounted from `/persist/grafana` to `/var/lib/grafana`.
 
 ## Service summary
 
-| Service   | Package       | Purpose                                    |
-|-----------|---------------|--------------------------------------------|
-| grafana   | grafana       | Dashboarding UI                            |
-| alloy     | grafana-alloy | Metrics shipping (self-scrape)             |
+| Service | Package       | Purpose                        |
+| ------- | ------------- | ------------------------------ |
+| grafana | grafana       | Dashboarding UI                |
+| alloy   | grafana-alloy | Metrics shipping (self-scrape) |
