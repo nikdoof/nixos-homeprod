@@ -12,7 +12,7 @@ let
     allow_sign_up = true
 
     [oidc.assign_memberships]
-    home = ["group.home"]
+    home = ["home"]
 
     [frontend]
     allow_password_login = false
