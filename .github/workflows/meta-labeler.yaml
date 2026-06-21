@@ -16,7 +16,7 @@ jobs:
     name: Labeler
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Sync Labels
         uses: EndBug/label-sync@v2
         with:
