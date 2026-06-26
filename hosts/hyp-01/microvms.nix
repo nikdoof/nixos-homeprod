@@ -37,22 +37,24 @@ in
     }
   ];
 
+  # RestartIfChanged is required, otherwise hyp-01 cleans up the Nix Store and
+  # stuff breaks in the VMs
   microvm.vms = {
     afp-01 = {
       flake = inputs.self;
-      restartIfChanged = false;
+      restartIfChanged = true;
     };
     ns-02 = {
       flake = inputs.self;
-      restartIfChanged = false;
+      restartIfChanged = true;
     };
     hs-01 = {
       flake = inputs.self;
-      restartIfChanged = false;
+      restartIfChanged = true;
     };
     web-01 = {
       flake = inputs.self;
-      restartIfChanged = false;
+      restartIfChanged = true;
     };
     mx-01 = {
       flake = inputs.self;
@@ -60,7 +62,7 @@ in
     };
     grf-01 = {
       flake = inputs.self;
-      restartIfChanged = false;
+      restartIfChanged = true;
     };
   };
 

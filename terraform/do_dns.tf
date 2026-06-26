@@ -4,7 +4,9 @@ locals {
   domains = [
     "doofnet.uk",
     "nikdoof.com",
-    "nikdoof.id"
+    "nikdoof.id",
+    "intellectops.com",
+    "incognitus.net",
   ]
 }
 

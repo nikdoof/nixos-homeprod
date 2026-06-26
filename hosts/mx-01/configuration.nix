@@ -112,6 +112,9 @@ in
       "hello@nikdoof.com" = {
         password = "!";
       };
+      "hello@intellectops.com" = {
+        password = "!";
+      };
     };
 
     extraAliases = {
@@ -140,6 +143,7 @@ in
         "paperless@doofnet.uk"
         "dmarc-reports@doofnet.uk"
         "hello@nikdoof.com"
+        "hello@intellectops.com"
       ];
     };
   };
