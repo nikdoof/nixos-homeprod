@@ -14,6 +14,7 @@ let
   svc-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILPHbFY5oPMjAinz46BD8qHTuMgjymS3Vo+57h+iKKWu";
   svc-02 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTivx90hHNKsMEV1mF/A7XUfkCVxKORubeK4N+uMVk0";
   web-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILBF2Kjr3uDks2Ga1Cm9ItmBuvYthNW0muBccotcIhmZ";
+  hrm-01 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO5HAsjzk/Z2OF0Czs+rUT1KYyI6FsON1kIOwop+eJJ8";
   systems = [
     afp-01
     gw
@@ -27,6 +28,7 @@ let
     svc-01
     svc-02
     web-01
+    hrm-01
   ];
 in
 {
@@ -81,4 +83,6 @@ in
   "headscaleClientSecret.age".publicKeys = users ++ [ hs-01 ];
 
   "dropboxNotifyToken.age".publicKeys = users ++ [ afp-01 ];
+
+  "hermesEnv.age".publicKeys = users ++ [ hrm-01 ];
 }
