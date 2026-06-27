@@ -87,15 +87,45 @@ in
         }
       ];
 
-      alerting.rules.settings.groups = [
-        (import ./grafana/alert-hardware.nix mkPromData)
-        (import ./grafana/alert-infrastructure.nix mkPromData)
-        (import ./grafana/alert-services.nix mkPromData)
-        (import ./grafana/alert-globaltalk.nix)
-        (import ./grafana/alert-homeassistant.nix mkPromData)
-        #(import ./grafana/alert-suricata.nix)
-        #(import ./grafana/alert-suricata-compromise.nix)
-      ];
+      alerting.rules.settings = {
+        groups = [
+          (import ./grafana/alert-hardware.nix mkPromData)
+          (import ./grafana/alert-infrastructure.nix mkPromData)
+          (import ./grafana/alert-services.nix mkPromData)
+          (import ./grafana/alert-globaltalk.nix)
+          (import ./grafana/alert-homeassistant.nix mkPromData)
+        ];
+
+        # Remove the retired Suricata alert rules from Grafana so provisioning
+        # doesn't leave orphaned groups behind after the imports above were
+        # commented out. Safe to drop once the rules are confirmed gone.
+        deleteRules = [
+          {
+            orgId = 1;
+            uid = "suricata-exploit-major";
+          }
+          {
+            orgId = 1;
+            uid = "suricata-cve-exploit";
+          }
+          {
+            orgId = 1;
+            uid = "suricata-exploit-burst";
+          }
+          {
+            orgId = 1;
+            uid = "suricata-internal-exploit-src";
+          }
+          {
+            orgId = 1;
+            uid = "suricata-internal-c2";
+          }
+          {
+            orgId = 1;
+            uid = "suricata-internal-lateral";
+          }
+        ];
+      };
 
       alerting.contactPoints.settings = {
         contactPoints = [
