@@ -56,7 +56,7 @@ in
       "traefik.http.services.copyparty.loadbalancer.server.port" = "3923";
       "traefik.http.routers.copyparty.entrypoints" = "websecure,extwebsecure";
     };
-    image = "ghcr.io/9001/copyparty-ac:1.20.16";
+    image = "ghcr.io/9001/copyparty-ac:1.20.18";
     environment = {
       TZ = "Europe/London";
     };
