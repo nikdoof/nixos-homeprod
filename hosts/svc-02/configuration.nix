@@ -36,6 +36,8 @@
   programs.zsh.shellAliases = {
     # Shortcut to rebuild NS-01 from this host
     nrs-ns01 = "nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-01 --no-reexec --sudo --ask-sudo-password";
+    nrs-ns03 = "nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-03.doofnet.uk --no-reexec --sudo --ask-sudo-password";
+    nrs-ns04 = "nixos-rebuild switch --refresh --flake github:nikdoof/nixos-homeprod#ns-01 --target-host ns-04.doofnet.uk --no-reexec --sudo --ask-sudo-password";
   };
 
   doofnet.cross_compile = true;
