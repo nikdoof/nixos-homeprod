@@ -54,7 +54,6 @@
         PAPERLESS_TIKA_ENDPOINT = "http://tika:9998";
         PAPERLESS_PORT = "8000";
         PAPERLESS_URL = "https://paperless.svc.doofnet.uk";
-        PAPERLESS_DEBUG = "true";
         PAPERLESS_APPS = "allauth.socialaccount.providers.openid_connect";
         PAPERLESS_DISABLE_REGULAR_LOGIN = "true";
         PAPERLESS_EMAIL_CERTIFICATE_LOCATION = "/etc/ssl/certs/ca-certificates.crt";
