@@ -132,12 +132,10 @@ in
       lib.concatStringsSep " " mailboxDomains
     );
 
-    services.dovecot2.extraConfig = lib.mkAfter ''
-      passdb {
-        driver = passwd-file
-        args = /etc/dovecot/users
-      }
-    '';
+    services.dovecot2.settings."passdb" = {
+      driver = "passwd-file";
+      args = "/etc/dovecot/users";
+    };
 
     systemd.services.dovecot-passwd = lib.mkIf (cfg.accounts != { }) {
       description = "Build Dovecot passwd file";
