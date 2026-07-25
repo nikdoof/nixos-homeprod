@@ -120,6 +120,7 @@ in
   # Bind grafana dataDir to persistence
   fileSystems."/var/lib/grafana" = {
     device = "/persist/grafana";
+    fsType = "bind";
     options = [ "bind" ];
   };
 

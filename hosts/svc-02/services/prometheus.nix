@@ -60,6 +60,7 @@
   # Bind Prometheus data directory to the NVMe.
   fileSystems."/var/lib/prometheus2" = {
     device = "/srv/data/prometheus/data";
+    fsType = "bind";
     options = [ "bind" ];
   };
 }
