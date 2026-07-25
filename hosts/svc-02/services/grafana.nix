@@ -55,6 +55,9 @@ in
         disable_login_form = false;
         oauth_auto_login = false;
       };
+      security = {
+        secret_key = "SW2YcwTIb9zpOOhoPsMm";
+      };
       "auth.generic_oauth" = {
         enabled = true;
         name = "Pocket ID";
