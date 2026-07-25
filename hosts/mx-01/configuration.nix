@@ -52,6 +52,7 @@ in
   # writes to non-standard paths, so bind mount over the default StateDirectory).
   fileSystems."/var/lib/redis-rspamd" = {
     device = "/persist/valkey";
+    fsType = "bind";
     options = [ "bind" ];
   };
 

@@ -95,12 +95,14 @@ in
     # Persist DHE params
     fileSystems."/var/lib/dhparams" = {
       device = "/persist/dhparams";
+      fsType = "bind";
       options = [ "bind" ];
     };
 
     # Persist the ACME folder
     fileSystems."/var/lib/acme" = {
       device = "/persist/acme";
+      fsType = "bind";
       options = [ "bind" ];
     };
   };

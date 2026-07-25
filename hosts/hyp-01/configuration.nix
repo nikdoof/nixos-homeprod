@@ -140,6 +140,7 @@
   # Bind Prometheus home folder to the NVMe.
   fileSystems."/var/lib/microvm" = {
     device = "/srv/data/microvm";
+    fsType = "bind";
     options = [ "bind" ];
   };
 

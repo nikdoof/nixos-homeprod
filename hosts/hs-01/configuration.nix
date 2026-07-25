@@ -110,6 +110,7 @@ in
   # Bind headscale dataDir to persistence
   fileSystems."/var/lib/headscale" = {
     device = "/persist/headscale";
+    fsType = "bind";
     options = [ "bind" ];
   };
 
