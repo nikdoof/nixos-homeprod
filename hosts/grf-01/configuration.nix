@@ -63,6 +63,9 @@ in
       auth = {
         disable_login_form = true;
       };
+      security = {
+        secret_key = "SW2YcwTIb9zpOOhoPsMm";
+      };
       "auth.anonymous" = {
         enabled = true;
         org_name = "Main Org.";
