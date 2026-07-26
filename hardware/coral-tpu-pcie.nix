@@ -1,14 +1,14 @@
 {
+  config,
   pkgs,
   ...
-}:
-{
+}: {
   boot.kernelModules = [
     "gasket"
     "apex"
   ];
-  boot.extraModulePackages = [
-    pkgs.linuxKernel.packages.linux_6_12.gasket
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    gasket
   ];
 
   environment.systemPackages = with pkgs; [

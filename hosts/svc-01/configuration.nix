@@ -44,7 +44,6 @@
     paperless = true;
   };
 
-  # Allow Private LAN access
   services.postgresql.authentication = pkgs.lib.mkAfter ''
     host all all 10.101.0.0/16 scram-sha-256
   '';
