@@ -14,6 +14,7 @@ in
         "nix-command"
         "flakes"
       ];
+      settings.access-tokens = [ "github.com=${config.age.secrets.githubApiToken.path}" ];
     }
     # Disable store maintenance on microvms - they share the host's /nix/store
     # via virtiofs and may remount it rw, so running GC or optimise from a guest
@@ -27,6 +28,8 @@ in
       };
     })
   ];
+
+  age.secrets.githubApiToken.file = ../../secrets/githubApiToken.age;
 
   # Disable risky modules
   boot.blacklistedKernelModules = [

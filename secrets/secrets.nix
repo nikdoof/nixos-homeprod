@@ -80,6 +80,8 @@ in
     ns-04
   ];
 
+  "githubApiToken.age".publicKeys = users ++ systems;
+
   "headscaleClientSecret.age".publicKeys = users ++ [ hs-01 ];
 
   "dropboxNotifyToken.age".publicKeys = users ++ [ afp-01 ];
