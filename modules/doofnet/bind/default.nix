@@ -401,6 +401,10 @@ in
       directory = "/var/lib/bind";
       forwarders = [ ];
 
+      # named-checkconf cannot validate includes of agenix runtime paths that
+      # don't exist in the build sandbox, so skip config validation here.
+      checkConfig = false;
+
       cacheNetworks = [
         "127.0.0.0/8"
         "::1"
