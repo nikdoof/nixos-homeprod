@@ -13,7 +13,7 @@ in
   nix = lib.mkMerge [
     {
       extraOptions = ''
-        include ${config.age.secrets.githubApiToken.path}
+        !include ${config.age.secrets.githubApiToken.path}
       '';
       settings.experimental-features = [
         "nix-command"
