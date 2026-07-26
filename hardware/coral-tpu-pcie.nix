@@ -2,7 +2,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   boot.kernelModules = [
     "gasket"
     "apex"

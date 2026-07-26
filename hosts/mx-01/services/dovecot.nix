@@ -22,11 +22,15 @@ in
 {
   services.dovecot2 = {
     enable = true;
+    package = pkgs.dovecot;
 
     enablePAM = false;
     createMailUser = true;
 
     settings = {
+      dovecot_config_version = "2.4.4";
+      dovecot_storage_version = "2.4.4";
+
       protocols = [
         "imap"
         "lmtp"
@@ -44,13 +48,33 @@ in
 
       mail_attribute_dict = "file:%h/Maildir/dovecot-attributes";
 
+      mail_plugins = {
+        acl = true;
+        fts = true;
+        fts_flatcurve = true;
+        quota = true;
+        zlib = true;
+      };
+
       auth_username_format = "%Lu";
 
       # IMAP METADATA (RFC 5464) — per-mailbox and per-server annotations
       "protocol imap" = {
+        mail_plugins = {
+          imap_acl = true;
+          imap_quota = true;
+          imap_zlib = true;
+          listescape = true;
+        };
         imap_metadata = true;
         imap_literal_minus = true;
         imap_id_log = "*";
+      };
+
+      "protocol lmtp" = {
+        mail_plugins = {
+          sieve = true;
+        };
       };
 
       "namespace inbox" = {
@@ -177,25 +201,6 @@ in
         group_by = "duration:exponential:1:5:10";
       };
     };
-
-    mailPlugins = {
-      globally.enable = [
-        "acl"
-        "fts"
-        "fts_flatcurve"
-        "quota"
-        "zlib"
-      ];
-      perProtocol.imap.enable = [
-        "imap_acl"
-        "imap_quota"
-        "imap_zlib"
-        "listescape"
-      ];
-      perProtocol.lmtp.enable = [
-        "sieve"
-      ];
-    };
   };
 
   # Copy Sieve script from Nix store to writable location so Dovecot can
@@ -209,9 +214,15 @@ in
   systemd.services.dovecot.serviceConfig.ExecStartPre =
     "${pkgs.coreutils}/bin/chown -R vmail:vmail ${vmailHome}";
 
-  # Dovecot FTS flatcurve plugin for full-text search
+  # Wait for ACME cert before starting dovecot
+  systemd.services.dovecot.requires = [
+    "acme-finished-${config.networking.hostName}.${config.networking.domain}.target"
+  ];
+  systemd.services.dovecot.after = [
+    "acme-finished-${config.networking.hostName}.${config.networking.domain}.target"
+  ];
+
   environment.systemPackages = [
-    pkgs.dovecot-fts-flatcurve
     pkgs.dovecot_pigeonhole
   ];
 }
