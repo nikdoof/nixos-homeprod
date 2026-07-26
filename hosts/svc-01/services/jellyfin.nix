@@ -12,8 +12,8 @@ _: {
       "/srv/data/jellyfin/cache:/cache:U"
     ];
     devices = [
-      "/dev/dri/by-path/pci-0000:00:02.0-render:/dev/dri/renderD128"
-      "/dev/dri/by-path/pci-0000:00:02.0-card:/dev/dri/card1"
+      "/dev/dri/renderD128:/dev/dri/renderD128"
+      "/dev/dri/card0:/dev/dri/card1"
     ];
     extraOptions = [ "--network=host" ];
   };
