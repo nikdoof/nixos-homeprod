@@ -52,8 +52,6 @@ in
         mail_compress = true;
       };
 
-      mailbox_list_storage_escape_char = "\\";
-
       auth_username_format = "%{user | lower}";
 
       # IMAP METADATA (RFC 5464) — per-mailbox and per-server annotations
@@ -156,13 +154,11 @@ in
         "login"
       ];
 
-      "userdb" = {
-        driver = "static";
+      "userdb static" = {
         args = "uid=vmail gid=vmail username_format=%{user} home=${vmailHome}/%{user | domain}/%{user | username}";
       };
 
       # Plugin settings — global in Dovecot 2.4 (plugin {} section removed)
-      fts = "flatcurve";
       fts_autoindex = "yes";
       fts_languages = "en de";
       fts_tokenizers = "generic email-address";
@@ -170,11 +166,17 @@ in
       fts_tokenizer_email_address = "maxlen=100";
       fts_filters = "normalizer-icu snowball stopwords";
       fts_filters_en = "lowercase snowball english-possessive stopwords";
-      acl = "vfile";
+      acl_driver = "vfile";
       acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
-      quota = "maildir:User quota";
-      quota_vsizes = "yes";
-      quota_rule = "*:storage=10G";
+
+      "fts flatcurve" = { };
+
+      "quota User quota" = {
+        quota_driver = "maildir";
+        quota_vsizes = "yes";
+        quota_rule = "*:storage=10G";
+      };
+
       sieve = "~/.dovecot.sieve";
       sieve_dir = "~/sieve";
       sieve_before = "${sieveDir}/spam-to-junk.sieve";

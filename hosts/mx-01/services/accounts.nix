@@ -132,8 +132,7 @@ in
       lib.concatStringsSep " " mailboxDomains
     );
 
-    services.dovecot2.settings."passdb" = {
-      driver = "passwd-file";
+    services.dovecot2.settings."passdb passwd-file" = {
       args = "/etc/dovecot/users";
     };
 
