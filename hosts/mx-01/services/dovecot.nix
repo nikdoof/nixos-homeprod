@@ -36,37 +36,34 @@ in
         "lmtp"
       ];
 
-      ssl_cert = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem>";
-      ssl_key = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem>";
+      ssl_server_cert_file = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem>";
+      ssl_server_key_file = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem>";
 
       mail_location = "maildir:~/Maildir";
 
       ssl_min_protocol = "TLSv1.2";
-      ssl_prefer_server_ciphers = true;
-
-      mail_attribute_dict = "file:%h/Maildir/dovecot-attributes";
+      ssl_server_prefer_ciphers = true;
 
       mail_plugins = {
         acl = true;
         fts = true;
         fts_flatcurve = true;
         quota = true;
-        zlib = true;
+        mail_compress = true;
       };
 
-      auth_username_format = "%Lu";
+      mailbox_list_storage_escape_char = "\\";
+
+      auth_username_format = "%{user | lower}";
 
       # IMAP METADATA (RFC 5464) — per-mailbox and per-server annotations
       "protocol imap" = {
         mail_plugins = {
           imap_acl = true;
           imap_quota = true;
-          imap_zlib = true;
-          listescape = true;
         };
         imap_metadata = true;
         imap_literal_minus = true;
-        imap_id_log = "*";
       };
 
       "protocol lmtp" = {
@@ -122,8 +119,8 @@ in
       "namespace shared" = {
         separator = "/";
         type = "shared";
-        prefix = "Shared/%%u/";
-        location = "maildir:%%h/Maildir:INDEX=~/Maildir/shared/%%u";
+        prefix = "Shared/$user/";
+        location = "maildir:%{owner_home}/Maildir:INDEX=~/Maildir/shared/$user";
         subscriptions = true;
         list = "children";
       };
@@ -161,31 +158,30 @@ in
 
       "userdb" = {
         driver = "static";
-        args = "uid=vmail gid=vmail username_format=%u home=${vmailHome}/%d/%n";
+        args = "uid=vmail gid=vmail username_format=%{user} home=${vmailHome}/%{user | domain}/%{user | username}";
       };
 
-      plugin = {
-        fts = "flatcurve";
-        fts_autoindex = "yes";
-        fts_languages = "en de";
-        fts_tokenizers = "generic email-address";
-        fts_tokenizer_generic = "algorithm=simple maxlen=30";
-        fts_tokenizer_email_address = "maxlen=100";
-        fts_filters = "normalizer-icu snowball stopwords";
-        fts_filters_en = "lowercase snowball english-possessive stopwords";
-        acl = "vfile";
-        acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
-        quota = "maildir:User quota";
-        quota_vsizes = "yes";
-        quota_rule = "*:storage=10G";
-        sieve = "~/.dovecot.sieve";
-        sieve_dir = "~/sieve";
-        sieve_before = "${sieveDir}/spam-to-junk.sieve";
-        sieve_global_extensions = [
-          "+fileinto"
-          "+mailbox"
-        ];
-      };
+      # Plugin settings — global in Dovecot 2.4 (plugin {} section removed)
+      fts = "flatcurve";
+      fts_autoindex = "yes";
+      fts_languages = "en de";
+      fts_tokenizers = "generic email-address";
+      fts_tokenizer_generic = "algorithm=simple maxlen=30";
+      fts_tokenizer_email_address = "maxlen=100";
+      fts_filters = "normalizer-icu snowball stopwords";
+      fts_filters_en = "lowercase snowball english-possessive stopwords";
+      acl = "vfile";
+      acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
+      quota = "maildir:User quota";
+      quota_vsizes = "yes";
+      quota_rule = "*:storage=10G";
+      sieve = "~/.dovecot.sieve";
+      sieve_dir = "~/sieve";
+      sieve_before = "${sieveDir}/spam-to-junk.sieve";
+      sieve_global_extensions = [
+        "+fileinto"
+        "+mailbox"
+      ];
 
       # Metrics
       "metric auth_success".filter = "(event=auth_request_finished AND success=yes)";
