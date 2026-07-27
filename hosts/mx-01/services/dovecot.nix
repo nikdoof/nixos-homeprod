@@ -219,10 +219,10 @@ in
 
   # Wait for ACME cert before starting dovecot
   systemd.services.dovecot.requires = [
-    "acme-finished-${config.networking.hostName}.${config.networking.domain}.target"
+    "acme-${config.networking.hostName}.${config.networking.domain}.service"
   ];
   systemd.services.dovecot.after = [
-    "acme-finished-${config.networking.hostName}.${config.networking.domain}.target"
+    "acme-${config.networking.hostName}.${config.networking.domain}.service"
   ];
 
   environment.systemPackages = [
