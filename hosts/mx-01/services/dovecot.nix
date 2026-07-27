@@ -184,7 +184,7 @@ in
         "email-address"
       ];
       language_filters = {
-        normalizer_icu = true;
+        normalizer-icu = true;
         snowball = true;
         stopwords = true;
       };
