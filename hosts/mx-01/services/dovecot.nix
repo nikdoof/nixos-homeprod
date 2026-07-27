@@ -122,11 +122,17 @@ in
       "namespace shared" = {
         separator = "/";
         type = "shared";
-        prefix = "Shared/%{owner_user}/";
+        # The prefix uses $user/$username/$domain template variables;
+        # %{owner_*} variables are only valid in the path settings below.
+        prefix = "Shared/$user/";
         mail_driver = "maildir";
         mail_path = "%{owner_home}/Maildir";
-        mail_index_path = "~/Maildir/shared/%{owner_user}";
-        subscriptions = true;
+        # Share the owner's index (single vmail UID), but keep per-user
+        # private indexes for the \Seen flag.
+        mail_index_private_path = "~/Maildir/shared/%{owner_user}";
+        # Store subscriptions per-grantee in their own inbox namespace,
+        # not in the owner's maildir.
+        subscriptions = false;
         list = "children";
       };
 
@@ -171,6 +177,12 @@ in
 
       # Plugin settings — global in Dovecot 2.4 (plugin {} section removed)
       fts_autoindex = "yes";
+      # Explicit list required: flatcurve fails to init with an empty
+      # language_tokenizers list. Order matters, so use a list (not attrset).
+      language_tokenizers = [
+        "generic"
+        "email-address"
+      ];
       language_filters = {
         normalizer_icu = true;
         snowball = true;
