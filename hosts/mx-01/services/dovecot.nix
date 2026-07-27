@@ -39,7 +39,8 @@ in
       ssl_server_cert_file = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem>";
       ssl_server_key_file = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem>";
 
-      mail_location = "maildir:~/Maildir";
+      mail_driver = "maildir";
+      mail_path = "~/Maildir";
 
       ssl_min_protocol = "TLSv1.2";
       ssl_server_prefer_ciphers = true;
@@ -160,26 +161,29 @@ in
 
       # Plugin settings — global in Dovecot 2.4 (plugin {} section removed)
       fts_autoindex = "yes";
-      fts_languages = "en de";
-      fts_tokenizers = "generic email-address";
-      fts_tokenizer_generic = "algorithm=simple maxlen=30";
-      fts_tokenizer_email_address = "maxlen=100";
-      fts_filters = "normalizer-icu snowball stopwords";
-      fts_filters_en = "lowercase snowball english-possessive stopwords";
+      language_default = "en";
+
       acl_driver = "vfile";
-      acl_shared_dict = "file:${vmailHome}/shared-mailboxes.db";
+      acl_sharing_map = {
+        "dict file" = {
+          path = "${vmailHome}/shared-mailboxes.db";
+        };
+      };
 
       "fts flatcurve" = { };
 
+      quota_storage_size = "10G";
+
       "quota User quota" = {
         quota_driver = "maildir";
-        quota_vsizes = "yes";
-        quota_rule = "*:storage=10G";
       };
 
-      sieve = "~/.dovecot.sieve";
-      sieve_dir = "~/sieve";
-      sieve_before = "${sieveDir}/spam-to-junk.sieve";
+      "sieve_script before_spam" = {
+        sieve_script_type = "before";
+        sieve_script_path = "${sieveDir}/spam-to-junk.sieve";
+        sieve_script_name = "spam-to-junk";
+      };
+
       sieve_global_extensions = [
         "+fileinto"
         "+mailbox"
