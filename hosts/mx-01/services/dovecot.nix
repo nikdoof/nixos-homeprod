@@ -39,8 +39,6 @@ in
       ssl_cert = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem>";
       ssl_key = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem>";
 
-      disable_plaintext_auth = true;
-
       mail_location = "maildir:~/Maildir";
 
       ssl_min_protocol = "TLSv1.2";
@@ -216,6 +214,11 @@ in
   # Ensure vmail owns its home before Dovecot starts
   systemd.services.dovecot.serviceConfig.ExecStartPre =
     "${pkgs.coreutils}/bin/chown -R vmail:vmail ${vmailHome}";
+
+  # Allow Dovecot to write auth/LMTP sockets in Postfix spool dir
+  systemd.services.dovecot.serviceConfig.ReadWritePaths = [
+    "/var/spool/postfix"
+  ];
 
   # Wait for ACME cert before starting dovecot
   systemd.services.dovecot.requires = [
