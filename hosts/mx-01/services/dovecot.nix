@@ -34,16 +34,17 @@ in
       protocols = [
         "imap"
         "lmtp"
+        "sieve"
       ];
 
-      ssl_server_cert_file = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem>";
-      ssl_server_key_file = "</var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem>";
+      ssl_server_cert_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/fullchain.pem";
+      ssl_server_key_file = "/var/lib/acme/${config.networking.hostName}.${config.networking.domain}/key.pem";
 
       mail_driver = "maildir";
       mail_path = "~/Maildir";
 
       ssl_min_protocol = "TLSv1.2";
-      ssl_server_prefer_ciphers = true;
+      ssl_server_prefer_ciphers = "server";
 
       mail_plugins = {
         acl = true;
@@ -56,6 +57,9 @@ in
       auth_username_format = "%{user | lower}";
 
       # IMAP METADATA (RFC 5464) — per-mailbox and per-server annotations
+      # METADATA requires a mail_attribute dict for storage.
+      mail_attribute."dict file".path = "%{home}/Maildir/dovecot-attributes";
+
       "protocol imap" = {
         mail_plugins = {
           imap_acl = true;
@@ -118,8 +122,10 @@ in
       "namespace shared" = {
         separator = "/";
         type = "shared";
-        prefix = "Shared/$user/";
-        location = "maildir:%{owner_home}/Maildir:INDEX=~/Maildir/shared/$user";
+        prefix = "Shared/%{owner_user}/";
+        mail_driver = "maildir";
+        mail_path = "%{owner_home}/Maildir";
+        mail_index_path = "~/Maildir/shared/%{owner_user}";
         subscriptions = true;
         list = "children";
       };
@@ -156,7 +162,11 @@ in
       ];
 
       "userdb static" = {
-        args = "uid=vmail gid=vmail username_format=%{user} home=${vmailHome}/%{user | domain}/%{user | username}";
+        fields = {
+          uid = "vmail";
+          gid = "vmail";
+          home = "${vmailHome}/%{user | domain}/%{user | username}";
+        };
       };
 
       # Plugin settings — global in Dovecot 2.4 (plugin {} section removed)
@@ -183,7 +193,7 @@ in
 
       quota_storage_size = "10G";
 
-      "quota User quota" = {
+      "quota \"User quota\"" = {
         quota_driver = "maildir";
       };
 
@@ -193,24 +203,30 @@ in
         sieve_script_name = "spam-to-junk";
       };
 
-      sieve_global_extensions = [
-        "+fileinto"
-        "+mailbox"
-      ];
-
       # Metrics
       "metric auth_success".filter = "(event=auth_request_finished AND success=yes)";
       "metric imap_command" = {
         filter = "event=imap_command_finished";
-        group_by = "cmd_name tagged_reply_state";
+        "group_by cmd_name"."method discrete" = { };
+        "group_by tagged_reply_state"."method discrete" = { };
       };
       "metric smtp_command" = {
         filter = "event=smtp_server_command_finished";
-        group_by = "cmd_name status_code duration:exponential:1:5:10";
+        "group_by cmd_name"."method discrete" = { };
+        "group_by status_code"."method discrete" = { };
+        "group_by duration"."method exponential" = {
+          min_magnitude = 1;
+          max_magnitude = 5;
+          base = 10;
+        };
       };
       "metric mail_delivery" = {
         filter = "event=mail_delivery_finished";
-        group_by = "duration:exponential:1:5:10";
+        "group_by duration"."method exponential" = {
+          min_magnitude = 1;
+          max_magnitude = 5;
+          base = 10;
+        };
       };
     };
   };

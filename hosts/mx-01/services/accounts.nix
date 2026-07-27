@@ -133,14 +133,14 @@ in
     );
 
     services.dovecot2.settings."passdb passwd-file" = {
-      args = "/etc/dovecot/users";
+      passwd_file_path = "/etc/dovecot/users";
     };
 
     systemd.services.dovecot-passwd = lib.mkIf (cfg.accounts != { }) {
       description = "Build Dovecot passwd file";
       after = [ "network.target" ];
-      before = [ "dovecot2.service" ];
-      requiredBy = [ "dovecot2.service" ];
+      before = [ "dovecot.service" ];
+      requiredBy = [ "dovecot.service" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -196,9 +196,9 @@ in
 
     systemd.services.dovecot-shared-acls = lib.mkIf (cfg.sharedAccess != { }) {
       description = "Configure shared mailbox ACLs";
-      after = [ "dovecot2.service" ];
-      wantedBy = [ "dovecot2.service" ];
-      bindsTo = [ "dovecot2.service" ];
+      after = [ "dovecot.service" ];
+      wantedBy = [ "dovecot.service" ];
+      bindsTo = [ "dovecot.service" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;

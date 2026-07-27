@@ -178,7 +178,7 @@ in
         '';
         reloadServices = [
           "postfix"
-          "dovecot2"
+          "dovecot"
           "rspamd"
         ];
       };
