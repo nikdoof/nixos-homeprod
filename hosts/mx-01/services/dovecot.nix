@@ -143,10 +143,13 @@ in
         group = "postfix";
       };
 
-      "service auth"."unix_listener ${postfixSpoolDir}/auth" = {
-        mode = "0600";
-        user = "postfix";
-        group = "postfix";
+      "service auth" = {
+        user = "root";
+        "unix_listener ${postfixSpoolDir}/auth" = {
+          mode = "0600";
+          user = "postfix";
+          group = "postfix";
+        };
       };
 
       "service stats"."inet_listener http" = {
