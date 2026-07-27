@@ -161,7 +161,16 @@ in
 
       # Plugin settings — global in Dovecot 2.4 (plugin {} section removed)
       fts_autoindex = "yes";
-      language_default = "en";
+      language_filters = {
+        normalizer_icu = true;
+        snowball = true;
+        stopwords = true;
+      };
+
+      "language en" = {
+        language_default = true;
+      };
+      "language de" = { };
 
       acl_driver = "vfile";
       acl_sharing_map = {
