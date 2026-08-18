@@ -75,6 +75,8 @@ in
                 "1.1.1.1"
               ];
               provider = "digitalocean";
+              propagationTimeout = "5m";
+              pollingInterval = "15s";
             };
           };
         };
