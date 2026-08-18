@@ -76,7 +76,7 @@ in
                 "ns2.digitalocean.com:53"
                 "ns3.digitalocean.com:53"
               ];
-              propagationDelayBeforeDNS = "30s";
+              delayBeforeCheck = "30s";
             };
           };
         };
