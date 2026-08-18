@@ -73,3 +73,12 @@ resource "digitalocean_record" "dmarc_report" {
   priority = 0
   ttl      = 3600
 }
+
+# FoundryVTT
+resource "digitalocean_record" "vtt" {
+  domain = "doofnet.uk"
+  type   = "CNAME"
+  name   = "vtt"
+  value  = "svc-prod-ingress-external.doofnet.uk."
+  ttl    = 43200
+}

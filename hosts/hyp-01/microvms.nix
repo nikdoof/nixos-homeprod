@@ -64,6 +64,10 @@ in
       flake = inputs.self;
       restartIfChanged = true;
     };
+    fvtt-01 = {
+      flake = inputs.self;
+      restartIfChanged = true;
+    };
     # hrm-01 = {
     #   flake = inputs.self;
     #   restartIfChanged = true;

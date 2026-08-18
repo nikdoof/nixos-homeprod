@@ -16,6 +16,10 @@
       # hosts hits Traefik directly rather than going via the public IP.
       "metrics.doofnet.uk".A = [ "10.101.3.20" ];
 
+      # Redirect vtt.doofnet.uk to svc-01 internally so internal clients hit
+      # Traefik directly rather than going via the public IP + DNAT loop.
+      "vtt.doofnet.uk".A = [ "10.101.3.20" ];
+
       "tester.mfg.cobaltmicro.com".A = [ "10.101.3.104" ];
       # You can also use CNAME to special RPZ actions:
       # - "." means NXDOMAIN (block the domain)

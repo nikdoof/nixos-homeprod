@@ -25,6 +25,7 @@
 
     # VMs
     subdomains."30.3".PTR = [ "afp-01.int.doofnet.uk." ];
+    subdomains."33.3".PTR = [ "fvtt-01.int.doofnet.uk." ];
   };
   dynamic.enable = true;
 }

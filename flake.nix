@@ -110,6 +110,7 @@
         web-01 = mkMicrovm "web-01" { };
         ns-02 = mkMicrovm "ns-02" { };
         hrm-01 = mkMicrovm "hrm-01" { extraModules = [ inputs.hermes-agent.nixosModules.default ]; };
+        fvtt-01 = mkMicrovm "fvtt-01" { };
 
         # AWS
         ns-03 = mkSystem "ns-03" { };

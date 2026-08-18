@@ -14,5 +14,6 @@
     subdomains."2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "ns-01.int.doofnet.uk." ];
     subdomains."3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "ns-02.int.doofnet.uk." ];
     subdomains."6.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "nas-03.int.doofnet.uk." ];
+    subdomains."3.3.0.0.3.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0".PTR = [ "fvtt-01.int.doofnet.uk." ];
   };
 }
