@@ -70,13 +70,13 @@ in
             email = "postmaster@${config.networking.domain}";
             storage = "${config.services.traefik.dataDir}/acme.json";
             dnsChallenge = {
-              resolvers = [
-                "8.8.8.8"
-                "1.1.1.1"
-              ];
               provider = "digitalocean";
-              propagationTimeout = "5m";
-              pollingInterval = "15s";
+              resolvers = [
+                "ns1.digitalocean.com:53"
+                "ns2.digitalocean.com:53"
+                "ns3.digitalocean.com:53"
+              ];
+              propagationDelayBeforeDNS = "30s";
             };
           };
         };
