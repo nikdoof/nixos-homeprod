@@ -30,7 +30,7 @@
       "traefik.http.services.linkding.loadbalancer.server.port" = "9090";
       "traefik.http.routers.linkding.entrypoints" = "websecure,extwebsecure";
     };
-    image = "sissbruecker/linkding:1.45.0";
+    image = "sissbruecker/linkding:1.46.2";
     environment = {
       LD_DB_ENGINE = "postgres";
       LD_DB_HOST = "10.88.0.1";
