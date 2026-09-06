@@ -43,7 +43,7 @@ _: {
         "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
         "traefik.http.routers.sonarr.middlewares" = "oauth-auth-redirect@file";
       };
-      image = "ghcr.io/home-operations/sonarr:4.0.19.3009";
+      image = "ghcr.io/home-operations/sonarr:4.0.19.3011";
       volumes = [
         "/srv/data/sonarr/config:/config:U"
         "/mnt/nas-03/media/:/data"
