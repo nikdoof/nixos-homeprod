@@ -60,7 +60,7 @@ in
         "traefik.http.services.mastodon-streaming.loadbalancer.server.port" = "4000";
         "traefik.http.routers.mastodon-streaming.entrypoints" = "websecure,extwebsecure";
       };
-      image = "ghcr.io/mastodon/mastodon-streaming:v4.6.4";
+      image = "ghcr.io/mastodon/mastodon-streaming:v4.7.1";
       cmd = [
         "node"
         "./streaming"
