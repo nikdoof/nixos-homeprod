@@ -57,7 +57,7 @@ _: {
         "traefik.http.services.lidarr.loadbalancer.server.port" = "8686";
         "traefik.http.routers.lidarr.middlewares" = "oauth-auth-redirect@file";
       };
-      image = "ghcr.io/home-operations/lidarr:3.1.5.5066";
+      image = "ghcr.io/home-operations/lidarr:3.1.6.5078";
       volumes = [
         "/srv/data/lidarr/config:/config:U"
         "/mnt/nas-03/media/:/data"
