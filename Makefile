@@ -31,7 +31,7 @@ REMOTE_SYSTEMS := ns-01 ns-03 ns-04
 # Map a remote host to its deploy FQDN.
 fqdn = $(if $(filter ns-01,$1),ns-01.int.doofnet.uk,\
           $(if $(filter ns-03,$1),ns-03.doofnet.uk,\
-          $(if $(filter ns-04,$1),ns-04.doofnet.uk,$1))))
+          $(if $(filter ns-04,$1),ns-04.doofnet.uk,$1)))
 
 SYSTEMS := $(LOCAL_SYSTEMS) $(REMOTE_SYSTEMS)
 
