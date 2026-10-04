@@ -4,7 +4,7 @@
 }:
 {
   zoneData = {
-    SOA = zlib.mkSOA 2025030301;
+    SOA = zlib.mkSOA 2026100401;
     NS = zlib.internalNS;
     TTL = 300;
 
@@ -17,6 +17,7 @@
       unifi.A = [ "10.101.3.21" ];
       loki.A = [ "10.101.3.21" ];
       prometheus.A = [ "10.101.3.21" ];
+      hermes.A = [ "10.101.3.32" ];
     };
   };
 }

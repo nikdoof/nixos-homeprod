@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   ...
 }:
 {
@@ -46,6 +47,66 @@
     hermesEnv = {
       file = ../../secrets/hermesEnv.age;
     };
+    digitalOceanApiToken = {
+      file = ../../secrets/digitalOceanApiToken.age;
+      owner = "acme";
+    };
+  };
+
+  security.acme.certs."hermes.svc.doofnet.uk" = {
+    dnsProvider = "digitalocean";
+    dnsResolver = "1.1.1.1:53";
+    group = "nginx";
+    environmentFile = pkgs.writeText "acme-env" ''
+      DO_AUTH_TOKEN_FILE=${config.age.secrets.digitalOceanApiToken.path}
+    '';
+  };
+
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedTlsSettings = true;
+    virtualHosts."hermes.svc.doofnet.uk" = {
+      useACMEHost = "hermes.svc.doofnet.uk";
+      listen = [
+        {
+          addr = "10.101.3.32";
+          port = 443;
+          ssl = true;
+        }
+      ];
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:9119";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_read_timeout 3600s;
+          proxy_send_timeout 3600s;
+          proxy_buffering off;
+        '';
+      };
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = [ 443 ];
+
+  systemd.services.hermes-dashboard = {
+    description = "Hermes Agent Web Dashboard";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "hermes-agent.service" ];
+    requires = [ "hermes-agent.service" ];
+    partOf = [ "hermes-agent.service" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = pkgs.writeShellScript "hermes-dashboard" ''
+        exec ${pkgs.podman}/bin/podman exec \
+          --user "$(${pkgs.coreutils}/bin/id -u hermes):$(${pkgs.coreutils}/bin/id -g hermes)" \
+          hermes-agent \
+          /data/current-package/bin/hermes dashboard \
+          --host 127.0.0.1 --port 9119 --no-open
+      '';
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
   };
 
   services.hermes-agent = {
@@ -62,7 +123,10 @@
     container.hostUsers = [ "nikdoof" ];
     addToSystemPackages = true;
 
-    extraDependencyGroups = [ "messaging" ];
+    extraDependencyGroups = [
+      "messaging"
+      "web"
+    ];
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
