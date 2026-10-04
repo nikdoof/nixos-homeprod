@@ -52,6 +52,7 @@
 
     container.enable = true;
     container.backend = "podman";
+    container.image = "docker.io/library/ubuntu:24.04";
     container.hostUsers = [ "nikdoof" ];
     addToSystemPackages = true;
 
