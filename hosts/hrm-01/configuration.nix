@@ -36,6 +36,11 @@
 
   virtualisation.docker.enable = false;
   virtualisation.podman.enable = true;
+  virtualisation.containers.storage.settings.storage.graphroot = "/persist/containers/storage";
+
+  systemd.tmpfiles.rules = [
+    "d /persist/containers/storage 0700 root root -"
+  ];
 
   age.secrets = {
     hermesEnv = {
