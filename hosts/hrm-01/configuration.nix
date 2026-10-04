@@ -115,22 +115,34 @@
 
   services.hermes-agent = {
     enable = true;
-    settings.model.default = "openrouter/owl-alpha";
-
+    settings = {
+      model.default = "openai/gpt-6-luna";
+      memory = {
+        memory_enabled = true;
+        user_profile_enabled = true;
+      };
+      terminal = {
+        backend = "local";
+        cwd = ".";
+        timeout = 180;
+      };
+      compression = {
+        enabled = true;
+        threshold = 0.85;
+        summary_model = "google/gemini-3-flash-preview";
+      };
+    };
     environmentFiles = [
       config.age.secrets.hermesEnv.path
     ];
 
-    container.enable = true;
-    container.backend = "podman";
-    container.image = "docker.io/library/ubuntu:24.04";
-    container.hostUsers = [ "nikdoof" ];
     addToSystemPackages = true;
 
     extraDependencyGroups = [
       "messaging"
       "web"
     ];
+
   };
 
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
