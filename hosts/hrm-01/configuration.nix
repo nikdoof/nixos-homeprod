@@ -35,6 +35,7 @@
   };
 
   virtualisation.docker.enable = false;
+  virtualisation.podman.enable = true;
 
   age.secrets = {
     hermesEnv = {
