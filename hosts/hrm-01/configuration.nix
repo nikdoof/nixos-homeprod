@@ -67,6 +67,7 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
     virtualHosts."hermes.svc.doofnet.uk" = {
+      onlySSL = true;
       useACMEHost = "hermes.svc.doofnet.uk";
       listen = [
         {
