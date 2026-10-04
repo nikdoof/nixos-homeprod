@@ -81,6 +81,7 @@
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host 127.0.0.1;
+          proxy_set_header Origin http://127.0.0.1;
           proxy_set_header X-Forwarded-Host $host;
           proxy_read_timeout 3600s;
           proxy_send_timeout 3600s;
