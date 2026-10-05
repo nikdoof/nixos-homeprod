@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -102,14 +103,17 @@
     serviceConfig = {
       Type = "simple";
       ExecStart = pkgs.writeShellScript "hermes-dashboard" ''
-        exec ${pkgs.podman}/bin/podman exec \
-          --user "$(${pkgs.coreutils}/bin/id -u hermes):$(${pkgs.coreutils}/bin/id -g hermes)" \
-          hermes-agent \
-          /data/current-package/bin/hermes dashboard \
-          --host 127.0.0.1 --port 9119 --no-open
+        exec ${builtins.head (builtins.match "([^ ]+) gateway" config.systemd.services.hermes-agent.serviceConfig.ExecStart)} dashboard --host 127.0.0.1 --port 9119 --no-open
       '';
+      User = config.services.hermes-agent.user;
+      Group = config.services.hermes-agent.group;
+      WorkingDirectory = config.services.hermes-agent.workingDirectory;
+      EnvironmentFile = config.services.hermes-agent.environmentFiles;
       Restart = "on-failure";
       RestartSec = 5;
+    };
+    environment = config.systemd.services.hermes-agent.environment // {
+      PATH = lib.mkForce config.systemd.services.hermes-agent.environment.PATH;
     };
   };
 
