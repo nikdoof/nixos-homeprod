@@ -10,7 +10,7 @@
     enable = true;
     cid = 16;
     vlan = "101";
-    mem = 2048;
+    mem = 2050;
   };
 
   environment.systemPackages = with pkgs; [
