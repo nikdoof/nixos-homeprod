@@ -181,6 +181,21 @@
 
   };
 
+  users.users.hermes.linger = true;
+  systemd.services.hermes-agent = {
+    after = [ "linger-users.service" ];
+    wants = [ "linger-users.service" ];
+    preStart = ''
+      for _ in $(seq 1 50); do
+        [ -S "/run/user/$(id -u)/bus" ] && break
+        sleep 0.2
+      done
+      if [ ! -S "/run/user/$(id -u)/bus" ]; then
+        echo "hermes-agent: no user bus after 10s; cron dispatch may fail" >&2
+      fi
+    '';
+  };
+
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment?
 }
