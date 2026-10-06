@@ -58,15 +58,7 @@
 
   systemd.tmpfiles.rules = [
     "d /persist/containers/storage 0700 root root -"
-    "d /persist/hermes 0750 hermes hermes -"
   ];
-
-  # Persist Hermes agent state across microVM rebuilds.
-  fileSystems."/var/lib/hermes" = {
-    device = "/persist/hermes";
-    fsType = "bind";
-    options = [ "bind" ];
-  };
 
   age.secrets = {
     hermesEnv = {
@@ -143,6 +135,7 @@
 
   services.hermes-agent = {
     enable = true;
+    stateDir = "/persist/hermes";
     settings = {
       model.default = "openai/gpt-6-luna";
       memory = {
