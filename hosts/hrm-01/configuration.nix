@@ -10,7 +10,23 @@
     enable = true;
     cid = 16;
     vlan = "101";
+    mem = 2048;
   };
+
+  environment.systemPackages = with pkgs; [
+    curl
+    fd
+    gh
+    git
+    jq
+    nodejs
+    python3
+    ripgrep
+    shellcheck
+    tree
+    wget
+    yq
+  ];
 
   # Networking
   networking.hostName = "hrm-01";
