@@ -82,3 +82,12 @@ resource "digitalocean_record" "vtt" {
   value  = "svc-prod-ingress-external.doofnet.uk."
   ttl    = 43200
 }
+
+# Hermes Agent dashboard
+resource "digitalocean_record" "hermes" {
+  domain = "doofnet.uk"
+  type   = "CNAME"
+  name   = "hermes"
+  value  = "svc-prod-ingress-external.doofnet.uk."
+  ttl    = 300
+}

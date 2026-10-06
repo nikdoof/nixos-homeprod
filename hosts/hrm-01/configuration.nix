@@ -86,6 +86,7 @@
     virtualHosts."hermes.svc.doofnet.uk" = {
       onlySSL = true;
       useACMEHost = "hermes.svc.doofnet.uk";
+      serverAliases = [ "hermes.doofnet.uk" ];
       listen = [
         {
           addr = "10.101.3.32";
@@ -97,9 +98,10 @@
         proxyPass = "http://127.0.0.1:9119";
         proxyWebsockets = true;
         extraConfig = ''
-          proxy_set_header Host 127.0.0.1;
-          proxy_set_header Origin http://127.0.0.1;
+          proxy_set_header Host $host;
+          proxy_set_header Origin $http_origin;
           proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Proto $scheme;
           proxy_read_timeout 3600s;
           proxy_send_timeout 3600s;
           proxy_buffering off;
@@ -119,7 +121,7 @@
     serviceConfig = {
       Type = "simple";
       ExecStart = pkgs.writeShellScript "hermes-dashboard" ''
-        exec ${builtins.head (builtins.match "([^ ]+) gateway" config.systemd.services.hermes-agent.serviceConfig.ExecStart)} dashboard --host 127.0.0.1 --port 9119 --no-open
+        exec ${builtins.head (builtins.match "([^ ]+) gateway" config.systemd.services.hermes-agent.serviceConfig.ExecStart)} dashboard --host 0.0.0.0 --port 9119 --no-open
       '';
       User = config.services.hermes-agent.user;
       Group = config.services.hermes-agent.group;
@@ -137,6 +139,19 @@
     enable = true;
     stateDir = "/persist/hermes";
     settings = {
+      dashboard = {
+        theme = "midnight";
+        font = "work-sans";
+        public_url = "https://hermes.doofnet.uk";
+        oauth = {
+          provider = "self-hosted";
+          self_hosted = {
+            issuer = "https://id.doofnet.uk";
+            client_id = "77d16268-c85f-4449-90ea-39ac5c860c7c";
+            scopes = "openid profile email";
+          };
+        };
+      };
       model.default = "openai/gpt-6-luna";
       memory = {
         memory_enabled = true;

@@ -18,6 +18,24 @@ _: {
         };
       };
     };
+
+    dynamicConfigOptions.http = {
+      routers.hermes-dashboard = {
+        rule = "Host(`hermes.doofnet.uk`)";
+        entryPoints = [
+          "websecure"
+          "extwebsecure"
+        ];
+        service = "hermes-dashboard";
+      };
+
+      services.hermes-dashboard.loadBalancer = {
+        passHostHeader = true;
+        servers = [
+          { url = "https://hermes.svc.doofnet.uk"; }
+        ];
+      };
+    };
   };
 
   networking.firewall.allowedTCPPorts = [
