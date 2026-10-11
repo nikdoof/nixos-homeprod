@@ -87,4 +87,5 @@ in
   "dropboxNotifyToken.age".publicKeys = users ++ [ afp-01 ];
 
   "hermesEnv.age".publicKeys = users ++ [ hrm-01 ];
+  "hermesTelegramBotToken.age".publicKeys = users ++ [ hrm-01 ];
 }

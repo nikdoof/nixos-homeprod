@@ -29,7 +29,24 @@ _: {
         service = "hermes-dashboard";
       };
 
+      routers.hermes-webhooks = {
+        rule = "Host(`hermes.doofnet.uk`) && PathPrefix(`/webhooks/`)";
+        entryPoints = [
+          "websecure"
+          "extwebsecure"
+        ];
+        priority = 1000;
+        service = "hermes-webhooks";
+      };
+
       services.hermes-dashboard.loadBalancer = {
+        passHostHeader = true;
+        servers = [
+          { url = "https://hermes.svc.doofnet.uk"; }
+        ];
+      };
+
+      services.hermes-webhooks.loadBalancer = {
         passHostHeader = true;
         servers = [
           { url = "https://hermes.svc.doofnet.uk"; }

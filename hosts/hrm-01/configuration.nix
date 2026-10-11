@@ -64,6 +64,9 @@
     hermesEnv = {
       file = ../../secrets/hermesEnv.age;
     };
+    hermesTelegramBotToken = {
+      file = ../../secrets/hermesTelegramBotToken.age;
+    };
     digitalOceanApiToken = {
       file = ../../secrets/digitalOceanApiToken.age;
       owner = "acme";
@@ -94,6 +97,14 @@
           ssl = true;
         }
       ];
+      locations."/webhooks/" = {
+        proxyPass = "http://127.0.0.1:8644/webhooks/";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
       locations."/" = {
         proxyPass = "http://127.0.0.1:9119";
         proxyWebsockets = true;
@@ -152,6 +163,20 @@
           };
         };
       };
+      platforms.webhook = {
+        enabled = true;
+        extra = {
+          host = "127.0.0.1";
+          port = 8644;
+        };
+      };
+      platforms.telegram = {
+        enabled = true;
+        extra.allow_from = [
+          "141765177"
+          "184133998"
+        ];
+      };
       model.default = "openai/gpt-6-luna";
       memory = {
         memory_enabled = true;
@@ -170,6 +195,7 @@
     };
     environmentFiles = [
       config.age.secrets.hermesEnv.path
+      config.age.secrets.hermesTelegramBotToken.path
     ];
 
     addToSystemPackages = true;
