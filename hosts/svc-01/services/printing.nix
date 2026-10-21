@@ -29,6 +29,22 @@
     ];
   };
 
+  systemd.timers."restart-printing-services" = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+      Unit = "restart-printing-services.service";
+    };
+  };
+
+  systemd.services."restart-printing-services" = {
+    script = ''
+      ${pkgs.systemd}/bin/systemctl restart cups.service avahi-daemon.service
+    '';
+    serviceConfig.Type = "oneshot";
+  };
+
   hardware.printers = {
     ensurePrinters = [
       {
