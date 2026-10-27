@@ -75,7 +75,7 @@
     };
 
     valkey = {
-      image = "valkey/valkey:9.1.2";
+      image = "valkey/valkey:9.1.3";
       ports = [ "6379:6379" ];
     };
   };
