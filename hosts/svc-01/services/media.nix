@@ -29,7 +29,7 @@ _: {
         "traefik.http.services.radarr.loadbalancer.server.port" = "7878";
         "traefik.http.routers.radarr.middlewares" = "oauth-auth-redirect@file";
       };
-      image = "ghcr.io/home-operations/radarr:6.4.4.10685";
+      image = "ghcr.io/home-operations/radarr:7.0.0.10815";
       volumes = [
         "/srv/data/radarr/config:/config:U"
         "/mnt/nas-03/media/:/data"
