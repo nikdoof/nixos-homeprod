@@ -17,6 +17,7 @@ _: {
     ./paperless.nix
     ./pocket-id.nix
     ./printing.nix
+    ./recyclarr.nix
     ./rustical.nix
     ./scanservjs.nix
     ./swarm-mirror.nix
