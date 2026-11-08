@@ -18,7 +18,7 @@ _: {
         "traefik.http.services.prowlarr.loadbalancer.server.port" = "9696";
         "traefik.http.routers.prowlarr.middlewares" = "oauth-auth-redirect@file";
       };
-      image = "ghcr.io/home-operations/prowlarr:3.0.0.5737";
+      image = "ghcr.io/home-operations/prowlarr:3.0.1.5752";
       volumes = [ "/srv/data/prowlarr/config:/config:U" ];
     };
 
