@@ -3,7 +3,7 @@ let
   configFile = pkgs.writeText "recyclarr.yml" ''
     radarr:
       movies:
-        base_url: http://127.0.0.1:7878
+        base_url: http://radarr:7878
         api_key: !env_var RADARR_API_KEY
         quality_definition:
           type: movie
@@ -18,7 +18,7 @@ let
 
     sonarr:
       series:
-        base_url: http://127.0.0.1:8989
+        base_url: http://sonarr:8989
         api_key: !env_var SONARR_API_KEY
         quality_definition:
           type: series
