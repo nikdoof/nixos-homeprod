@@ -20,8 +20,6 @@ let
       series:
         base_url: http://127.0.0.1:8989
         api_key: !env_var SONARR_API_KEY
-        quality_definition:
-          type: series
         custom_formats:
           - trash_ids:
               # Unwanted
