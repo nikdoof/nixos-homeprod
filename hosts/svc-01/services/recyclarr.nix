@@ -58,6 +58,11 @@ let
               - d0c516558625b04b363fa6c5c2c7cfd4 # WEB Scene
             assign_scores_to:
               - name: WEB 1080p / 720p
+          - trash_ids:
+              - 44ccbcbc74506f208973e1463b11705f # WiTH AD (audio description)
+            assign_scores_to:
+              - name: WEB 1080p / 720p
+                score: -10000
   '';
 in
 {
