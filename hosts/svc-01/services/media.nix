@@ -30,6 +30,7 @@ _: {
         "traefik.http.routers.radarr.middlewares" = "oauth-auth-redirect@file";
       };
       image = "ghcr.io/home-operations/radarr:7.0.2.10888";
+      ports = [ "127.0.0.1:7878:7878" ];
       volumes = [
         "/srv/data/radarr/config:/config:U"
         "/mnt/nas-03/media/:/data"
@@ -44,6 +45,7 @@ _: {
         "traefik.http.routers.sonarr.middlewares" = "oauth-auth-redirect@file";
       };
       image = "ghcr.io/home-operations/sonarr:5.0.0.2941";
+      ports = [ "127.0.0.1:8989:8989" ];
       volumes = [
         "/srv/data/sonarr/config:/config:U"
         "/mnt/nas-03/media/:/data"
