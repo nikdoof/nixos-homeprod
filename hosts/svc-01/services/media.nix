@@ -44,7 +44,7 @@ _: {
         "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
         "traefik.http.routers.sonarr.middlewares" = "oauth-auth-redirect@file";
       };
-      image = "ghcr.io/home-operations/sonarr:5.0.0.2941";
+      image = "ghcr.io/home-operations/sonarr:5.0.0.2997";
       ports = [ "127.0.0.1:8989:8989" ];
       volumes = [
         "/srv/data/sonarr/config:/config:U"
