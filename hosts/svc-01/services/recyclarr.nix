@@ -1,5 +1,32 @@
 { pkgs, ... }:
 let
+  sampleReleaseFormat = pkgs.writeTextDir "sample-release.json" ''
+    {
+      "trash_id": "doofnet-sample-release",
+      "name": "Sample Release",
+      "includeCustomFormatWhenRenaming": false,
+      "specifications": [
+        {
+          "name": "Sample in release title",
+          "implementation": "ReleaseTitleSpecification",
+          "negate": false,
+          "required": true,
+          "fields": {
+            "value": "(?i)\\bsample\\b"
+          }
+        }
+      ]
+    }
+  '';
+
+  settingsFile = pkgs.writeText "recyclarr-settings.yml" ''
+    resource_providers:
+      - name: svc-01-custom-sonarr-formats
+        type: custom-formats
+        path: ${sampleReleaseFormat}
+        service: sonarr
+  '';
+
   configFile = pkgs.writeText "recyclarr.yml" ''
     radarr:
       movies:
@@ -61,6 +88,11 @@ let
             assign_scores_to:
               - name: WEB 1080p / 720p
                 score: -10000
+          - trash_ids:
+              - doofnet-sample-release # Local custom format: reject sample-only releases
+            assign_scores_to:
+              - name: WEB 1080p / 720p
+                score: -10000
   '';
 in
 {
@@ -85,6 +117,8 @@ in
     ];
 
     script = ''
+      ${pkgs.coreutils}/bin/install -m 0644 ${settingsFile} /var/lib/recyclarr/settings.yml
+
       radarr_api_key="$(${pkgs.xmlstarlet}/bin/xmlstarlet sel -t -v '/Config/ApiKey' /srv/data/radarr/config/config.xml)"
       sonarr_api_key="$(${pkgs.xmlstarlet}/bin/xmlstarlet sel -t -v '/Config/ApiKey' /srv/data/sonarr/config/config.xml)"
 
