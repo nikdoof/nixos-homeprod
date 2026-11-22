@@ -5,7 +5,7 @@ Manages the public-facing cloud infrastructure for doofnet.uk.
 ## Resources
 
 - **AWS EC2** — `ns-03` (eu-west-1) and `ns-04` (eu-west-2): BIND secondary nameservers serving publicly-delegated reverse zones, fronted by Elastic IPs with rDNS.
-- **DigitalOcean DNS** — A records for `ns-03` / `ns-04`, MX records for 3 domains (`doofnet.uk`, `nikdoof.com`, `nikdoof.id`), SPF, DMARC, and SRV records (`_imaps._tcp`, `_submission._tcp`).
+- **DigitalOcean DNS** — A records for `ns-03` / `ns-04`, MX records for 3 domains (`doofnet.uk`, `nikdoof.com`, `nikdoof.id`), SPF, DMARC, SRV records (`_imaps._tcp`, `_submission._tcp`), and application CNAMEs including `todo.doofnet.uk`.
 - **GotoSocial CDN** — S3 bucket (eu-west-2) with public website hosting for GoToSocial media attachments, plus an IAM user with scoped credentials.
 - **SMS Bot** — Lambda function (eu-west-2) serving Twilio SMS/call webhooks, managed via an external module.
 

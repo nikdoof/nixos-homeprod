@@ -91,3 +91,12 @@ resource "digitalocean_record" "hermes" {
   value  = "svc-prod-ingress-external.doofnet.uk."
   ttl    = 300
 }
+
+# BooHooToDo
+resource "digitalocean_record" "todo" {
+  domain = "doofnet.uk"
+  type   = "CNAME"
+  name   = "todo"
+  value  = "svc-prod-ingress-external.doofnet.uk."
+  ttl    = 300
+}

@@ -57,6 +57,7 @@ in
   "minifluxEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "linkdingEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "scrumboyEnvironment.age".publicKeys = users ++ [ svc-01 ];
+  "boohootodoEnvironment.age".publicKeys = users ++ [ svc-01 ];
   "paperlessClientSecret.age".publicKeys = users ++ [ svc-01 ];
   "gitSecrets.age".publicKeys = users ++ [ svc-01 ];
   "mastodonEnvironment.age".publicKeys = users ++ [ svc-01 ];
