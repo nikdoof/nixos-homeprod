@@ -17,9 +17,6 @@ let
     [frontend]
     allow_password_login = false
 
-    [tracing]
-    opentelemetry = true
-
     [dav_push]
     enabled = true
   '';
